@@ -17,6 +17,7 @@ export default function VeAssetGeneration(props) {
   const [amount, setAmount] = useState('');
   const [amountError, setAmountError] = useState(false);
   const [project, setProject] = useState(null);
+  const [selectedDateError, setSelectedDateError] = useState(false);
 
   useEffect(function () {
     const lockReturned = () => {

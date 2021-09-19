@@ -25,6 +25,15 @@ function Balances({ project }) {
       <div className={classes.separator}></div>
       <div className={classes.overviewCard}>
         <div>
+          <Typography variant="h5">{project?.otherTokenMetadata?.symbol} balance</Typography>
+          <Typography variant="h2">
+            {!project?.otherTokenMetadata?.balance ? <Skeleton style={{ minWidth: '200px ' }} /> : `${formatCurrency(project?.otherTokenMetadata?.balance, 4)}`}
+          </Typography>
+        </div>
+      </div>
+      <div className={classes.separator}></div>
+      <div className={classes.overviewCard}>
+        <div>
           <Typography variant="h5">{project?.veTokenMetadata?.symbol} balance</Typography>
           <Typography variant="h2">{!project?.veTokenMetadata?.balance ? <Skeleton style={{ minWidth: '200px ' }} /> : `${formatCurrency(project?.veTokenMetadata?.balance, 4)}`}</Typography>
         </div>
@@ -34,6 +43,13 @@ function Balances({ project }) {
         <div>
           <Typography variant="h5">Total {project?.veTokenMetadata?.symbol}</Typography>
           <Typography variant="h2">{!project ? <Skeleton style={{ minWidth: '200px ' }} /> : `${formatCurrency(project?.veTokenMetadata?.totalSupply, 0)}`}</Typography>
+        </div>
+      </div>
+      <div className={classes.separator}></div>
+      <div className={classes.overviewCard}>
+        <div>
+          <Typography variant="h5">Total {project?.tokenMetadata?.symbol} staked</Typography>
+          <Typography variant="h2">{!project ? <Skeleton style={{ minWidth: '200px ' }} /> : `${formatCurrency(project?.veTokenMetadata?.supply, 0)}`}</Typography>
         </div>
       </div>
     </Paper>

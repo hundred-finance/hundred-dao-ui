@@ -42,14 +42,17 @@ export default function VeAssetGeneration(props) {
 
     let days = 0;
     switch (event.target.value) {
-      case 'week':
-        days = 7;
-        break;
       case 'month':
         days = 30;
         break;
       case 'year':
         days = 365;
+        break;
+      case '2year':
+        days = 365 * 2;
+        break;
+      case '3year':
+        days = 365 * 3;
         break;
       case 'years':
         days = 1461;
@@ -79,7 +82,7 @@ export default function VeAssetGeneration(props) {
     if (!error) {
       setLockLoading(true);
 
-      const selectedDateUnix = moment(selectedDate).unix()
+      const selectedDateUnix = moment(selectedDate).unix();
 
       stores.dispatcher.dispatch({ type: INCREASE_LOCK_DURATION, content: { selectedDate: selectedDateUnix, project } });
     }
@@ -87,7 +90,9 @@ export default function VeAssetGeneration(props) {
 
   return (
     <Paper elevation={1} className={classes.projectCardContainer}>
-      <Typography variant="h2" className={ classes.sectionHeader }>Increase lock duration</Typography>
+      <Typography variant="h2" className={classes.sectionHeader}>
+        Increase lock duration
+      </Typography>
       <div className={classes.textField}>
         <div className={classes.inputTitleContainer}>
           <div className={classes.inputTitle}>
@@ -119,23 +124,18 @@ export default function VeAssetGeneration(props) {
           </div>
         </div>
         <RadioGroup row aria-label="position" name="position" onChange={handleChange} value={selectedValue}>
-          <FormControlLabel value="week" control={<Radio color="primary" />} label="1 week" labelPlacement="bottom" />
           <FormControlLabel value="month" control={<Radio color="primary" />} label="1 month" labelPlacement="bottom" />
           <FormControlLabel value="year" control={<Radio color="primary" />} label="1 year" labelPlacement="bottom" />
-          <FormControlLabel value="years" control={<Radio color="primary" />} label="4 years" labelPlacement="bottom" />
+          <FormControlLabel value="2year" control={<Radio color="primary" />} label="2 years" labelPlacement="bottom" />
+          {project?.maxDurationYears == 3 ? 
+            <FormControlLabel value="3year" control={<Radio color="primary" />} label="3 years" labelPlacement="bottom" />
+            :
+            <FormControlLabel value="years" control={<Radio color="primary" />} label="4 years" labelPlacement="bottom" />
+          }
         </RadioGroup>
       </div>
       <div className={classes.actionButton}>
-        <Button
-          fullWidth
-          disableElevation
-          variant="contained"
-          color="primary"
-          size="large"
-          onClick={onLock}
-          disabled={ lockLoading}
-          className={classes.button}
-        >
+        <Button fullWidth disableElevation variant="contained" color="primary" size="large" onClick={onLock} disabled={lockLoading} className={classes.button}>
           <Typography variant="h5">{lockLoading ? <CircularProgress size={15} /> : `Lock ${project?.tokenMetadata?.symbol}`}</Typography>
         </Button>
       </div>

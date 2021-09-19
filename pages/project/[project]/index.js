@@ -6,6 +6,8 @@ import Skeleton from '@material-ui/lab/Skeleton';
 
 import Layout from '../../../components/layout/layout.js';
 import Balances from '../../../components/balances';
+import LockDurationChart from '../../../components/lockDuration';
+
 import GaugeCalculator from '../../../components/gaugeCalculator';
 import VeAssetGeneration from '../../../components/veAssetGeneration';
 import VeAssetModificationAmount from '../../../components/veAssetModificationAmount';
@@ -35,7 +37,10 @@ function Projects({ changeTheme }) {
   useEffect(function () {
     const projectReturned = (proj) => {
       setProject(proj);
-      forceUpdate()
+      if (proj?.onload) {
+        proj.onload();
+      }
+      forceUpdate();
     }
 
     const accountConfigured = () => {
@@ -100,8 +105,12 @@ function Projects({ changeTheme }) {
             { !(project && project.veTokenMetadata && BigNumber(project.veTokenMetadata.userLocked).gt(0)) &&
               <VeAssetGeneration project={project} />
             }
+            <LockDurationChart project={project} />
+          </div>
+          <div className={classes.projectCardContainer}>
             <GaugeVoting project={project} />
           </div>
+
         </div>
 
       <Footer />

@@ -197,7 +197,11 @@ export default function VeAssetGeneration(props) {
           <FormControlLabel value="week" control={<Radio color="primary" />} label="1 week" labelPlacement="bottom" />
           <FormControlLabel value="month" control={<Radio color="primary" />} label="1 month" labelPlacement="bottom" />
           <FormControlLabel value="year" control={<Radio color="primary" />} label="1 year" labelPlacement="bottom" />
-          <FormControlLabel value="years" control={<Radio color="primary" />} label="4 years" labelPlacement="bottom" />
+          {project?.maxDurationYears == 3 ? 
+            <FormControlLabel value="3year" control={<Radio color="primary" />} label="3 years" labelPlacement="bottom" />
+            :
+            <FormControlLabel value="years" control={<Radio color="primary" />} label="4 years" labelPlacement="bottom" />
+          }
         </RadioGroup>
       </div>
       <div className={classes.actionButton}>

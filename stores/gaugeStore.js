@@ -28,6 +28,7 @@ import {
 import { ERC20_ABI, GAUGE_CONTROLLER_ABI, GAUGE_ABI, VOTING_ESCROW_ABI, PICKLE_GAUGE_CONTROLLER_ABI, SUSHISWAP_LP_TOKEN_ABI, UNISWAP_LP_TOKEN_ABI, PICKLE_GAUGE_ABI } from './abis';
 
 import * as moment from 'moment';
+import Swal from "sweetalert2";
 
 import stores from './';
 import { ERC20ABI } from './abis';
@@ -45,29 +46,50 @@ class Store {
       configured: false,
       projects: [
         {
-          type: 'curve',
-          id: 'curve',
-          name: 'curve.fi',
-          logo: 'https://assets.coingecko.com/coins/images/12124/large/Curve.png',
-          url: 'https://curve.fi',
-          gaugeProxyAddress: '0x2F50D538606Fa9EDD2B11E2446BEb18C9D5846bB',
+          type: 'sharedstake',
+          id: 'sharedstake',
+          name: 'sharedstake.org',
+          logo: 'https://assets.coingecko.com/coins/images/13948/small/sgt-png.png',
+          url: 'https://sharedstake.org',
+          gaugeProxyAddress: null, // todo we dont have a gauge
+          tokenAddress: "0x41bfba56b9ba48d0a83775d89c247180617266bc",
+          sgtAddress: "0x24c19f7101c1731b85f1127eaa0407732e36ecdd",
+          // tokenAddress: "0x24c19f7101c1731b85f1127eaa0407732e36ecdd",
+          // lpTokenAddress: "0x41bfba56b9ba48d0a83775d89c247180617266bc",
+          veTokenAddress: "0x21b555305e9d65c8b8ae232e60fd806edc9c5d78",
           gauges: [],
           vaults: [],
           tokenMetadata: {},
           veTokenMetadata: {},
+          otherTokenMetadata: {},
+          useDays: true,
+          maxDurationYears: 3,
+          onload: null
         },
-        {
-          type: 'pickle',
-          id: 'pickle',
-          name: 'Pickle.finance',
-          logo: 'https://assets.coingecko.com/coins/images/12435/large/pickle_finance_logo.jpg',
-          url: 'https://pickle.finance',
-          gaugeProxyAddress: '0x2e57627ACf6c1812F99e274d0ac61B786c19E74f',
-          gauges: [],
-          vaults: [],
-          tokenMetadata: {},
-          veTokenMetadata: {},
-        },
+        // {
+        //   type: 'curve',
+        //   id: 'curve',
+        //   name: 'curve.fi',
+        //   logo: 'https://assets.coingecko.com/coins/images/12124/large/Curve.png',
+        //   url: 'https://curve.fi',
+        //   gaugeProxyAddress: '0x2F50D538606Fa9EDD2B11E2446BEb18C9D5846bB',
+        //   gauges: [],
+        //   vaults: [],
+        //   tokenMetadata: {},
+        //   veTokenMetadata: {},
+        // },
+        // {
+        //   type: 'pickle',
+        //   id: 'pickle',
+        //   name: 'Pickle.finance',
+        //   logo: 'https://assets.coingecko.com/coins/images/12435/large/pickle_finance_logo.jpg',
+        //   url: 'https://pickle.finance',
+        //   gaugeProxyAddress: '0x2e57627ACf6c1812F99e274d0ac61B786c19E74f',
+        //   gauges: [],
+        //   vaults: [],
+        //   tokenMetadata: {},
+        //   veTokenMetadata: {},
+        // },
       ],
     };
 
@@ -144,7 +166,80 @@ class Store {
       this._getProjectDataCurve(project, callback)
     } else if (project.type === 'pickle') {
       this._getProjectDataPickle(project, callback)
+    } else if (project.type === 'sharedstake') {
+      this._getProjectDataSGT(project, callback)
     }
+  };
+
+  _getProjectDataSGT = async (project, callback) => {
+    const web3 = await stores.accountStore.getWeb3Provider();
+    if (!web3) {
+      return null;
+    }
+
+    project.logoVeToke = project.logo;
+    project.logoToken = project.logo;
+
+    project.onload = async () => await Swal.fire({
+      title: "<span style='color:tomato'>Please note!<span>",
+      html: `SharedStake uses Sushi LP as the base token for vote escrow locking.
+      <br/><br/>
+      <a href='https://app.sushi.com/add/ETH/0x24C19F7101c1731b85F1127EaA0407732E36EcDD' target='_blank'>
+        Click here to get SLP by adding SGTv2 & ETH on Sushi.com  
+      </a>
+      <br/><br/>
+      Minimum lock time is 7 days. Max lock time is 3 years or 1095 days.  
+      <br/>
+      Unlocking before the lock end you select will result in 30% of your deposited SLP being burnt.`,
+      background: "#181818",
+      showCancelButton: false,
+      showConfirmButton: true
+    });
+
+    const sgtTokenAddress = project.sgtAddress;
+    const sgtTokenContract = new web3.eth.Contract(ERC20_ABI, sgtTokenAddress);
+
+    const otherTokenMetadata = {
+      address: web3.utils.toChecksumAddress(sgtTokenAddress),
+      symbol: await sgtTokenContract.methods.symbol().call(),
+      decimals: parseInt(await sgtTokenContract.methods.decimals().call()),
+      logo: project.logoToken,
+    };
+    project.otherTokenMetadata = otherTokenMetadata;
+
+    return this._getProjectDataNoGauge(project, callback);
+  }
+
+
+  _getProjectDataNoGauge = async (project, callback) => {
+    const web3 = await stores.accountStore.getWeb3Provider();
+    if (!web3) {
+      return null;
+    }
+    const tokenAddress = project.tokenAddress;
+    const tokenContract = new web3.eth.Contract(ERC20_ABI, tokenAddress);
+
+    const veTokenAddress = project.veTokenAddress;
+    const veTokenContract = new web3.eth.Contract(ERC20_ABI, veTokenAddress);
+
+    const projectTokenMetadata = {
+      address: web3.utils.toChecksumAddress(tokenAddress),
+      symbol: await tokenContract.methods.symbol().call(),
+      decimals: parseInt(await tokenContract.methods.decimals().call()),
+      logo: project.logoToken,
+    };
+
+    const projectVeTokenMetadata = {
+      address: web3.utils.toChecksumAddress(veTokenAddress),
+      symbol: await veTokenContract.methods.symbol().call(),
+      decimals: parseInt(await veTokenContract.methods.decimals().call()),
+      logo: project.logoVeToken
+    };
+
+    project.totalWeight = 0;
+    project.tokenMetadata = projectTokenMetadata;
+    project.veTokenMetadata = projectVeTokenMetadata;
+    callback(null, project);
   };
 
   _getProjectDataPickle = async (project, callback) => {
@@ -474,6 +569,17 @@ class Store {
     this.emitter.emit(PROJECT_RETURNED, project);
   };
 
+  getTokenBalance = async (web3, metadata, account) => {
+    const tokenContract = new web3.eth.Contract(ERC20_ABI, metadata.address);
+
+    const tokenBalance = await tokenContract.methods.balanceOf(account.address).call();
+
+    metadata.balance = BigNumber(tokenBalance)
+      .div(10 ** metadata.decimals)
+      .toFixed(metadata.decimals);
+    return metadata;
+  }
+
   getTokenBalances = async (payload) => {
     const configured = this.getStore('configured')
     if(!configured) {
@@ -509,6 +615,8 @@ class Store {
     const veTokenBalance = await veTokenContract.methods.balanceOf(account.address).call();
     const totalSupply = await veTokenContract.methods.totalSupply().call();
     const userLocked = await veTokenContract.methods.locked(account.address).call();
+    const supply = await veTokenContract.methods.supply().call();
+
 
     project.tokenMetadata.balance = BigNumber(tokenBalance)
       .div(10 ** project.tokenMetadata.decimals)
@@ -529,10 +637,19 @@ class Store {
     project.veTokenMetadata.userLocked = BigNumber(userLocked.amount)
       .div(10 ** project.veTokenMetadata.decimals)
       .toFixed(project.veTokenMetadata.decimals);
+
+    project.veTokenMetadata.supply = BigNumber(supply)
+      .div(10 ** project.tokenMetadata.decimals)
+      .toFixed(project.tokenMetadata.decimals);
+
     project.veTokenMetadata.userLockEnd = userLocked.end;
 
     let gaugeControllerContract = null
     let voteWeights = []
+
+    if (project.type == 'sharedstake') {
+      project.otherTokenMetadata = await this.getTokenBalance(web3, project.otherTokenMetadata, account);
+    }
 
     if(project.type === 'curve') {
       // get the gauge vote weights for the user
@@ -762,7 +879,12 @@ class Store {
       //maybe throw an error
     }
 
-    const { selectedDate, project } = payload.content;
+    let { selectedDate, project } = payload.content;
+
+    if (project.useDays) {
+      selectedDate = moment.duration(moment.unix(selectedDate).diff(moment().startOf('day'))).asDays();
+    }
+    console.log(selectedDate, project, 'jkkk')
 
     this._callIncreaseUnlockTime(web3, project, account, selectedDate, (err, lockResult) => {
       if (err) {

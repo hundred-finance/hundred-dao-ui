@@ -78,9 +78,14 @@ export default function GaugeVoting({ project }) {
 
   return (
     <Paper elevation={1} className={classes.projectCardContainer}>
-      <div className={classes.split}>
+      <Typography variant="h2" className={classes.sectionHeader}>
+        Gauge Voting (coming soon!)
+      </Typography>
+      <div className={classes.split} style={{ opacity: 0.5, pointerEvents: 'none' }}>
         <div className={classes.half}>
-          <Typography variant="h2" className={ classes.sectionHeader }>Vote for your gauge</Typography>
+          <Typography variant="h2" className={classes.sectionHeader}>
+            Vote for your gauge
+          </Typography>
           <div className={classes.textField}>
             <div className={classes.inputTitleContainer}>
               <div className={classes.inputTitle}>
@@ -107,7 +112,7 @@ export default function GaugeVoting({ project }) {
                   InputProps={{
                     ...params.InputProps,
                     ...{
-                      placeholder: 'Search gauge'
+                      placeholder: 'Search gauge',
                     },
                   }}
                   variant="outlined"
@@ -148,16 +153,15 @@ export default function GaugeVoting({ project }) {
               </Typography>
             </div>
           </div>
-          {
-            BigNumber(project?.userVotesPercent).gt(0) &&
-            (<div className={classes.gaugeVotesTable}>
+          {BigNumber(project?.userVotesPercent).gt(0) && (
+            <div className={classes.gaugeVotesTable}>
               {project?.gauges?.map((gauge, idx) => {
                 if (!gauge.userVotesPercent || (gauge.userVotesPercent && BigNumber(gauge.userVotesPercent).eq(0))) {
                   return null;
                 }
 
                 return (
-                  <div className={classes.calculationResult} key={'gauge'+idx}>
+                  <div className={classes.calculationResult} key={'gauge' + idx}>
                     <Typography variant="h5">{gauge.lpToken.name}</Typography>
                     <Typography variant="h5" className={classes.bold}>
                       {formatCurrency(gauge.userVotesPercent)} %
@@ -177,21 +181,26 @@ export default function GaugeVoting({ project }) {
                   </div>
                 );
               })}
-            </div>)
-          }
-          {
-            BigNumber(project?.userVotesPercent).eq(0) &&
-            (<div className={classes.gaugeVotesTable}>
-              <Typography>Voting for a gauge increases the emissions that the farm receives. The more votes that your farm receives, the more profitable it will be.</Typography>
-            </div>)
-          }
+            </div>
+          )}
+          {BigNumber(project?.userVotesPercent).eq(0) && (
+            <div className={classes.gaugeVotesTable}>
+              <Typography>
+                Voting for a gauge increases the emissions that the farm receives. The more votes that your farm receives, the more profitable it will be.
+              </Typography>
+            </div>
+          )}
         </div>
         <div className={classes.half}>
-          <Typography variant="h2" className={ classes.sectionHeader }>Current Vote weighting</Typography>
+          <Typography variant="h2" className={classes.sectionHeader}>
+            Current Vote weighting
+          </Typography>
           <PieChart data={project?.gauges?.sort((a, b) => (a.relativeWeight > b.relativeWeight ? -1 : 1))} />
         </div>
       </div>
-      <div><GaugeVotesTable project={ project } /></div>
+      <div>
+        <GaugeVotesTable project={project} />
+      </div>
     </Paper>
   );
 }
