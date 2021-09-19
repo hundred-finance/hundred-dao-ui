@@ -1,5 +1,5 @@
 # Vesting + Gauges + Voting
-Like curve or pickle
+Like sharedstake.org or curve or pickle 
 
 ve-asset and gaugeproxy implementation (can be used to turn SPIRIT into veSPIRIT and then instead of direct emissions with direct multipliers can have users vote on gauges, creates more scarcity and utility for spirit) https://github.com/pickle-finance/contracts
 
@@ -28,3 +28,7 @@ Show current reward ratio and pending reward ratio per vault
 ### Feature 3: Voting
 
 Users can vote for a gauge or multiple gauges using their veTOK
+
+# Thanks
+
+This project is forked from antonell/veToken-voting with many fixes and changes copied over from it's Ruler fork by Alanthecryptodev.  
