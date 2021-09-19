@@ -23,10 +23,9 @@
   flex-direction: column;
   gap: 10px;
   position: sticky;
-  top: 10rem;
+  top: 5rem;
   height: fit-content;
   justify-content: center;
-  top: 16rem;
   align-items: center;
 }
 

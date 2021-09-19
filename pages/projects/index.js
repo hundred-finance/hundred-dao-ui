@@ -51,7 +51,6 @@ function Projects({ changeTheme, theme }) {
             <Typography variant='h2' className={ classes.helpingParagraph }>Helping DeFi projects share code and technology</Typography>
             <Typography variant='h2' className={ classes.helpingParagraph }>Initial offering: vote escrow token UI</Typography>
             <Typography variant='h2' className={ classes.helpingParagraph }>Helping emission based projects upgrade to vesting escrow assets</Typography>
-            <Typography className={classes.subTitle}>Select the project from the list to start maximising your rewards for your favourite project.</Typography>
             <Typography className={classes.subTitle}><a href='https://medium.com/@chimera_defi/sharedtools-c2fe8e49ba9b' target='_blank'>Read about our mission here.</a></Typography>
           </div>
           <div className={ classes.socials }>
