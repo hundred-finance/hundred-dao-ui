@@ -41,5 +41,9 @@
     "sweetalert2": "^11.1.6",
     "web3": "^1.3.3",
     "web3-batch-call": "^1.0.12"
+  },
+  "devDependencies": {
+    "electron": "^14.0.1",
+    "got": "^11.8.2"
   }
 }
