@@ -1,3 +1,15 @@
+# EthOnline
+
+- Cross chain tooling and factory contracts for common DeFi patterns
+- Overview: https://medium.com/@chimera_defi/sharedtools-c2fe8e49ba9b
+- Check other repos:
+- This repo - vetoken voting - UI for vote escrow projects can integrate into
+- https://github.com/chimera-defi/veToken-voting
+- Website https://www.sharedtools.org/project/sharedstake
+- Factory contracts for master chef farming and vote escrow https://github.com/chimera-defi/sharedtools-factory
+- Hardhat template for quick descriptive contract deploys https://github.com/chimera-defi/hardhat-template
+- Hardhat framework with integration for metis, skale https://github.com/chimera-defi/hardhat-framework
+
 # Vesting + Gauges + Voting
 Like sharedstake.org or curve or pickle 
 
