@@ -749,9 +749,7 @@ class Store {
         .toFixed(0);
     }
 
-    const gasPrice = await stores.accountStore.getGasPrice('fast');
-
-    this._callContractWait(web3, tokenContract, 'approve', [project.veTokenMetadata.address, amountToSend], account, gasPrice, GET_TOKEN_BALANCES, { id: project.id }, callback);
+    await this._asyncCallContractWait(web3, tokenContract, 'approve', [project.veTokenMetadata.address, amountToSend], account, null, GET_TOKEN_BALANCES, { id: project.id }, callback);
   };
 
   lock = async (payload) => {
@@ -785,9 +783,7 @@ class Store {
       .times(10 ** project.tokenMetadata.decimals)
       .toFixed(0);
 
-    const gasPrice = await stores.accountStore.getGasPrice('fast');
-
-    this._callContractWait(web3, escrowContract, 'create_lock', [amountToSend, selectedDate], account, gasPrice, GET_TOKEN_BALANCES, { id: project.id }, callback);
+    await this._asyncCallContractWait(web3, escrowContract, 'create_lock', [amountToSend, selectedDate], account, null, GET_TOKEN_BALANCES, { id: project.id }, callback);
   };
 
   vote = async (payload) => {
@@ -821,13 +817,12 @@ class Store {
       .times(100)
       .toFixed(0);
 
-    const gasPrice = await stores.accountStore.getGasPrice('fast');
 
     console.log(gaugeControllerContract)
     console.log('vote_for_gauge_weights')
     console.log([gaugeAddress, amountToSend])
 
-    this._callContractWait(web3, gaugeControllerContract, 'vote_for_gauge_weights', [gaugeAddress, amountToSend], account, gasPrice, GET_TOKEN_BALANCES, { id: project.id }, callback);
+    await this._asyncCallContractWait(web3, gaugeControllerContract, 'vote_for_gauge_weights', [gaugeAddress, amountToSend], account, null, GET_TOKEN_BALANCES, { id: project.id }, callback);
   };
 
   increaseLockAmount = async (payload) => {
@@ -861,9 +856,8 @@ class Store {
       .times(10 ** project.tokenMetadata.decimals)
       .toFixed(0);
 
-    const gasPrice = await stores.accountStore.getGasPrice('fast');
 
-    this._callContractWait(web3, escrowContract, 'increase_amount', [amountToSend], account, gasPrice, GET_TOKEN_BALANCES, { id: project.id }, callback);
+    await this._asyncCallContractWait(web3, escrowContract, 'increase_amount', [amountToSend], account, null, GET_TOKEN_BALANCES, { id: project.id }, callback);
   };
 
   increaseLockDuration = async (payload) => {
@@ -884,7 +878,6 @@ class Store {
     if (project.useDays) {
       selectedDate = moment.duration(moment.unix(selectedDate).diff(moment().startOf('day'))).asDays();
     }
-    console.log(selectedDate, project, 'jkkk')
 
     this._callIncreaseUnlockTime(web3, project, account, selectedDate, (err, lockResult) => {
       if (err) {
@@ -897,54 +890,31 @@ class Store {
 
   _callIncreaseUnlockTime = async (web3, project, account, selectedDate, callback) => {
     const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.veTokenMetadata.address);
-    const gasPrice = await stores.accountStore.getGasPrice('fast');
 
-    this._callContractWait(web3, escrowContract, 'increase_unlock_time', [selectedDate], account, gasPrice, GET_TOKEN_BALANCES, { id: project.id }, callback);
+    this._asyncCallContractWait(web3, escrowContract, 'increase_unlock_time', [selectedDate], account, null, GET_TOKEN_BALANCES, { id: project.id }, callback);
   };
 
-  _callContract = (web3, contract, method, params, account, gasPrice, dispatchEvent, dispatchEventPayload, callback) => {
-    const context = this;
-    contract.methods[method](...params)
-      .send({
-        from: account.address,
-        gasPrice: web3.utils.toWei(gasPrice, 'gwei'),
-      })
-      .on('transactionHash', function (hash) {
-        context.emitter.emit(TX_SUBMITTED, hash);
-        callback(null, hash);
-      })
-      .on('confirmation', function (confirmationNumber, receipt) {
-        console.log(receipt)
-        console.log(confirmationNumber)
-        if (dispatchEvent && confirmationNumber == 0) {
-          context.dispatcher.dispatch({ type: dispatchEvent, content: dispatchEventPayload });
-        }
-      })
-      .on('error', function (error) {
-        if (!error.toString().includes('-32601')) {
-          if (error.message) {
-            return callback(error.message);
-          }
-          callback(error);
-        }
-      })
-      .catch((error) => {
-        if (!error.toString().includes('-32601')) {
-          if (error.message) {
-            return callback(error.message);
-          }
-          callback(error);
-        }
-      });
-  };
+  _asyncCallContractWait = async(web3, contract, method, params, account, gasPrice, dispatchEvent, dispatchEventPayload, callback) => {
+    gasPrice = await stores.accountStore._getGasPricesEIP1559();
+
+    this._callContractWait(web3, contract, method, params, account, gasPrice, dispatchEvent, dispatchEventPayload, callback);
+  }
 
   _callContractWait = (web3, contract, method, params, account, gasPrice, dispatchEvent, dispatchEventPayload, callback) => {
     const context = this;
+
+    let {
+      maxPriorityFeePerGas,
+      maxFeePerGas
+    } = gasPrice;
+    let sendPayload = {
+      from: account.address,
+      maxPriorityFeePerGas: web3.utils.toWei(maxPriorityFeePerGas.toFixed(0), 'gwei'),
+      maxFeePerGas: web3.utils.toWei(maxFeePerGas.toFixed(0), 'gwei'),
+    }
+
     contract.methods[method](...params)
-      .send({
-        from: account.address,
-        gasPrice: web3.utils.toWei(gasPrice, 'gwei'),
-      })
+      .send(sendPayload)
       .on('transactionHash', function (hash) {
         context.emitter.emit(TX_SUBMITTED, hash);
       })
@@ -959,18 +929,6 @@ class Store {
           context.dispatcher.dispatch({ type: dispatchEvent, content: dispatchEventPayload });
         }
       })
-      // .on('confirmation', function (confirmationNumber, receipt) {
-      //   console.log(receipt)
-      //   console.log(confirmationNumber)
-      //   if(confirmationNumber === 0) {
-      //     callback(null, hash);
-      //
-      //     if (dispatchEvent) {
-      //       context.dispatcher.dispatch({ type: dispatchEvent, content: dispatchEventPayload });
-      //     }
-      //   }
-      //
-      // })
       .on('error', function (error) {
         if (!error.toString().includes('-32601')) {
           if (error.message) {
