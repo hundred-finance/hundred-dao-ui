@@ -875,9 +875,9 @@ class Store {
 
     let { selectedDate, project } = payload.content;
 
-    if (project.useDays) {
-      selectedDate = moment.duration(moment.unix(selectedDate).diff(moment().startOf('day'))).asDays();
-    }
+    // if (project.useDays) {
+    //   selectedDate = moment.duration(moment.unix(selectedDate).diff(moment().startOf('day'))).asDays();
+    // }
 
     this._callIncreaseUnlockTime(web3, project, account, selectedDate, (err, lockResult) => {
       if (err) {

@@ -82,7 +82,10 @@ export default function VeAssetGeneration(props) {
     if (!error) {
       setLockLoading(true);
 
-      const selectedDateUnix = moment(selectedDate).unix();
+      let selectedDateUnix = moment(selectedDate).unix();
+      if (project.useDays) {
+        selectedDateUnix = moment.duration(moment.unix(selectedDateUnix).diff(moment().startOf('day'))).asDays();
+      }
 
       stores.dispatcher.dispatch({ type: INCREASE_LOCK_DURATION, content: { selectedDate: selectedDateUnix, project } });
     }
