@@ -1,15 +1,16 @@
   
 import React, { useState, useEffect } from 'react';
 // import stores from '../../stores/index.js';
-// import classes from './veAssetGeneration.module.css';
 
 import { ethers, BigNumber } from "ethers";
 import GaugeChart from "react-gauge-chart";
 import styled from "styled-components";
 import Skeleton from "@material-ui/lab/Skeleton";
+import { Paper } from '@material-ui/core';
 
 // import { UseDillOutput } from "../../../containers/Dill";
 // import { accentColor } from "../../../util/constants";
+import classes from './lockDuration.module.css';
 
 const formatNumber = (number) => Math.round(parseFloat(ethers.utils.formatEther(number))).toLocaleString();
 function toFixedIfNecessary( value, dp ){
@@ -57,7 +58,7 @@ function LockDurationChart ({ project }) {
     const years = Math.round(ratio * project.maxDurationYears * 100) / 100;
   
     return (
-      <>
+      <Paper elevation={1} className={classes.overviewContainer}>
         <ChartContainer>
           <GaugeChart
             id="lock-duration-gauge-chart"
@@ -78,7 +79,7 @@ function LockDurationChart ({ project }) {
         </div>
         </ChartContainer>
   
-      </>
+      </Paper>
     );
   };
 

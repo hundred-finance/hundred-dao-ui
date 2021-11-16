@@ -79,13 +79,11 @@ export default function GaugeVoting({ project }) {
   return (
     <Paper elevation={1} className={classes.projectCardContainer}>
       <Typography variant="h2" className={classes.sectionHeader}>
-        Gauge Voting (coming soon!)
+        Gauge Voting
       </Typography>
-      <div className={classes.split} style={{ opacity: 0.5, pointerEvents: 'none' }}>
+      <div className={classes.split}>
         <div className={classes.half}>
-          <Typography variant="h2" className={classes.sectionHeader}>
-            Vote for your gauge
-          </Typography>
+          <Typography variant="h2" className={classes.sectionHeader}>Vote for your gauge</Typography>
           <div className={classes.textField}>
             <div className={classes.inputTitleContainer}>
               <div className={classes.inputTitle}>

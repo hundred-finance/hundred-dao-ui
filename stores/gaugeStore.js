@@ -46,50 +46,21 @@ class Store {
       configured: false,
       projects: [
         {
-          type: 'sharedstake',
-          id: 'sharedstake',
-          name: 'sharedstake.org',
-          logo: 'https://assets.coingecko.com/coins/images/13948/small/sgt-png.png',
-          url: 'https://sharedstake.org',
-          gaugeProxyAddress: null, // todo we dont have a gauge
-          tokenAddress: "0x41bfba56b9ba48d0a83775d89c247180617266bc",
-          sgtAddress: "0x24c19f7101c1731b85f1127eaa0407732e36ecdd",
-          // tokenAddress: "0x24c19f7101c1731b85f1127eaa0407732e36ecdd",
-          // lpTokenAddress: "0x41bfba56b9ba48d0a83775d89c247180617266bc",
-          veTokenAddress: "0x21b555305e9d65c8b8ae232e60fd806edc9c5d78",
+          type: 'hundredfinance',
+          id: 'hundred-finance-kovan',
+          name: 'Hundred Finance (kovan)',
+          logo: '/logo128.png',
+          url: 'hundred.finance',
+          gaugeProxyAddress: "0xFa0F5d0cA1031aC6A47CA8Db9cf9dcfd45B3659a",
           gauges: [],
           vaults: [],
           tokenMetadata: {},
           veTokenMetadata: {},
           otherTokenMetadata: {},
-          useDays: true,
-          maxDurationYears: 3,
+          useDays: false,
+          maxDurationYears: 4,
           onload: null
-        },
-        // {
-        //   type: 'curve',
-        //   id: 'curve',
-        //   name: 'curve.fi',
-        //   logo: 'https://assets.coingecko.com/coins/images/12124/large/Curve.png',
-        //   url: 'https://curve.fi',
-        //   gaugeProxyAddress: '0x2F50D538606Fa9EDD2B11E2446BEb18C9D5846bB',
-        //   gauges: [],
-        //   vaults: [],
-        //   tokenMetadata: {},
-        //   veTokenMetadata: {},
-        // },
-        // {
-        //   type: 'pickle',
-        //   id: 'pickle',
-        //   name: 'Pickle.finance',
-        //   logo: 'https://assets.coingecko.com/coins/images/12435/large/pickle_finance_logo.jpg',
-        //   url: 'https://pickle.finance',
-        //   gaugeProxyAddress: '0x2e57627ACf6c1812F99e274d0ac61B786c19E74f',
-        //   gauges: [],
-        //   vaults: [],
-        //   tokenMetadata: {},
-        //   veTokenMetadata: {},
-        // },
+        }
       ],
     };
 
@@ -153,7 +124,7 @@ class Store {
           this.emitter.emit(ERROR);
           return;
         }
-
+        console.log("projects", data)
         this.setStore({ projects: data, configured: true });
 
         this.emitter.emit(GAUGES_CONFIGURED);
@@ -168,6 +139,8 @@ class Store {
       this._getProjectDataPickle(project, callback)
     } else if (project.type === 'sharedstake') {
       this._getProjectDataSGT(project, callback)
+    } else if (project.type === 'hundredfinance') {
+      this._getProjectDataHND(project, callback)
     }
   };
 
@@ -209,7 +182,6 @@ class Store {
 
     return this._getProjectDataNoGauge(project, callback);
   }
-
 
   _getProjectDataNoGauge = async (project, callback) => {
     const web3 = await stores.accountStore.getWeb3Provider();
@@ -518,6 +490,129 @@ class Store {
       symbol: await veTokenContract.methods.symbol().call(),
       decimals: parseInt(await veTokenContract.methods.decimals().call()),
       logo: `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${web3.utils.toChecksumAddress(veTokenAddress)}/logo.png`,
+    };
+
+    project.totalWeight = BigNumber(totalWeight).div(1e18).toNumber();
+    project.tokenMetadata = projectTokenMetadata;
+    project.veTokenMetadata = projectVeTokenMetadata;
+    project.gauges = projectGauges;
+
+    callback(null, project);
+  }
+
+  _getProjectDataHND = async (project, callback) => {
+    const web3 = await stores.accountStore.getWeb3Provider();
+    if (!web3) {
+      return null;
+    }
+
+    const gaugeControllerContract = new web3.eth.Contract(GAUGE_CONTROLLER_ABI, project.gaugeProxyAddress);
+
+    // get how many gauges there are
+    const n_gauges = await gaugeControllerContract.methods.n_gauges().call();
+    const tmpArr = [...Array(parseInt(n_gauges)).keys()];
+
+    // get all the gauges
+    const gaugesPromises = tmpArr.map((gauge, idx) => {
+      return new Promise((resolve, reject) => {
+        resolve(gaugeControllerContract.methods.gauges(idx).call());
+      });
+    });
+
+    const gauges = await Promise.all(gaugesPromises);
+
+    // get the gauge relative weights
+    const gaugesWeightsPromise = gauges.map((gauge) => {
+      return new Promise((resolve, reject) => {
+        resolve(gaugeControllerContract.methods.get_gauge_weight(gauge).call());
+      });
+    });
+
+    const gaugesWeights = await Promise.all(gaugesWeightsPromise);
+
+    // get the gauge relative weights
+    const gaugesRelativeWeightsPromise = gauges.map((gauge) => {
+      return new Promise((resolve, reject) => {
+        resolve(gaugeControllerContract.methods.gauge_relative_weight(gauge).call());
+      });
+    });
+
+    const gaugesRelativeWeights = await Promise.all(gaugesRelativeWeightsPromise);
+
+    // get the gauge lp token
+    const gaugesLPTokensPromise = gauges.map((gauge) => {
+      return new Promise((resolve, reject) => {
+        const gaugeContract = new web3.eth.Contract(GAUGE_ABI, gauge);
+
+        resolve(gaugeContract.methods.lp_token().call());
+      });
+    });
+
+    const gaugesLPTokens = await Promise.all(gaugesLPTokensPromise);
+
+    // get LP token info
+    const lpTokensPromise = gaugesLPTokens
+      .map((lpToken) => {
+        const lpTokenContract = new web3.eth.Contract(ERC20_ABI, lpToken);
+
+        const promises = [];
+        const namePromise = new Promise((resolve, reject) => {
+          resolve(lpTokenContract.methods.name().call());
+        });
+        const symbolPromise = new Promise((resolve, reject) => {
+          resolve(lpTokenContract.methods.symbol().call());
+        });
+        const decimalsPromise = new Promise((resolve, reject) => {
+          resolve(lpTokenContract.methods.decimals().call());
+        });
+
+        promises.push(namePromise);
+        promises.push(symbolPromise);
+        promises.push(decimalsPromise);
+
+        return promises;
+      })
+      .flat();
+
+    const lpTokens = await Promise.all(lpTokensPromise);
+
+    let projectGauges = [];
+    for (let i = 0; i < gauges.length; i++) {
+      const gauge = {
+        address: gauges[i],
+        weight: BigNumber(gaugesWeights[i]).div(1e18).toNumber(),
+        relativeWeight: BigNumber(gaugesRelativeWeights[i]).times(100).div(1e18).toNumber(),
+        lpToken: {
+          address: gaugesLPTokens[i],
+          name: lpTokens[i * 3],
+          symbol: lpTokens[i * 3 + 1],
+          decimals: lpTokens[i * 3 + 2],
+        },
+      };
+
+      projectGauges.push(gauge);
+    }
+
+    const totalWeight = await gaugeControllerContract.methods.get_total_weight().call();
+
+    const tokenAddress = await gaugeControllerContract.methods.token().call();
+    const tokenContract = new web3.eth.Contract(ERC20_ABI, tokenAddress);
+
+    const veTokenAddress = await gaugeControllerContract.methods.voting_escrow().call();
+    const veTokenContract = new web3.eth.Contract(ERC20_ABI, veTokenAddress);
+
+    const projectTokenMetadata = {
+      address: web3.utils.toChecksumAddress(tokenAddress),
+      symbol: await tokenContract.methods.symbol().call(),
+      decimals: parseInt(await tokenContract.methods.decimals().call()),
+      logo: `https://assets.coingecko.com/coins/images/18445/thumb/hnd.PNG`,
+    };
+
+    const projectVeTokenMetadata = {
+      address: web3.utils.toChecksumAddress(veTokenAddress),
+      symbol: await veTokenContract.methods.symbol().call(),
+      decimals: parseInt(await veTokenContract.methods.decimals().call()),
+      logo: `https://assets.coingecko.com/coins/images/18445/thumb/hnd.PNG`,
     };
 
     project.totalWeight = BigNumber(totalWeight).div(1e18).toNumber();

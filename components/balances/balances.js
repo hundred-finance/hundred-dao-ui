@@ -25,15 +25,6 @@ function Balances({ project }) {
       <div className={classes.separator}></div>
       <div className={classes.overviewCard}>
         <div>
-          <Typography variant="h5">{project?.otherTokenMetadata?.symbol} balance</Typography>
-          <Typography variant="h2">
-            {!project?.otherTokenMetadata?.balance ? <Skeleton style={{ minWidth: '200px ' }} /> : `${formatCurrency(project?.otherTokenMetadata?.balance, 4)}`}
-          </Typography>
-        </div>
-      </div>
-      <div className={classes.separator}></div>
-      <div className={classes.overviewCard}>
-        <div>
           <Typography variant="h5">{project?.veTokenMetadata?.symbol} balance</Typography>
           <Typography variant="h2">{!project?.veTokenMetadata?.balance ? <Skeleton style={{ minWidth: '200px ' }} /> : `${formatCurrency(project?.veTokenMetadata?.balance, 4)}`}</Typography>
         </div>

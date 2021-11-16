@@ -96,21 +96,23 @@ function Projects({ changeTheme }) {
         <div className={classes.projectContainer}>
           <Balances project={project} />
           <div className={classes.projectCardContainer}>
+            <div className={ classes.fakeGrid }>
             { (project && project.veTokenMetadata && BigNumber(project.veTokenMetadata.userLocked).gt(0)) &&
-              <div className={ classes.fakeGrid }>
+              <>
+                <LockDurationChart project={project} />
                 <VeAssetModificationAmount project={project} />
                 <VeAssetModificationDuration project={project} />
-              </div>
+              </>
             }
             { !(project && project.veTokenMetadata && BigNumber(project.veTokenMetadata.userLocked).gt(0)) &&
-              <VeAssetGeneration project={project} />
+              <>
+                <LockDurationChart project={project} />
+                <VeAssetGeneration project={project} />
+              </>
             }
-            <LockDurationChart project={project} />
-          </div>
-          <div className={classes.projectCardContainer}>
+            </div>
             <GaugeVoting project={project} />
           </div>
-
         </div>
 
       <Footer />

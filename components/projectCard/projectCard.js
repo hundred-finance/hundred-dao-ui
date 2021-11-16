@@ -46,7 +46,7 @@ export default function ProjectCard({ project }) {
     <Paper elevation={ 1 } className={classes.projectCardContainer} onClick={handleNavigate}>
       <div className={classes.projectCardTitle}>
         <div className={classes.projectCardLogo}>
-          <img src={project.logo ? project.logo : '/tokens/unknown-logo.png'} alt="" height={ 70 }/>
+          <img src={project.logo ? project.logo : '/unknown-logo.png'} alt="" height={ 70 }/>
         </div>
         <div className={classes.projectCardName}>
           <Typography variant="h2" className={classes.fontWeightBold}>
