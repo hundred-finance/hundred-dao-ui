@@ -605,7 +605,7 @@ class Store {
       address: web3.utils.toChecksumAddress(tokenAddress),
       symbol: await tokenContract.methods.symbol().call(),
       decimals: parseInt(await tokenContract.methods.decimals().call()),
-      logo: `https://assets.coingecko.com/coins/images/18445/thumb/hnd.PNG`,
+      logo: `/logo128.png`,
     };
 
     const projectVeTokenMetadata = {
