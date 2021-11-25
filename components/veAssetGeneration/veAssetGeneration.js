@@ -54,25 +54,19 @@ export default function VeAssetGeneration(props) {
   const handleChange = (event) => {
     setSelectedValue(event.target.value);
 
-    let days = 0;
     switch (event.target.value) {
       case 'week':
-        days = 7;
+        setSelectedDate(moment().add(1, 'weeks').format('YYYY-MM-DD'));
         break;
       case 'month':
-        days = 30;
+        setSelectedDate(moment().add(1, 'months').format('YYYY-MM-DD'));
         break;
       case 'year':
-        days = 365;
-        break;
-      case 'years':
-        days = 1461;
+        setSelectedDate(moment().add(1, 'years').format('YYYY-MM-DD'));
         break;
       default:
+        setSelectedDate(moment().add(4, 'years').format('YYYY-MM-DD'));
     }
-    const newDate = moment().add(days, 'days').format('YYYY-MM-DD');
-
-    setSelectedDate(newDate);
   };
 
   const updateProject = () => {
