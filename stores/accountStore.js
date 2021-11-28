@@ -96,7 +96,6 @@ class Store {
                 web3context: { library: { provider: a.provider } }
               });
               this.emitter.emit(CONFIGURE_RETURNED);
-              this.dispatcher.dispatch({ type: CONFIGURE_GAUGES });
             })
             .catch(e => {
               this.emitter.emit(ERROR, e);

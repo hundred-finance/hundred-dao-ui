@@ -20,7 +20,16 @@ import BigNumber from 'bignumber.js';
 import classes from './project.module.css';
 
 import stores from '../../../stores/index.js';
-import { ERROR, GET_PROJECT, PROJECT_RETURNED, GAUGES_CONFIGURED, GET_TOKEN_BALANCES, TOKEN_BALANCES_RETURNED, CONFIGURE_RETURNED, CONNECT_WALLET } from '../../../stores/constants';
+import {
+  ERROR,
+  GET_PROJECT,
+  PROJECT_RETURNED,
+  GAUGES_CONFIGURED,
+  GET_TOKEN_BALANCES,
+  TOKEN_BALANCES_RETURNED,
+  CONFIGURE_RETURNED,
+  CONNECT_WALLET, CONFIGURE_GAUGES,
+} from '../../../stores/constants';
 
 import { formatCurrency, formatAddress } from '../../../utils';
 
@@ -56,6 +65,7 @@ function Projects({ changeTheme }) {
     if(router.query.project) {
       stores.dispatcher.dispatch({ type: GET_PROJECT, content: { id: router.query.project } });
       stores.dispatcher.dispatch({ type: GET_TOKEN_BALANCES, content: { id: router.query.project } });
+      stores.dispatcher.dispatch({ type: CONFIGURE_GAUGES });
     }
 
     return () => {

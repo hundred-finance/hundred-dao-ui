@@ -45,7 +45,25 @@ class Store {
           name: 'Hundred Finance (kovan)',
           logo: '/logo128.png',
           url: 'hundred.finance',
+          chainId: 42,
           gaugeProxyAddress: "0xFa0F5d0cA1031aC6A47CA8Db9cf9dcfd45B3659a",
+          gauges: [],
+          vaults: [],
+          tokenMetadata: {},
+          veTokenMetadata: {},
+          otherTokenMetadata: {},
+          useDays: false,
+          maxDurationYears: 4,
+          onload: null
+        },
+        {
+          type: 'hundredfinance',
+          id: 'hundred-finance-arbitrum',
+          name: 'Hundred Finance (arbitrum)',
+          logo: '/logo128.png',
+          url: 'hundred.finance',
+          chainId: 42161,
+          gaugeProxyAddress: "0xb4BAfc3d60662De362c0cB0f5e2DE76603Ea77D7",
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -108,8 +126,11 @@ class Store {
   configure = async (payload) => {
     const projects = this.getStore('projects');
 
+    const web3 = await stores.accountStore.getWeb3Provider();
+    let chainId = await web3?.eth?.getChainId();
+
     async.map(
-      projects,
+      projects.filter(p => p.chainId === chainId),
       (project, callback) => {
         this._getProjectData(project, callback);
       },
@@ -133,7 +154,7 @@ class Store {
   _getProjectDataHND = async (project, callback) => {
     const web3 = await stores.accountStore.getWeb3Provider();
     if (!web3) {
-      return null;
+      return;
     }
 
     const gaugeControllerContract = new web3.eth.Contract(GAUGE_CONTROLLER_ABI, project.gaugeProxyAddress);
