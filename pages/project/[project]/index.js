@@ -66,6 +66,8 @@ function Projects({ changeTheme }) {
       stores.dispatcher.dispatch({ type: GET_PROJECT, content: { id: router.query.project } });
       stores.dispatcher.dispatch({ type: GET_TOKEN_BALANCES, content: { id: router.query.project } });
       stores.dispatcher.dispatch({ type: CONFIGURE_GAUGES });
+    } else {
+      router.push("/")
     }
 
     return () => {
