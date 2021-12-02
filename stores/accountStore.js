@@ -1,22 +1,12 @@
 import async from "async";
 import {
-  GAS_PRICE_API,
-  ZAPPER_GAS_PRICE_API,
   ERROR,
   STORE_UPDATED,
   CONFIGURE,
   CONFIGURE_RETURNED,
   ACCOUNT_CHANGED,
-  GET_GAS_PRICES,
-  GAS_PRICES_RETURNED,
   CONFIGURE_GAUGES
 } from "./constants";
-
-import { ERC20ABI } from "./abis";
-
-import { bnDec } from "../utils";
-
-import stores from "./";
 
 import {
   injected,
@@ -27,7 +17,6 @@ import {
   network
 } from "./connectors";
 
-import BigNumber from "bignumber.js";
 import Web3 from "web3";
 
 class Store {
@@ -52,16 +41,6 @@ class Store {
         fantom: 250,
         arbitrum: 42161
       },
-      nonEIP1559Chains: [42161],
-      gasPrices: {
-        slow: 90,
-        standard: 90,
-        fast: 100,
-        instant: 130
-      },
-      gasSpeed: "fast",
-      maxPriorityFeePerGas: 1,
-      maxFeePerGas: 100,
       currentBlock: 11743358
     };
 
@@ -89,7 +68,6 @@ class Store {
   }
 
   configure = async () => {
-    this.getGasPrices();
     this.getCurrentBlock();
 
     injected.isAuthorized()
@@ -149,110 +127,6 @@ class Store {
       this.setStore({ currentBlock: block });
     } catch (ex) {
       console.log(ex);
-    }
-  };
-
-  getGasPrices = async payload => {
-    const gasPrices = await this._getGasPrices();
-    let gasSpeed = localStorage.getItem("yearn.finance-gas-speed");
-
-    if (!gasSpeed || gasSpeed === 'slow') {
-      gasSpeed = "fast";
-      localStorage.getItem("yearn.finance-gas-speed", "fast");
-    }
-
-    let EIP1559Support = await this._doesChainSupportEIP1559();
-
-    if (EIP1559Support) {
-      let gasEIP1559 = this._getGasPricesEIP1559()
-      this.setStore({ gasPrices: gasPrices, gasSpeed: gasSpeed, ...gasEIP1559 });
-    } else {
-      this.setStore({ gasPrices: gasPrices, gasSpeed: gasSpeed });
-    }
-    this.emitter.emit(GAS_PRICES_RETURNED);
-    return gasPrices;
-  };
-
-  _doesChainSupportEIP1559 = async () => {
-    var web3 = new Web3(process.env.NEXT_PUBLIC_PROVIDER);
-    let w3 = await this.getWeb3Provider();
-    const cid = await w3.eth.getChainId();
-    if (!cid || this.store.nonEIP1559Chains.indexOf(cid) > -1) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-  getChainId = async payload => {
-    try {
-      var web3 = new Web3(process.env.NEXT_PUBLIC_PROVIDER);
-      const block = await web3.eth.chain_id();
-      this.setStore({ currentBlock: block });
-    } catch (ex) {
-      console.log(ex);
-    }
-  };
-
-  _getGasPricesEIP1559 = async () => {
-    let price = await this.getMediumGas();
-    return price;
-  }
-
-  _getGasPrices = async () => {
-    try {
-      const url = ZAPPER_GAS_PRICE_API;
-      const priceResponse = await fetch(url);
-      const priceJSON = await priceResponse.json();
-      if (priceJSON) {
-        return priceJSON;
-      }
-    } catch (e) {
-      console.log(e);
-      return {};
-    }
-  };
-
-getGasPriceViaBlockNative = async confidenceMin => {
-  let url = "https://api.blocknative.com/gasprices/blockprices";
-  let opts = {
-    headers: {'Authorization': "7df171bb-271c-470b-84a7-2b2c03d9319f"},
-    method:'GET',
-    json: true,
-  };
-  let res = await fetch(url, opts);
-  res = await res.json();
-  let estimatedPrices = res.blockPrices[0].estimatedPrices.filter(obj => obj.confidence >= confidenceMin);
-  let lowest = estimatedPrices[estimatedPrices.length - 1];
-
-  return {
-    maxPriorityFeePerGas: (lowest.maxPriorityFeePerGas),
-    maxFeePerGas: (lowest.price),
-  };
-};
-
-getMediumGas = async () => {
-  return await this.getGasPriceViaBlockNative(80);
-};
-
-
-  getGasPrice = async speed => {
-    let gasSpeed = speed;
-    if (!speed) {
-      gasSpeed = this.getStore("gasSpeed");
-    }
-
-    try {
-      const url = ZAPPER_GAS_PRICE_API;
-      const priceResponse = await fetch(url);
-      const priceJSON = await priceResponse.json();
-
-      if (priceJSON) {
-        return priceJSON[gasSpeed].toFixed(0);
-      }
-    } catch (e) {
-      console.log(e);
-      return {};
     }
   };
 
