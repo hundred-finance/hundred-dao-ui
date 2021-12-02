@@ -46,6 +46,13 @@ class Store {
         Fortmatic: fortmatic,
         Portis: portis
       },
+      chains: {
+        mainnet: 1,
+        polygon: 137,
+        fantom: 250,
+        arbitrum: 42161
+      },
+      nonEIP1559Chains: [42161],
       gasPrices: {
         slow: 90,
         standard: 90,
@@ -154,11 +161,37 @@ class Store {
       localStorage.getItem("yearn.finance-gas-speed", "fast");
     }
 
-    let gasEIP1559 = this._getGasPricesEIP1559()
+    let EIP1559Support = await this._doesChainSupportEIP1559();
 
-    this.setStore({ gasPrices: gasPrices, gasSpeed: gasSpeed, ...gasEIP1559 });
+    if (EIP1559Support) {
+      let gasEIP1559 = this._getGasPricesEIP1559()
+      this.setStore({ gasPrices: gasPrices, gasSpeed: gasSpeed, ...gasEIP1559 });
+    } else {
+      this.setStore({ gasPrices: gasPrices, gasSpeed: gasSpeed });
+    }
     this.emitter.emit(GAS_PRICES_RETURNED);
     return gasPrices;
+  };
+
+  _doesChainSupportEIP1559 = async () => {
+    var web3 = new Web3(process.env.NEXT_PUBLIC_PROVIDER);
+    let w3 = await this.getWeb3Provider();
+    const cid = await w3.eth.getChainId();
+    if (!cid || this.store.nonEIP1559Chains.indexOf(cid) > -1) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  getChainId = async payload => {
+    try {
+      var web3 = new Web3(process.env.NEXT_PUBLIC_PROVIDER);
+      const block = await web3.eth.chain_id();
+      this.setStore({ currentBlock: block });
+    } catch (ex) {
+      console.log(ex);
+    }
   };
 
   _getGasPricesEIP1559 = async () => {

@@ -614,23 +614,29 @@ class Store {
   };
 
   _asyncCallContractWait = async(web3, contract, method, params, account, gasPrice, dispatchEvent, dispatchEventPayload, callback) => {
-    gasPrice = await stores.accountStore._getGasPricesEIP1559();
+    let sendPayload = {
+      from: account.address
+    }
 
-    this._callContractWait(web3, contract, method, params, account, gasPrice, dispatchEvent, dispatchEventPayload, callback);
+    let doesChainSupportEIP1559 = await stores.accountStore._doesChainSupportEIP1559();
+    if (doesChainSupportEIP1559) {
+      gasPrice = await stores.accountStore._getGasPricesEIP1559();
+      let {
+        maxPriorityFeePerGas,
+        maxFeePerGas
+      } = gasPrice;
+      sendPayload.maxPriorityFeePerGas = web3.utils.toWei(maxPriorityFeePerGas.toFixed(0), 'gwei');
+      sendPayload.maxFeePerGas = web3.utils.toWei(maxFeePerGas.toFixed(0), 'gwei');
+    } else {
+      gasPrice = await stores.accountStore.getGasPrice('fast');
+      sendPayload.gasPrice = web3.utils.toWei(gasPrice, 'gwei');
+    }
+
+    this._callContractWait(web3, contract, method, params, account, sendPayload, dispatchEvent, dispatchEventPayload, callback);
   }
 
-  _callContractWait = (web3, contract, method, params, account, gasPrice, dispatchEvent, dispatchEventPayload, callback) => {
+  _callContractWait = (web3, contract, method, params, account, sendPayload, dispatchEvent, dispatchEventPayload, callback) => {
     const context = this;
-
-    let {
-      maxPriorityFeePerGas,
-      maxFeePerGas
-    } = gasPrice;
-    let sendPayload = {
-      from: account.address,
-      maxPriorityFeePerGas: web3.utils.toWei(maxPriorityFeePerGas.toFixed(0), 'gwei'),
-      maxFeePerGas: web3.utils.toWei(maxFeePerGas.toFixed(0), 'gwei'),
-    }
 
     contract.methods[method](...params)
       .send(sendPayload)
