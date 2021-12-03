@@ -72,7 +72,7 @@ export default class Example extends PureComponent {
             cy="50%"
             outerRadius={80}
             fill="#8884d8"
-            dataKey="relativeWeight"
+            dataKey={this.props.dataKey}
             onMouseEnter={this.onPieEnter}
             startAngle={90}
             endAngle={450}

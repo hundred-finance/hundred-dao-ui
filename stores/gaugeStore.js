@@ -181,14 +181,27 @@ class Store {
 
     const gaugesWeights = await Promise.all(gaugesWeightsPromise);
 
+    const week = 604800;
+    const day = 86400;
+
+    const currentEpochTime = Math.floor(new Date().getTime() / 1000)
+    const nextEpochTime = Math.floor(currentEpochTime / week) * week + week + day
+
     // get the gauge relative weights
-    const gaugesRelativeWeightsPromise = gauges.map((gauge) => {
+    const gaugesNextEpochRelativeWeightsPromise = gauges.map((gauge) => {
       return new Promise((resolve, reject) => {
-        resolve(gaugeControllerContract.methods.gauge_relative_weight(gauge).call());
+        resolve(gaugeControllerContract.methods.gauge_relative_weight(gauge, nextEpochTime).call());
       });
     });
 
-    const gaugesRelativeWeights = await Promise.all(gaugesRelativeWeightsPromise);
+    const gaugesCurrentEpochRelativeWeightsPromise = gauges.map((gauge) => {
+      return new Promise((resolve, reject) => {
+        resolve(gaugeControllerContract.methods.gauge_relative_weight(gauge, currentEpochTime).call());
+      });
+    });
+
+    const gaugesCurrentEpochRelativeWeights = await Promise.all(gaugesCurrentEpochRelativeWeightsPromise);
+    const gaugesNextEpochRelativeWeights = await Promise.all(gaugesNextEpochRelativeWeightsPromise);
 
     // get the gauge lp token
     const gaugesLPTokensPromise = gauges.map((gauge) => {
@@ -232,7 +245,8 @@ class Store {
       const gauge = {
         address: gauges[i],
         weight: BigNumber(gaugesWeights[i]).div(1e18).toNumber(),
-        relativeWeight: BigNumber(gaugesRelativeWeights[i]).times(100).div(1e18).toNumber(),
+        currentEpochRelativeWeight: BigNumber(gaugesCurrentEpochRelativeWeights[i]).times(100).div(1e18).toNumber(),
+        nextEpochRelativeWeight: BigNumber(gaugesNextEpochRelativeWeights[i]).times(100).div(1e18).toNumber(),
         lpToken: {
           address: gaugesLPTokens[i],
           name: lpTokens[i * 3],
