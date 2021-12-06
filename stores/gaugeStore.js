@@ -464,8 +464,8 @@ class Store {
     const balanceOf = await Promise.all(balanceOfPromise);
 
     const rewardPolicyMakerContract = new web3.eth.Contract(REWARD_POLICY_MAKER_ABI, project.rewardPolicyMaker);
-    const currentRewardRate = await rewardPolicyMakerContract.methods.rate_at(currentEpochTime());
-    const nextEpochRewardRate = await rewardPolicyMakerContract.methods.rate_at(nextEpochTime());
+    const currentRewardRate = await rewardPolicyMakerContract.methods.rate_at(currentEpochTime()).call();
+    const nextEpochRewardRate = await rewardPolicyMakerContract.methods.rate_at(nextEpochTime()).call();
 
     let totalPercentUsed = 0
 
