@@ -284,7 +284,7 @@ class Store {
         weight: BigNumber(gaugesWeights[i]).div(1e18).toNumber(),
         currentEpochRelativeWeight: BigNumber(gaugesCurrentEpochRelativeWeights[i]).times(100).div(1e18).toNumber(),
         nextEpochRelativeWeight: BigNumber(gaugesNextEpochRelativeWeights[i]).times(100).div(1e18).toNumber(),
-        totalStakeBalance: BigNumber(lpTokens[i * 5 + 3]).div(1e8).toNumber(),
+        totalStakeBalance: BigNumber(lpTokens[i * 5 + 3]).div(1e8).toNumber() * convRate * 100,
         liquidityShare: 0,
         apr: 0,
         lpToken: {
@@ -293,7 +293,7 @@ class Store {
           symbol: lpTokens[i * 5 + 1],
           decimals: lpTokens[i * 5 + 2],
           price: lpPrice,
-          conversionRate: convRate
+          conversionRate: convRate * 100
         },
       };
 
@@ -470,7 +470,7 @@ class Store {
     let totalPercentUsed = 0
 
     for (let i = 0; i < project.gauges.length; i++) {
-      project.gauges[i].balance = BigNumber(balanceOf[i]).div(1e8).toNumber()
+      project.gauges[i].balance = BigNumber(balanceOf[i]).div(1e8).toNumber() * project.gauges[i].lpToken.conversionRate
 
       const gaugeVotePercent = BigNumber(voteWeights[i]).div(100)
       project.gauges[i].userVotesPercent = gaugeVotePercent.toFixed(2)
@@ -492,7 +492,7 @@ class Store {
       project.gauges[i].boost = project.gauges[i].liquidityShare / project.gauges[i].minLiquidityShare;
 
       let providedLiquidity =
-        project.gauges[i].balance * project.gauges[i].lpToken.conversionRate  * project.gauges[i].lpToken.price;
+        project.gauges[i].balance  * project.gauges[i].lpToken.price;
 
 
       let totalRewards = currentRewardRate * 365 * 24 * 3600 * project.hndPrice / 1e18;
