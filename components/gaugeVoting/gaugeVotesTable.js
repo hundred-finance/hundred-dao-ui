@@ -12,6 +12,7 @@ import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Typography from '@material-ui/core/Typography';
 
 import { formatCurrency, formatAddress } from '../../utils';
+import { Tooltip } from '@material-ui/core';
 
 function descendingComparator(a, b, orderBy) {
   if (!a || !b) {
@@ -60,6 +61,7 @@ const headCells = [
     numeric: true,
     disablePadding: false,
     label: 'APR',
+    tooltip: "Current Epoch APR -> Next Epoch APR"
   },
   {
     id: 'balance',
@@ -78,6 +80,7 @@ const headCells = [
     numeric: true,
     disablePadding: false,
     label: 'My APR',
+    tooltip: "Current Epoch APR -> Next Epoch APR"
   },
 ];
 
@@ -92,10 +95,12 @@ function EnhancedTableHead(props) {
       <TableRow>
         {headCells.map((headCell) => (
           <TableCell key={headCell.id} align={headCell.numeric ? 'right' : 'left'} padding={'default'} sortDirection={orderBy === headCell.id ? order : false}>
-            <TableSortLabel active={orderBy === headCell.id} direction={orderBy === headCell.id ? order : 'asc'} onClick={createSortHandler(headCell.id)}>
-              <Typography variant="h5">{headCell.label}</Typography>
-              {orderBy === headCell.id ? <span className={classes.visuallyHidden}>{order === 'desc' ? 'sorted descending' : 'sorted ascending'}</span> : null}
-            </TableSortLabel>
+            <Tooltip title={headCell.tooltip ? headCell.tooltip : headCell.label}>
+              <TableSortLabel active={orderBy === headCell.id} direction={orderBy === headCell.id ? order : 'asc'} onClick={createSortHandler(headCell.id)}>
+                <Typography variant="h5">{headCell.label}</Typography>
+                {orderBy === headCell.id ? <span className={classes.visuallyHidden}>{order === 'desc' ? 'sorted descending' : 'sorted ascending'}</span> : null}
+              </TableSortLabel>
+            </Tooltip>
           </TableCell>
         ))}
       </TableRow>
