@@ -47,9 +47,9 @@
 }
 
 .calculationResult {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 40% 30% 30%;
+  place-items: center;
 }
 
 .bold {
