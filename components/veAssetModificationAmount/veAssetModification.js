@@ -84,7 +84,7 @@ export default function VeAssetGeneration(props) {
 
   return (
     <Paper elevation={1} className={classes.projectCardContainer}>
-      <Typography variant="h2" className={ classes.sectionHeader }>Lock additional {project && project.tokenMetadata ? project.tokenMetadata.symbol : 'asset'}</Typography>
+      <Typography variant="h3" className={ classes.sectionHeader }>Lock additional {project && project.tokenMetadata ? project.tokenMetadata.symbol : 'asset'}</Typography>
       <div className={classes.textField}>
         <div className={classes.inputTitleContainer}>
           <div className={classes.inputTitle}>

@@ -31,7 +31,8 @@ import {
   CONNECT_WALLET, CONFIGURE_GAUGES,
 } from '../../../stores/constants';
 
-import { formatCurrency, formatAddress } from '../../../utils';
+import PieChart from '../../../components/gaugeVoting/pieChart';
+import GaugeVotesTable from '../../../components/gaugeVoting/gaugeVotesTable';
 
 function Projects({ changeTheme }) {
   const router = useRouter();
@@ -108,22 +109,35 @@ function Projects({ changeTheme }) {
         <div className={classes.projectContainer}>
           <Balances project={project} />
           <div className={classes.projectCardContainer}>
-            <div className={ classes.fakeGrid }>
-            { (project && project.veTokenMetadata && BigNumber(project.veTokenMetadata.userLocked).gt(0)) &&
-              <>
-                <LockDurationChart project={project} />
-                <VeAssetModificationAmount project={project} />
-                <VeAssetModificationDuration project={project} />
-              </>
-            }
-            { !(project && project.veTokenMetadata && BigNumber(project.veTokenMetadata.userLocked).gt(0)) &&
-              <>
-                <LockDurationChart project={project} />
-                <VeAssetGeneration project={project} />
-              </>
-            }
-            </div>
-            <GaugeVoting project={project} />
+            <VeAssetModificationAmount project={project} />
+            <VeAssetModificationDuration project={project} />
+            <LockDurationChart project={project} />
+          </div>
+          <div className={classes.projectCardContainer}>
+            <GaugeVoting project={project}/>
+            <Paper elevation={1} className={classes.ChartContainer}>
+              <Typography variant="h3">
+                Current Vote weighting
+              </Typography>
+              <PieChart
+                data={project?.gauges?.sort((a, b) => (a.currentEpochRelativeWeight > b.currentEpochRelativeWeight ? -1 : 1))}
+                dataKey={"currentEpochRelativeWeight"}
+              />
+            </Paper>
+            <Paper elevation={1} className={classes.ChartContainer}>
+              <Typography variant="h3">
+                Next epoch Vote weighting
+              </Typography>
+              <PieChart
+                data={project?.gauges?.sort((a, b) => (a.nextEpochRelativeWeight > b.nextEpochRelativeWeight ? -1 : 1))}
+                dataKey={"nextEpochRelativeWeight"}
+              />
+            </Paper>
+          </div>
+          <div className={classes.fakeGrid}>
+            <Paper elevation={1}>
+              <GaugeVotesTable project={project} />
+            </Paper>
           </div>
         </div>
 

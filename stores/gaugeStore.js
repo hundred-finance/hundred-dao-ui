@@ -24,10 +24,13 @@ import {
   INCREASE_LOCK_DURATION_RETURNED
 } from './constants';
 
-import { ERC20_ABI, GAUGE_CONTROLLER_ABI, GAUGE_ABI, VOTING_ESCROW_ABI, PICKLE_GAUGE_CONTROLLER_ABI, SUSHISWAP_LP_TOKEN_ABI, UNISWAP_LP_TOKEN_ABI, PICKLE_GAUGE_ABI } from './abis';
+import { ERC20_ABI, GAUGE_CONTROLLER_ABI, GAUGE_ABI, VOTING_ESCROW_ABI } from './abis';
 
 import stores from './';
 import BigNumber from 'bignumber.js';
+import { PRICE_ORACLE_ABI } from './abis/HundredFinancePriceOracleABI';
+import { CTOKEN_ABI } from './abis/CtokenABI';
+import { REWARD_POLICY_MAKER_ABI } from './abis/RewardPolicyMaker';
 
 const fetch = require('node-fetch');
 
@@ -47,6 +50,8 @@ class Store {
           url: 'hundred.finance',
           chainId: 42,
           gaugeProxyAddress: "0xFa0F5d0cA1031aC6A47CA8Db9cf9dcfd45B3659a",
+          lpPriceOracle: "0x10010069DE6bD5408A6dEd075Cf6ae2498073c73",
+          rewardPolicyMaker: "0x0d9459A2d7252c4cd62cF13416Cd319c3e0C5bB4",
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -64,6 +69,8 @@ class Store {
           url: 'hundred.finance',
           chainId: 42161,
           gaugeProxyAddress: "0xb4BAfc3d60662De362c0cB0f5e2DE76603Ea77D7",
+          lpPriceOracle: "0x10010069DE6bD5408A6dEd075Cf6ae2498073c73",
+          rewardPolicyMaker: "0x3A4148DDDd121fbceD8717CB7B82370Be27F76bf",
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -147,17 +154,17 @@ class Store {
     );
   };
 
-  _getProjectData = (project, callback) => {
-    this._getProjectDataHND(project, callback)
-  };
+  _getProjectData = async (project, callback) => {
 
-  _getProjectDataHND = async (project, callback) => {
     const web3 = await stores.accountStore.getWeb3Provider();
     if (!web3) {
       return;
     }
 
+    const hndPrice = await this._getHndPrice();
+
     const gaugeControllerContract = new web3.eth.Contract(GAUGE_CONTROLLER_ABI, project.gaugeProxyAddress);
+    const priceOracleContract = new web3.eth.Contract(PRICE_ORACLE_ABI, project.lpPriceOracle);
 
     // get how many gauges there are
     const n_gauges = await gaugeControllerContract.methods.n_gauges().call();
@@ -214,10 +221,30 @@ class Store {
 
     const gaugesLPTokens = await Promise.all(gaugesLPTokensPromise);
 
+    const lpTokenUnderlyingInfo = await Promise.all(
+      gaugesLPTokens.map(lp => {
+        let pricePromise = new Promise((resolve, reject) => {
+          resolve(priceOracleContract.methods.getUnderlyingPrice(lp).call());
+        })
+        let exchangeRare = new Promise((resolve, reject) => {
+          resolve(new web3.eth.Contract(CTOKEN_ABI, lp).methods.exchangeRateStored().call());
+        })
+
+        let underlying = new Promise((resolve, reject) => {
+          resolve(new web3.eth.Contract(CTOKEN_ABI, lp).methods.underlying().call());
+        })
+
+        return [
+          pricePromise, exchangeRare, underlying
+        ];
+      }).flat()
+    )
+
     // get LP token info
     const lpTokensPromise = gaugesLPTokens
-      .map((lpToken) => {
+      .map((lpToken, index) => {
         const lpTokenContract = new web3.eth.Contract(ERC20_ABI, lpToken);
+        const lpUnderlyingTokenContract = new web3.eth.Contract(ERC20_ABI, lpTokenUnderlyingInfo[index * 3 + 2]);
 
         const promises = [];
         const namePromise = new Promise((resolve, reject) => {
@@ -229,10 +256,18 @@ class Store {
         const decimalsPromise = new Promise((resolve, reject) => {
           resolve(lpTokenContract.methods.decimals().call());
         });
+        const totalStakePromise = new Promise((resolve, reject) => {
+          resolve(lpTokenContract.methods.balanceOf(gauges[index]).call());
+        });
+        const underlyingDecimalsPromise = new Promise((resolve, reject) => {
+          resolve(lpUnderlyingTokenContract.methods.decimals().call());
+        });
 
         promises.push(namePromise);
         promises.push(symbolPromise);
         promises.push(decimalsPromise);
+        promises.push(totalStakePromise);
+        promises.push(underlyingDecimalsPromise);
 
         return promises;
       })
@@ -242,16 +277,23 @@ class Store {
 
     let projectGauges = [];
     for (let i = 0; i < gauges.length; i++) {
+      let lpPrice = BigNumber(lpTokenUnderlyingInfo[i * 3]).div(10 ** (36-lpTokens[i * 5 + 4])).toNumber();
+      let convRate = BigNumber(lpTokenUnderlyingInfo[i * 3 + 1]).div(10 ** 18).toNumber();
       const gauge = {
         address: gauges[i],
         weight: BigNumber(gaugesWeights[i]).div(1e18).toNumber(),
         currentEpochRelativeWeight: BigNumber(gaugesCurrentEpochRelativeWeights[i]).times(100).div(1e18).toNumber(),
         nextEpochRelativeWeight: BigNumber(gaugesNextEpochRelativeWeights[i]).times(100).div(1e18).toNumber(),
+        totalStakeBalance: BigNumber(lpTokens[i * 5 + 3]).div(1e8).toNumber(),
+        liquidityShare: 0,
+        apr: 0,
         lpToken: {
           address: gaugesLPTokens[i],
-          name: lpTokens[i * 3],
-          symbol: lpTokens[i * 3 + 1],
-          decimals: lpTokens[i * 3 + 2],
+          name: lpTokens[i * 5],
+          symbol: lpTokens[i * 5 + 1],
+          decimals: lpTokens[i * 5 + 2],
+          price: lpPrice,
+          conversionRate: convRate
         },
       };
 
@@ -284,6 +326,7 @@ class Store {
     project.tokenMetadata = projectTokenMetadata;
     project.veTokenMetadata = projectVeTokenMetadata;
     project.gauges = projectGauges;
+    project.hndPrice = hndPrice
 
     callback(null, project);
   }
@@ -420,15 +463,44 @@ class Store {
 
     const balanceOf = await Promise.all(balanceOfPromise);
 
-    console.log("balances", balanceOf)
+    const rewardPolicyMakerContract = new web3.eth.Contract(REWARD_POLICY_MAKER_ABI, project.rewardPolicyMaker);
+    const currentRewards = await rewardPolicyMakerContract.methods.rate_at(Math.floor(new Date().getTime() / 1000));
 
     let totalPercentUsed = 0
 
     for (let i = 0; i < project.gauges.length; i++) {
       project.gauges[i].balance = BigNumber(balanceOf[i]).div(1e8).toNumber()
+
       const gaugeVotePercent = BigNumber(voteWeights[i]).div(100)
       project.gauges[i].userVotesPercent = gaugeVotePercent.toFixed(2)
       totalPercentUsed = BigNumber(totalPercentUsed).plus(gaugeVotePercent)
+
+      project.gauges[i].liquidityShare =
+        Math.min(
+          BigNumber(project.gauges[i].balance).multipliedBy(0.4)
+            .plus(
+              BigNumber(project.gauges[i].totalStakeBalance)
+                .multipliedBy(0.6)
+                .multipliedBy(BigNumber(veTokenBalance))
+                .div(BigNumber(totalSupply))
+            ).toNumber(),
+          project.gauges[i].balance
+        ) * 100 / project.gauges[i].totalStakeBalance;
+
+      project.gauges[i].minLiquidityShare = project.gauges[i].balance * 0.4 * 100 / project.gauges[i].totalStakeBalance;
+      project.gauges[i].boost = project.gauges[i].liquidityShare / project.gauges[i].minLiquidityShare;
+
+      let providedLiquidity =
+        project.gauges[i].balance * project.gauges[i].lpToken.conversionRate  * project.gauges[i].lpToken.price;
+
+
+      let totalRewards = currentRewards * 365 * 24 * 3600 * project.hndPrice / 1e18;
+      let rewards = totalRewards * project.gauges[i].currentEpochRelativeWeight * project.gauges[i].liquidityShare / 10000
+
+      if (providedLiquidity > 0) {
+        project.gauges[i].apr = rewards * 100 / providedLiquidity
+      }
+
     }
 
     project.userVotesPercent = totalPercentUsed.toFixed(2)
@@ -670,6 +742,28 @@ class Store {
           callback(error);
         }
       });
+  };
+
+  _getHndPrice = async () => {
+      try{
+      const url =  "https://api.coingecko.com/api/v3/simple/price?ids=hundred-finance&vs_currencies=usd"
+      const headers = {}
+      const response = await fetch(url,
+        {
+          method: "GET",
+          mode: 'cors',
+          headers: headers
+        }
+      )
+      const data = await response.json()
+      const hnd = data ? data["hundred-finance"] : null
+
+      return  hnd ? +hnd.usd : 0
+    }
+    catch(err){
+      console.log(err)
+    }
+    return 0;
   };
 }
 

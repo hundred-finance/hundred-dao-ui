@@ -58,17 +58,23 @@ const headCells = [
     label: 'Your balance',
   },
   {
+    id: 'apr',
+    numeric: true,
+    disablePadding: false,
+    label: 'APR (boost)',
+  },
+  {
+    id: 'totalBalance',
+    numeric: true,
+    disablePadding: false,
+    label: 'Total balance',
+  },
+  {
     id: 'relativeWeight',
     numeric: true,
     disablePadding: false,
     label: 'Votes',
   },
-  {
-    id: 'relativeWeightPercent',
-    numeric: true,
-    disablePadding: false,
-    label: 'Percent',
-  }
 ];
 
 function EnhancedTableHead(props) {
@@ -282,12 +288,17 @@ export default function EnhancedTable({ project }) {
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
-                      {formatCurrency(row.weight)}
+                      {formatCurrency(row.apr)} % ({formatCurrency(row.boost)}x)
                     </Typography>
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
-                      {formatCurrency(row.relativeWeight)} %
+                      {formatCurrency(row.totalStakeBalance)}
+                    </Typography>
+                  </TableCell>
+                  <TableCell className={classes.cell} align="right">
+                    <Typography variant="h5" className={classes.textSpaced}>
+                      {formatCurrency(row.weight)}
                     </Typography>
                   </TableCell>
                 </TableRow>

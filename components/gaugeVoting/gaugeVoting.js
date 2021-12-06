@@ -77,142 +77,117 @@ export default function GaugeVoting({ project }) {
   };
 
   return (
-    <>
-      <div className={classes.split}>
-        <Paper elevation={1} className={classes.projectCardContainer}>
-          <Typography variant="h2" className={classes.sectionHeader}>
-            Current Vote weighting
-          </Typography>
-          <PieChart
-            data={project?.gauges?.sort((a, b) => (a.currentEpochRelativeWeight > b.currentEpochRelativeWeight ? -1 : 1))}
-            dataKey={"currentEpochRelativeWeight"}
-          />
-        </Paper>
-        <Paper elevation={1} className={classes.projectCardContainer}>
-          <Typography variant="h2" className={classes.sectionHeader}>
-            Next epoch Vote weighting
-          </Typography>
-          <PieChart
-            data={project?.gauges?.sort((a, b) => (a.nextEpochRelativeWeight > b.nextEpochRelativeWeight ? -1 : 1))}
-            dataKey={"nextEpochRelativeWeight"}
-          />
-        </Paper>
-        <Paper elevation={1} className={classes.projectCardContainer}>
-          <Typography variant="h2" className={classes.sectionHeader}>
-            Gauge Voting
-          </Typography>
-          <div>
-            <Typography variant="h2" className={classes.sectionHeader}>Vote for your gauge</Typography>
-            <div className={classes.textField}>
-              <div className={classes.inputTitleContainer}>
-                <div className={classes.inputTitle}>
-                  <Typography variant="h5" noWrap>
-                    Select Gauge
-                  </Typography>
-                </div>
-              </div>
-              <Autocomplete
-                disableClearable={true}
-                options={project?.gauges}
-                value={gauge}
-                onChange={onGaugeSelectChanged}
-                getOptionLabel={(option) => option.lpToken.symbol}
-                fullWidth={true}
-                renderOption={(option, { selected }) => (
-                  <React.Fragment>
-                    <div className={classes.text}>{option.lpToken.symbol}</div>
-                  </React.Fragment>
-                )}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    InputProps={{
-                      ...params.InputProps,
-                      ...{
-                        placeholder: 'Search gauge',
-                      },
-                    }}
-                    variant="outlined"
-                  />
-                )}
-              />
+    <Paper elevation={1} className={classes.projectCardContainer}>
+      <Typography variant="h3" className={classes.sectionHeader}>
+        Gauge Voting
+      </Typography>
+      <div>
+        <Typography variant="h5" className={classes.sectionHeader}>Vote for your gauge</Typography>
+        <div className={classes.textField}>
+          <div className={classes.inputTitleContainer}>
+            <div className={classes.inputTitle}>
+              <Typography variant="h5" noWrap>
+                Select Gauge
+              </Typography>
             </div>
-
-            <div className={classes.textField}>
-              <div className={classes.inputTitleContainer}>
-                <div className={classes.inputTitle}>
-                  <Typography variant="h5" noWrap>
-                    Vote Percent
-                  </Typography>
-                </div>
-              </div>
-              <TextField
-                variant="outlined"
-                fullWidth
-                placeholder="0.00"
-                value={amount}
-                error={amountError}
-                onChange={(e) => {
-                  setAmount(e.target.value);
-                }}
-              />
-            </div>
-            <div className={classes.actionButton}>
-              <Button fullWidth disableElevation variant="contained" color="primary" size="large" onClick={onVote} disabled={voteLoading}>
-                <Typography variant="h5">{voteLoading ? <CircularProgress size={15} /> : 'Vote'}</Typography>
-              </Button>
-            </div>
-            <div className={classes.calculationResults}>
-              <div className={classes.calculationResult}>
-                <Typography variant="h3">Current voting power used: </Typography>
-                <Typography variant="h3" className={classes.bold}>
-                  {formatCurrency(project?.userVotesPercent)} %
-                </Typography>
-              </div>
-            </div>
-            {BigNumber(project?.userVotesPercent).gt(0) && (
-              <div className={classes.gaugeVotesTable}>
-                {project?.gauges?.map((gauge, idx) => {
-                  if (!gauge.userVotesPercent || (gauge.userVotesPercent && BigNumber(gauge.userVotesPercent).eq(0))) {
-                    return null;
-                  }
-
-                  return (
-                    <div className={classes.calculationResult} key={'gauge' + idx}>
-                      <Typography variant="h5">{gauge.lpToken.name}</Typography>
-                      <Typography variant="h5" className={classes.bold}>
-                        {formatCurrency(gauge.userVotesPercent)} %
-                      </Typography>
-                      <Button
-                        disableElevation
-                        variant="contained"
-                        color="primary"
-                        size="small"
-                        onClick={() => {
-                          onReset(gauge);
-                        }}
-                        disabled={resetLoading}
-                      >
-                        <Typography variant="h5">{resetLoading ? <CircularProgress size={15} /> : 'Reset'}</Typography>
-                      </Button>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-            {BigNumber(project?.userVotesPercent).eq(0) && (
-              <div className={classes.gaugeVotesTable}>
-                <Typography>
-                  Voting for a gauge increases the emissions that the farm receives. The more votes that your farm receives, the more profitable it will be.
-                </Typography>
-              </div>
-            )}
           </div>
-        </Paper>
-        <Paper elevation={1} className={classes.projectCardContainer}>
-          <GaugeVotesTable project={project} />
-        </Paper>
+          <Autocomplete
+            disableClearable={true}
+            options={project?.gauges}
+            value={gauge}
+            onChange={onGaugeSelectChanged}
+            getOptionLabel={(option) => option.lpToken.symbol}
+            fullWidth={true}
+            renderOption={(option, { selected }) => (
+              <React.Fragment>
+                <div className={classes.text}>{option.lpToken.symbol}</div>
+              </React.Fragment>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                InputProps={{
+                  ...params.InputProps,
+                  ...{
+                    placeholder: 'Search gauge',
+                  },
+                }}
+                variant="outlined"
+              />
+            )}
+          />
+        </div>
+
+        <div className={classes.textField}>
+          <div className={classes.inputTitleContainer}>
+            <div className={classes.inputTitle}>
+              <Typography variant="h5" noWrap>
+                Vote Percent
+              </Typography>
+            </div>
+          </div>
+          <TextField
+            variant="outlined"
+            fullWidth
+            placeholder="0.00"
+            value={amount}
+            error={amountError}
+            onChange={(e) => {
+              setAmount(e.target.value);
+            }}
+          />
+        </div>
+        <div className={classes.actionButton}>
+          <Button fullWidth disableElevation variant="contained" color="primary" size="large" onClick={onVote} disabled={voteLoading}>
+            <Typography variant="h5">{voteLoading ? <CircularProgress size={15} /> : 'Vote'}</Typography>
+          </Button>
+        </div>
+        <div className={classes.calculationResults}>
+          <div className={classes.calculationResult}>
+            <Typography variant="h3">Current voting power used: </Typography>
+            <Typography variant="h3" className={classes.bold}>
+              {formatCurrency(project?.userVotesPercent)} %
+            </Typography>
+          </div>
+        </div>
+        {BigNumber(project?.userVotesPercent).gt(0) && (
+          <div className={classes.gaugeVotesTable}>
+            {project?.gauges?.map((gauge, idx) => {
+              if (!gauge.userVotesPercent || (gauge.userVotesPercent && BigNumber(gauge.userVotesPercent).eq(0))) {
+                return null;
+              }
+
+              return (
+                <div className={classes.calculationResult} key={'gauge' + idx}>
+                  <Typography variant="h5">{gauge.lpToken.name}</Typography>
+                  <Typography variant="h5" className={classes.bold}>
+                    {formatCurrency(gauge.userVotesPercent)} %
+                  </Typography>
+                  <Button
+                    disableElevation
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    onClick={() => {
+                      onReset(gauge);
+                    }}
+                    disabled={resetLoading}
+                  >
+                    <Typography variant="h5">{resetLoading ? <CircularProgress size={15} /> : 'Reset'}</Typography>
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        {BigNumber(project?.userVotesPercent).eq(0) && (
+          <div className={classes.gaugeVotesTable}>
+            <Typography>
+              Voting for a gauge increases the emissions that the farm receives. The more votes that your farm receives, the more profitable it will be.
+            </Typography>
+          </div>
+        )}
       </div>
-    </>
+    </Paper>
   );
 }

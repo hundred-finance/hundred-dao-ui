@@ -93,7 +93,7 @@ export default function VeAssetGeneration(props) {
 
   return (
     <Paper elevation={1} className={classes.projectCardContainer}>
-      <Typography variant="h2" className={classes.sectionHeader}>
+      <Typography variant="h3" className={classes.sectionHeader}>
         Increase lock duration
       </Typography>
       <div className={classes.textField}>
