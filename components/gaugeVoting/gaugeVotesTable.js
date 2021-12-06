@@ -10,16 +10,8 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
-import IconButton from '@material-ui/core/IconButton';
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-
-import BigNumber from 'bignumber.js';
 
 import { formatCurrency, formatAddress } from '../../utils';
-
-import * as moment from 'moment';
 
 function descendingComparator(a, b, orderBy) {
   if (!a || !b) {
@@ -62,6 +54,12 @@ const headCells = [
     numeric: true,
     disablePadding: false,
     label: 'APR (boost)',
+  },
+  {
+    id: 'nextEpochApr',
+    numeric: true,
+    disablePadding: false,
+    label: 'Next epoch APR',
   },
   {
     id: 'totalBalance',
@@ -289,6 +287,11 @@ export default function EnhancedTable({ project }) {
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
                       {formatCurrency(row.apr)} % ({formatCurrency(row.boost)}x)
+                    </Typography>
+                  </TableCell>
+                  <TableCell className={classes.cell} align="right">
+                    <Typography variant="h5" className={classes.textSpaced}>
+                      {formatCurrency(row.nextEpochApr)} %
                     </Typography>
                   </TableCell>
                   <TableCell className={classes.cell} align="right">

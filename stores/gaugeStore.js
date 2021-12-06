@@ -34,6 +34,12 @@ import { REWARD_POLICY_MAKER_ABI } from './abis/RewardPolicyMaker';
 
 const fetch = require('node-fetch');
 
+const WEEK = 604800;
+const DAY = 86400;
+
+const currentEpochTime = () => Math.floor(new Date().getTime() / 1000)
+const nextEpochTime = () => Math.floor(currentEpochTime() / WEEK) * WEEK + WEEK + DAY
+
 class Store {
   constructor(dispatcher, emitter) {
     this.dispatcher = dispatcher;
@@ -188,22 +194,16 @@ class Store {
 
     const gaugesWeights = await Promise.all(gaugesWeightsPromise);
 
-    const week = 604800;
-    const day = 86400;
-
-    const currentEpochTime = Math.floor(new Date().getTime() / 1000)
-    const nextEpochTime = Math.floor(currentEpochTime / week) * week + week + day
-
     // get the gauge relative weights
     const gaugesNextEpochRelativeWeightsPromise = gauges.map((gauge) => {
       return new Promise((resolve, reject) => {
-        resolve(gaugeControllerContract.methods.gauge_relative_weight(gauge, nextEpochTime).call());
+        resolve(gaugeControllerContract.methods.gauge_relative_weight(gauge, nextEpochTime()).call());
       });
     });
 
     const gaugesCurrentEpochRelativeWeightsPromise = gauges.map((gauge) => {
       return new Promise((resolve, reject) => {
-        resolve(gaugeControllerContract.methods.gauge_relative_weight(gauge, currentEpochTime).call());
+        resolve(gaugeControllerContract.methods.gauge_relative_weight(gauge, currentEpochTime()).call());
       });
     });
 
@@ -464,7 +464,8 @@ class Store {
     const balanceOf = await Promise.all(balanceOfPromise);
 
     const rewardPolicyMakerContract = new web3.eth.Contract(REWARD_POLICY_MAKER_ABI, project.rewardPolicyMaker);
-    const currentRewards = await rewardPolicyMakerContract.methods.rate_at(Math.floor(new Date().getTime() / 1000));
+    const currentRewardRate = await rewardPolicyMakerContract.methods.rate_at(currentEpochTime());
+    const nextEpochRewardRate = await rewardPolicyMakerContract.methods.rate_at(nextEpochTime());
 
     let totalPercentUsed = 0
 
@@ -494,11 +495,15 @@ class Store {
         project.gauges[i].balance * project.gauges[i].lpToken.conversionRate  * project.gauges[i].lpToken.price;
 
 
-      let totalRewards = currentRewards * 365 * 24 * 3600 * project.hndPrice / 1e18;
+      let totalRewards = currentRewardRate * 365 * 24 * 3600 * project.hndPrice / 1e18;
       let rewards = totalRewards * project.gauges[i].currentEpochRelativeWeight * project.gauges[i].liquidityShare / 10000
+
+      let nextEpochTotalRewards = nextEpochRewardRate * 365 * 24 * 3600 * project.hndPrice / 1e18;
+      let nextEpochRewards = nextEpochTotalRewards * project.gauges[i].nextEpochRelativeWeight * project.gauges[i].liquidityShare / 10000
 
       if (providedLiquidity > 0) {
         project.gauges[i].apr = rewards * 100 / providedLiquidity
+        project.gauges[i].nextEpochApr = nextEpochRewards * 100 / providedLiquidity
       }
 
     }
