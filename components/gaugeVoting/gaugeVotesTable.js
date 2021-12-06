@@ -44,30 +44,6 @@ function stableSort(array, comparator) {
 const headCells = [
   { id: 'vault', numeric: false, disablePadding: false, label: 'Vault' },
   {
-    id: 'balance',
-    numeric: true,
-    disablePadding: false,
-    label: 'My balance',
-  },
-  {
-    id: 'apr',
-    numeric: true,
-    disablePadding: false,
-    label: 'My APR',
-  },
-  {
-    id: 'gaugeApr',
-    numeric: true,
-    disablePadding: false,
-    label: 'Gauge APR',
-  },
-  {
-    id: 'boost',
-    numeric: true,
-    disablePadding: false,
-    label: 'Boost',
-  },
-  {
     id: 'totalBalance',
     numeric: true,
     disablePadding: false,
@@ -78,6 +54,30 @@ const headCells = [
     numeric: true,
     disablePadding: false,
     label: 'Votes',
+  },
+  {
+    id: 'gaugeApr',
+    numeric: true,
+    disablePadding: false,
+    label: 'APR',
+  },
+  {
+    id: 'balance',
+    numeric: true,
+    disablePadding: false,
+    label: 'My balance',
+  },
+  {
+    id: 'boost',
+    numeric: true,
+    disablePadding: false,
+    label: 'Boost',
+  },
+  {
+    id: 'apr',
+    numeric: true,
+    disablePadding: false,
+    label: 'My APR',
   },
 ];
 
@@ -287,12 +287,12 @@ export default function EnhancedTable({ project }) {
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
-                      {formatCurrency(row.balance)}
+                      {formatCurrency(row.totalStakeBalance)}
                     </Typography>
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
-                      {formatCurrency(row.apr)}% -> {formatCurrency(row.nextEpochApr)}%
+                      {formatCurrency(row.weight)}
                     </Typography>
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
@@ -302,17 +302,17 @@ export default function EnhancedTable({ project }) {
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
+                      {formatCurrency(row.balance)}
+                    </Typography>
+                  </TableCell>
+                  <TableCell className={classes.cell} align="right">
+                    <Typography variant="h5" className={classes.textSpaced}>
                       {formatCurrency(row.boost)}x
                     </Typography>
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
-                      {formatCurrency(row.totalStakeBalance)}
-                    </Typography>
-                  </TableCell>
-                  <TableCell className={classes.cell} align="right">
-                    <Typography variant="h5" className={classes.textSpaced}>
-                      {formatCurrency(row.weight)}
+                      {formatCurrency(row.apr)}% -> {formatCurrency(row.nextEpochApr)}%
                     </Typography>
                   </TableCell>
                 </TableRow>
