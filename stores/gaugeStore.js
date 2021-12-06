@@ -491,19 +491,25 @@ class Store {
       project.gauges[i].minLiquidityShare = project.gauges[i].balance * 0.4 * 100 / project.gauges[i].totalStakeBalance;
       project.gauges[i].boost = project.gauges[i].liquidityShare / project.gauges[i].minLiquidityShare;
 
-      let providedLiquidity =
-        project.gauges[i].balance  * project.gauges[i].lpToken.price;
-
+      let providedLiquidity = project.gauges[i].balance * project.gauges[i].lpToken.price;
+      let totalProvidedLiquidity = project.gauges[i].totalStakeBalance * project.gauges[i].lpToken.price;
 
       let totalRewards = currentRewardRate * 365 * 24 * 3600 * project.hndPrice / 1e18;
-      let rewards = totalRewards * project.gauges[i].currentEpochRelativeWeight * project.gauges[i].liquidityShare / 10000
+      let gaugeRewards = totalRewards * project.gauges[i].currentEpochRelativeWeight / 100
+      let rewards = gaugeRewards * project.gauges[i].liquidityShare / 100
 
       let nextEpochTotalRewards = nextEpochRewardRate * 365 * 24 * 3600 * project.hndPrice / 1e18;
-      let nextEpochRewards = nextEpochTotalRewards * project.gauges[i].nextEpochRelativeWeight * project.gauges[i].liquidityShare / 10000
+      let nextEpochGaugeRewards = nextEpochTotalRewards * project.gauges[i].nextEpochRelativeWeight / 100;
+      let nextEpochRewards = nextEpochGaugeRewards * project.gauges[i].liquidityShare / 100
 
       if (providedLiquidity > 0) {
         project.gauges[i].apr = rewards * 100 / providedLiquidity
         project.gauges[i].nextEpochApr = nextEpochRewards * 100 / providedLiquidity
+      }
+
+      if (totalProvidedLiquidity > 0) {
+        project.gauges[i].gaugeApr = gaugeRewards * 100 / totalProvidedLiquidity
+        project.gauges[i].nextEpochGaugeApr = nextEpochGaugeRewards * 100 / totalProvidedLiquidity
       }
 
     }

@@ -47,19 +47,25 @@ const headCells = [
     id: 'balance',
     numeric: true,
     disablePadding: false,
-    label: 'Your balance',
+    label: 'My balance',
   },
   {
     id: 'apr',
     numeric: true,
     disablePadding: false,
-    label: 'APR (boost)',
+    label: 'My APR',
   },
   {
-    id: 'nextEpochApr',
+    id: 'gaugeApr',
     numeric: true,
     disablePadding: false,
-    label: 'Next epoch APR',
+    label: 'Gauge APR',
+  },
+  {
+    id: 'boost',
+    numeric: true,
+    disablePadding: false,
+    label: 'Boost',
   },
   {
     id: 'totalBalance',
@@ -286,12 +292,17 @@ export default function EnhancedTable({ project }) {
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
-                      {formatCurrency(row.apr)}% ({formatCurrency(row.boost)}x)
+                      {formatCurrency(row.apr)}% -> {formatCurrency(row.nextEpochApr)}%
                     </Typography>
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
-                      {formatCurrency(row.nextEpochApr)}%
+                      {formatCurrency(row.gaugeApr)}% -> {formatCurrency(row.nextEpochGaugeApr)}%
+                    </Typography>
+                  </TableCell>
+                  <TableCell className={classes.cell} align="right">
+                    <Typography variant="h5" className={classes.textSpaced}>
+                      {formatCurrency(row.boost)}x
                     </Typography>
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
