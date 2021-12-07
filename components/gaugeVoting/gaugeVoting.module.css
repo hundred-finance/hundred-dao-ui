@@ -47,9 +47,17 @@
 }
 
 .calculationResult {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vote_line {
+  font-weight: bold;
   display: grid;
-  grid-template-columns: 40% 30% 30%;
-  place-items: center;
+  grid-template-columns: 80% 18%;
+  grid-gap: 2%;
+  align-items: center;
 }
 
 .bold {

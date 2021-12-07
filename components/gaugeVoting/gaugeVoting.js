@@ -158,11 +158,13 @@ export default function GaugeVoting({ project }) {
               }
 
               return (
-                <div className={classes.calculationResult} key={'gauge' + idx}>
-                  <Typography variant="h5">{gauge.lpToken.name}</Typography>
-                  <Typography variant="h5" className={classes.bold}>
-                    {formatCurrency(gauge.userVotesPercent)}%
-                  </Typography>
+                <div className={classes.vote_line} key={'gauge' + idx}>
+                  <div className={classes.calculationResult}>
+                    <Typography variant="h5">{gauge.lpToken.name}</Typography>
+                    <Typography variant="h5" className={classes.bold}>
+                      {formatCurrency(gauge.userVotesPercent)}%
+                    </Typography>
+                  </div>
                   <Button
                     disableElevation
                     variant="contained"
