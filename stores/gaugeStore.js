@@ -507,10 +507,8 @@ class Store {
         project.gauges[i].nextEpochApr = nextEpochRewards * 100 / providedLiquidity
       }
 
-      if (totalProvidedLiquidity > 0) {
-        project.gauges[i].gaugeApr = gaugeRewards * 100 / totalProvidedLiquidity
-        project.gauges[i].nextEpochGaugeApr = nextEpochGaugeRewards * 100 / totalProvidedLiquidity
-      }
+      project.gauges[i].gaugeApr = gaugeRewards * 100 / totalProvidedLiquidity
+      project.gauges[i].nextEpochGaugeApr = nextEpochGaugeRewards * 100 / totalProvidedLiquidity
 
     }
 
