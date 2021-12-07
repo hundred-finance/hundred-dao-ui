@@ -32,6 +32,7 @@ import {
 
 import PieChart from '../../../components/gaugeVoting/pieChart';
 import GaugeVotesTable from '../../../components/gaugeVoting/gaugeVotesTable';
+import BigNumber from 'bignumber.js';
 
 function Projects({ changeTheme }) {
   const router = useRouter();
@@ -107,11 +108,19 @@ function Projects({ changeTheme }) {
 
         <div className={classes.projectContainer}>
           <Balances project={project} />
-          <div className={classes.projectCardContainer}>
-            <VeAssetModificationAmount project={project} />
-            <VeAssetModificationDuration project={project} />
-            <LockDurationChart project={project} />
-          </div>
+            {isLockIncreasePossible(project) ?
+              <div className={classes.projectCardContainer}>
+                <VeAssetModificationAmount project={project} />
+                <VeAssetModificationDuration project={project} />
+                <LockDurationChart project={project} />
+              </div>
+              :
+              <div className={classes.projectCardContainer2Columns}>
+                <VeAssetGeneration project={project} />
+                <LockDurationChart project={project} />
+              </div>
+            }
+
           <div className={classes.projectCardContainer}>
             <GaugeVoting project={project}/>
             <Paper elevation={1} className={classes.ChartContainer}>
@@ -143,6 +152,10 @@ function Projects({ changeTheme }) {
       <Footer />
     </Layout>
   );
+}
+
+function isLockIncreasePossible(project) {
+  return project && project.veTokenMetadata && BigNumber(project.veTokenMetadata.userLocked).gt(0)
 }
 
 export default Projects;

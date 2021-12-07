@@ -21,6 +21,15 @@
   box-sizing: border-box;
 }
 
+.projectCardContainer2Columns {
+  padding: 0 36px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-gap: 48px;
+  box-sizing: border-box;
+}
+
 .fakeGrid {
   width: 100%;
   padding: 0 36px;
