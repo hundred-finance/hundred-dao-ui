@@ -16,7 +16,6 @@ import GaugeVoting from '../../../components/gaugeVoting';
 import Header from '../../../components/header';
 import Footer from '../../../components/footer';
 
-import BigNumber from 'bignumber.js';
 import classes from './project.module.css';
 
 import stores from '../../../stores/index.js';

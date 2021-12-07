@@ -138,8 +138,14 @@ export default function VeAssetGeneration(props) {
         </RadioGroup>
       </div>
       <div className={classes.actionButton}>
-        <Button fullWidth disableElevation variant="contained" color="primary" size="large" onClick={onLock} disabled={lockLoading} className={classes.button}>
-          <Typography variant="h5">{lockLoading ? <CircularProgress size={15} /> : `Lock ${project?.tokenMetadata?.symbol}`}</Typography>
+        <Button
+          fullWidth disableElevation
+          variant="contained" color="primary" size="large"
+          onClick={onLock}
+          disabled={lockLoading || !isLockIncreasePossible(project)}
+          className={classes.button}
+        >
+          <Typography variant="h5">{lockLoading ? <CircularProgress size={15} /> : `Increase ${project?.tokenMetadata?.symbol} Lock`}</Typography>
         </Button>
       </div>
       {/*<div className={classes.calculationResults}>
@@ -150,4 +156,8 @@ export default function VeAssetGeneration(props) {
       </div>*/}
     </Paper>
   );
+}
+
+function isLockIncreasePossible(project) {
+  return project && project.veTokenMetadata && BigNumber(project.veTokenMetadata.userLocked).gt(0)
 }
