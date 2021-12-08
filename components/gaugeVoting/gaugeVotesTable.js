@@ -320,7 +320,7 @@ export default function EnhancedTable({ project }) {
                     </Typography>
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
-                      <Tooltip title={`You need ${formatCurrency(row.needVeHndForMaxBoost)} veHND to get max boost`} followCursor>
+                      <Tooltip title={`You need ${formatCurrency(row.needVeHndForMaxBoost)} more veHND to get max boost`} followCursor>
                         <Typography variant="h5" className={classes.textSpacedClickable}>
                           {formatCurrency(row.boost)}x
                         </Typography>
