@@ -74,8 +74,7 @@ function LockDurationChart ({ project }) {
         <div>
           The average lock duration is currently{" "}
           <span style={{ color: accentColor }}>{years}</span> years (based on{" "}
-          {toFixedIfNecessary(totalSupply,2)} {project.veTokenMetadata.symbol} and {toFixedIfNecessary(totalLocked,2)} {project.tokenMetadata.symbol} 
-            locked).
+          {toFixedIfNecessary(totalSupply,2)} {project.veTokenMetadata.symbol} and {toFixedIfNecessary(totalLocked,2)} {project.tokenMetadata.symbol} locked).
         </div>
         </ChartContainer>
   

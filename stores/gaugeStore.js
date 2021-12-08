@@ -406,7 +406,7 @@ class Store {
 
     const veTokenContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.veTokenMetadata.address);
     const veTokenBalance = await veTokenContract.methods.balanceOf(account.address).call();
-    const totalSupply = await veTokenContract.methods.totalSupply().call();
+    const totalVeTokenSupply = await veTokenContract.methods.totalSupply().call();
     const userLocked = await veTokenContract.methods.locked(account.address).call();
     const supply = await veTokenContract.methods.supply().call();
 
@@ -424,7 +424,7 @@ class Store {
     project.veTokenMetadata.balance = BigNumber(veTokenBalance)
       .div(10 ** project.veTokenMetadata.decimals)
       .toFixed(project.veTokenMetadata.decimals);
-    project.veTokenMetadata.totalSupply = BigNumber(totalSupply)
+    project.veTokenMetadata.totalSupply = BigNumber(totalVeTokenSupply)
       .div(10 ** project.veTokenMetadata.decimals)
       .toFixed(project.veTokenMetadata.decimals);
     project.veTokenMetadata.userLocked = BigNumber(userLocked.amount)
@@ -477,20 +477,9 @@ class Store {
       project.gauges[i].userVotesPercent = gaugeVotePercent.toFixed(2)
       totalPercentUsed = BigNumber(totalPercentUsed).plus(gaugeVotePercent)
 
-      project.gauges[i].liquidityShare =
-        Math.min(
-          BigNumber(project.gauges[i].balance).multipliedBy(0.4)
-            .plus(
-              BigNumber(project.gauges[i].totalStakeBalance)
-                .multipliedBy(0.6)
-                .multipliedBy(BigNumber(veTokenBalance))
-                .div(BigNumber(totalSupply))
-            ).toNumber(),
-          project.gauges[i].balance
-        ) * 100 / project.gauges[i].totalStakeBalance;
-
-      project.gauges[i].minLiquidityShare = project.gauges[i].balance * 0.4 * 100 / project.gauges[i].totalStakeBalance;
-      project.gauges[i].boost = project.gauges[i].liquidityShare / project.gauges[i].minLiquidityShare;
+      project.gauges[i].liquidityShare = userLiquidityShare(project.gauges[i], veTokenBalance, totalVeTokenSupply);
+      project.gauges[i].boost = userBoost(project.gauges[i], veTokenBalance, totalVeTokenSupply);
+      project.gauges[i].needVeHndForMaxBoost = project.gauges[i].balance * project.veTokenMetadata.totalSupply / project.gauges[i].totalStakeBalance;
 
       let providedLiquidity = project.gauges[i].balance * project.gauges[i].lpToken.price;
       let totalProvidedLiquidity = project.gauges[i].totalStakeBalance * project.gauges[i].lpToken.price;
@@ -775,6 +764,24 @@ class Store {
     }
     return 0;
   };
+}
+
+function userLiquidityShare(gauge, veTokenBalance, totalVeTokenSupply) {
+  return Math.min(
+    BigNumber(gauge.balance).multipliedBy(0.4)
+      .plus(
+        BigNumber(gauge.totalStakeBalance)
+          .multipliedBy(0.6)
+          .multipliedBy(BigNumber(veTokenBalance))
+          .div(BigNumber(totalVeTokenSupply))
+      ).toNumber(),
+    gauge.balance
+  ) * 100 / gauge.totalStakeBalance;
+}
+
+function userBoost(gauge, veTokenBalance, totalVeTokenSupply) {
+  return userLiquidityShare(gauge, veTokenBalance, totalVeTokenSupply) /
+    userLiquidityShare(gauge, 0, totalVeTokenSupply)
 }
 
 export default Store;

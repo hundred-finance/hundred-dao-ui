@@ -165,6 +165,11 @@ const useStyles = makeStyles((theme) => ({
   textSpaced: {
     lineHeight: '1.5',
   },
+  textSpacedClickable: {
+    lineHeight: '1.5',
+    cursor: 'pointer',
+    textDecoration: 'underline'
+  },
   cell: {},
   cellSuccess: {
     color: '#4eaf0a',
@@ -243,6 +248,10 @@ const useStyles = makeStyles((theme) => ({
   statusSafe: {
     color: 'green',
   },
+  infoIcon: {
+  fontSize: '1.5rem !important',
+  marginTop: '0.1rem'
+}
 }));
 
 export default function EnhancedTable({ project }) {
@@ -311,9 +320,11 @@ export default function EnhancedTable({ project }) {
                     </Typography>
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
-                    <Typography variant="h5" className={classes.textSpaced}>
-                      {formatCurrency(row.boost)}x
-                    </Typography>
+                      <Tooltip title={`You need ${formatCurrency(row.needVeHndForMaxBoost)} veHND to get max boost`} followCursor>
+                        <Typography variant="h5" className={classes.textSpacedClickable}>
+                          {formatCurrency(row.boost)}x
+                        </Typography>
+                      </Tooltip>
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
