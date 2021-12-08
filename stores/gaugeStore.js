@@ -226,7 +226,7 @@ class Store {
         let pricePromise = new Promise((resolve, reject) => {
           resolve(priceOracleContract.methods.getUnderlyingPrice(lp).call());
         })
-        let exchangeRare = new Promise((resolve, reject) => {
+        let exchangeRate = new Promise((resolve, reject) => {
           resolve(new web3.eth.Contract(CTOKEN_ABI, lp).methods.exchangeRateStored().call());
         })
 
@@ -235,7 +235,7 @@ class Store {
         })
 
         return [
-          pricePromise, exchangeRare, underlying
+          pricePromise, exchangeRate, underlying
         ];
       }).flat()
     )
@@ -284,7 +284,7 @@ class Store {
         weight: BigNumber(gaugesWeights[i]).div(1e18).toNumber(),
         currentEpochRelativeWeight: BigNumber(gaugesCurrentEpochRelativeWeights[i]).times(100).div(1e18).toNumber(),
         nextEpochRelativeWeight: BigNumber(gaugesNextEpochRelativeWeights[i]).times(100).div(1e18).toNumber(),
-        totalStakeBalance: BigNumber(lpTokens[i * 5 + 3]).div(1e8).toNumber() * convRate * 100,
+        totalStakeBalance: BigNumber(lpTokens[i * 5 + 3]).div(10 ** lpTokens[i * 5 + 4]).toNumber() * convRate,
         liquidityShare: 0,
         apr: 0,
         lpToken: {
@@ -292,8 +292,9 @@ class Store {
           name: lpTokens[i * 5],
           symbol: lpTokens[i * 5 + 1],
           decimals: lpTokens[i * 5 + 2],
+          underlyingDecimals: lpTokens[i * 5 + 4],
           price: lpPrice,
-          conversionRate: convRate * 100
+          conversionRate: convRate
         },
       };
 
@@ -470,7 +471,7 @@ class Store {
     let totalPercentUsed = 0
 
     for (let i = 0; i < project.gauges.length; i++) {
-      project.gauges[i].balance = BigNumber(balanceOf[i]).div(1e8).toNumber() * project.gauges[i].lpToken.conversionRate
+      project.gauges[i].balance = BigNumber(balanceOf[i]).div(10 ** project.gauges[i].lpToken.underlyingDecimals).toNumber() * project.gauges[i].lpToken.conversionRate
 
       const gaugeVotePercent = BigNumber(voteWeights[i]).div(100)
       project.gauges[i].userVotesPercent = gaugeVotePercent.toFixed(2)
