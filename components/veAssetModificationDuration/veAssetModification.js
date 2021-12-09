@@ -138,7 +138,7 @@ export default function VeAssetGeneration(props) {
         </RadioGroup>
       </div>
       <div className={classes.textField}>
-        Current lock ends on {moment.unix(project?.veTokenMetadata?.userLockEnd).toString()}
+        Current lock ends on <span style={{ color: '#26ff91' }}>{moment.unix(project?.veTokenMetadata?.userLockEnd).toString()}</span>
       </div>
       <div className={classes.actionButton}>
         <Button
