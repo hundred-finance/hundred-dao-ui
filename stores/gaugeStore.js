@@ -408,6 +408,7 @@ class Store {
     const veTokenBalance = await veTokenContract.methods.balanceOf(account.address).call();
     const totalVeTokenSupply = await veTokenContract.methods.totalSupply().call();
     const userLocked = await veTokenContract.methods.locked(account.address).call();
+    const userLockEnd = (veTokenContract.methods.locked__end(account.address).call()) * 1000;
     const supply = await veTokenContract.methods.supply().call();
 
 
@@ -430,6 +431,7 @@ class Store {
     project.veTokenMetadata.userLocked = BigNumber(userLocked.amount)
       .div(10 ** project.veTokenMetadata.decimals)
       .toFixed(project.veTokenMetadata.decimals);
+    project.veTokenMetadata.userLockEnd = userLockEnd;
 
     project.veTokenMetadata.supply = BigNumber(supply)
       .div(10 ** project.tokenMetadata.decimals)

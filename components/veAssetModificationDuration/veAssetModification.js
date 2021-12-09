@@ -137,12 +137,15 @@ export default function VeAssetGeneration(props) {
           }
         </RadioGroup>
       </div>
+      <div className={classes.textField}>
+        Current lock ends on {moment.unix(project?.veTokenMetadata?.userLockEnd).toString()}
+      </div>
       <div className={classes.actionButton}>
         <Button
           fullWidth disableElevation
           variant="contained" color="primary" size="large"
           onClick={onLock}
-          disabled={lockLoading || !isLockIncreasePossible(project)}
+          disabled={lockLoading || !isLockIncreasePossible(project, selectedDate)}
           className={classes.button}
         >
           <Typography variant="h5">{lockLoading ? <CircularProgress size={15} /> : `Increase ${project?.tokenMetadata?.symbol} Lock`}</Typography>
@@ -158,6 +161,9 @@ export default function VeAssetGeneration(props) {
   );
 }
 
-function isLockIncreasePossible(project) {
-  return project && project.veTokenMetadata && BigNumber(project.veTokenMetadata.userLocked).gt(0)
+function isLockIncreasePossible(project, selectedDate) {
+  return project &&
+    project.veTokenMetadata &&
+    BigNumber(project.veTokenMetadata.userLocked).gt(0) &&
+    moment(selectedDate).unix() >= project.veTokenMetadata.userLockEnd
 }
