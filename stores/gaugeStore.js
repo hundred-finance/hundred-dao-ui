@@ -481,7 +481,8 @@ class Store {
 
       project.gauges[i].liquidityShare = userLiquidityShare(project.gauges[i], veTokenBalance, totalVeTokenSupply);
       project.gauges[i].boost = userBoost(project.gauges[i], veTokenBalance, totalVeTokenSupply);
-      project.gauges[i].needVeHndForMaxBoost = project.gauges[i].balance * project.veTokenMetadata.totalSupply / project.gauges[i].totalStakeBalance;
+      project.gauges[i].needVeHndForMaxBoost =
+        project.gauges[i].balance * project.veTokenMetadata.totalSupply / (project.gauges[i].totalStakeBalance - project.gauges[i].balance);
 
       let providedLiquidity = project.gauges[i].balance * project.gauges[i].lpToken.price;
       let totalProvidedLiquidity = project.gauges[i].totalStakeBalance * project.gauges[i].lpToken.price;
