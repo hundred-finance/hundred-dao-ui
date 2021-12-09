@@ -85,6 +85,25 @@ class Store {
           useDays: false,
           maxDurationYears: 4,
           onload: null
+        },
+        {
+          type: 'hundredfinance',
+          id: 'hundred-finance-fantom',
+          name: 'Hundred Finance (fantom)',
+          logo: '/logo128.png',
+          url: 'hundred.finance',
+          chainId: 250,
+          gaugeProxyAddress: "0xb1c4426C86082D91a6c097fC588E5D5d8dD1f5a8",
+          lpPriceOracle: "0x10010069DE6bD5408A6dEd075Cf6ae2498073c73",
+          rewardPolicyMaker: "0x772918d032cFd4Ff09Ea7Af623e56E2D8D96bB65",
+          gauges: [],
+          vaults: [],
+          tokenMetadata: {},
+          veTokenMetadata: {},
+          otherTokenMetadata: {},
+          useDays: false,
+          maxDurationYears: 4,
+          onload: null
         }
       ],
     };
