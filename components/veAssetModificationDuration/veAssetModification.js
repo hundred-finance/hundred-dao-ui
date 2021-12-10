@@ -6,7 +6,13 @@ import { formatCurrency } from '../../utils';
 import moment from 'moment';
 
 import stores from '../../stores/index.js';
-import { ERROR, INCREASE_LOCK_DURATION, INCREASE_LOCK_DURATION_RETURNED } from '../../stores/constants';
+import {
+  ERROR,
+  INCREASE_LOCK_DURATION,
+  INCREASE_LOCK_DURATION_RETURNED,
+  WITHDRAW,
+  WITHDRAW_RETURNED,
+} from '../../stores/constants';
 
 import classes from './veAssetModification.module.css';
 
@@ -24,6 +30,7 @@ export default function VeAssetGeneration(props) {
     };
 
     stores.emitter.on(INCREASE_LOCK_DURATION_RETURNED, lockReturned);
+    stores.emitter.on(WITHDRAW_RETURNED, lockReturned);
     stores.emitter.on(ERROR, lockReturned);
 
     return () => {
@@ -91,6 +98,22 @@ export default function VeAssetGeneration(props) {
     }
   };
 
+  const onUnlock = () => {
+    setSelectedDateError(false);
+    let error = false;
+
+    if (!selectedDate) {
+      setSelectedDateError(true);
+      error = true;
+    }
+
+    if (!error) {
+      setLockLoading(true);
+
+      stores.dispatcher.dispatch({ type: WITHDRAW, content: { project } });
+    }
+  };
+
   return (
     <Paper elevation={1} className={classes.projectCardContainer}>
       <Typography variant="h3" className={classes.sectionHeader}>
@@ -151,12 +174,20 @@ export default function VeAssetGeneration(props) {
           <Typography variant="h5">{lockLoading ? <CircularProgress size={15} /> : `Increase ${project?.tokenMetadata?.symbol} Lock`}</Typography>
         </Button>
       </div>
-      {/*<div className={classes.calculationResults}>
-        <div className={classes.calculationResult}>
-          <Typography variant="h2">You will receive: </Typography>
-          <Typography variant="h2" className={classes.bold}></Typography>
-        </div>
-      </div>*/}
+      <div className={classes.textField}>
+        Currently locked HND <span style={{ color: '#26ff91' }}>{project?.veTokenMetadata?.userLocked}</span>
+      </div>
+      <div className={classes.actionButton}>
+        <Button
+          fullWidth disableElevation
+          variant="contained" color="primary" size="large"
+          onClick={onUnlock}
+          disabled={lockLoading || !isUnLockPossible(project)}
+          className={classes.button}
+        >
+          <Typography variant="h5">{lockLoading ? <CircularProgress size={15} /> : `Unlock HND`}</Typography>
+        </Button>
+      </div>
     </Paper>
   );
 }
@@ -166,4 +197,11 @@ function isLockIncreasePossible(project, selectedDate) {
     project.veTokenMetadata &&
     BigNumber(project.veTokenMetadata.userLocked).gt(0) &&
     moment(selectedDate).unix() >= project.veTokenMetadata.userLockEnd
+}
+
+function isUnLockPossible(project) {
+  return project &&
+    project.veTokenMetadata &&
+    BigNumber(project.veTokenMetadata.userLocked).gt(0) &&
+    moment().unix() >= project.veTokenMetadata.userLockEnd
 }

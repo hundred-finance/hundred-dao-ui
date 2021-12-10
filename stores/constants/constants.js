@@ -52,6 +52,9 @@ export const APPROVE_LOCK_RETURNED = 'APPROVE_LOCK_RETURNED'
 export const LOCK = 'LOCK'
 export const LOCK_RETURNED = 'LOCK_RETURNED'
 
+export const WITHDRAW = 'WITHDRAW'
+export const WITHDRAW_RETURNED = 'WITHDRAW_RETURNED'
+
 export const VOTE = 'VOTE'
 export const VOTE_RETURNED = 'VOTE_RETURNED'
 
