@@ -145,7 +145,7 @@ export default function VeAssetGeneration(props) {
         <div className={classes.inputTitleContainer}>
           <div className={classes.inputTitle}>
             <Typography variant="h5" noWrap>
-              Relock for
+              Relock for { isLockIncreasePossible(project, selectedDate) ? `(new veHND balance: ${projectedVeHndBalance(project).toString()})` : ''  }
             </Typography>
           </div>
         </div>
@@ -153,7 +153,7 @@ export default function VeAssetGeneration(props) {
           <FormControlLabel value="month" control={<Radio color="primary" />} label="1 month" labelPlacement="bottom" />
           <FormControlLabel value="year" control={<Radio color="primary" />} label="1 year" labelPlacement="bottom" />
           <FormControlLabel value="2year" control={<Radio color="primary" />} label="2 years" labelPlacement="bottom" />
-          {project?.maxDurationYears == 3 ? 
+          {project?.maxDurationYears === 3 ?
             <FormControlLabel value="3year" control={<Radio color="primary" />} label="3 years" labelPlacement="bottom" />
             :
             <FormControlLabel value="years" control={<Radio color="primary" />} label="4 years" labelPlacement="bottom" />
@@ -204,4 +204,13 @@ function isUnLockPossible(project) {
     project.veTokenMetadata &&
     BigNumber(project.veTokenMetadata.userLocked).gt(0) &&
     moment().unix() >= project.veTokenMetadata.userLockEnd
+}
+
+function projectedVeHndBalance(project, newLockEnd) {
+  let oldLockEnd = project.veTokenMetadata.userLockEnd
+  if (newLockEnd > oldLockEnd) {
+    let now = moment().unix()
+    return project.veTokenMetadata.userLocked * (newLockEnd - now) / (oldLockEnd - now)
+  }
+  return project.veTokenMetadata.userLocked
 }

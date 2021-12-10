@@ -149,12 +149,24 @@ export default function VeAssetGeneration(props) {
           <Typography variant="h5">{lockLoading ? <CircularProgress size={15} /> : `Lock ${project?.tokenMetadata?.symbol}`}</Typography>
         </Button>
       </div>
-      {/*<div className={classes.calculationResults}>
-        <div className={classes.calculationResult}>
-          <Typography variant="h2">You will receive: </Typography>
-          <Typography variant="h2" className={classes.bold}></Typography>
-        </div>
-      </div>*/}
+      { amount ?
+          <div className={classes.calculationResults}>
+            <div className={classes.calculationResult}>
+              <Typography variant="h3">You will receive: {projectedVeHndBalance(project, amount)} veHND</Typography>
+            </div>
+          </div>
+        :
+          ''
+      }
     </Paper>
   );
+}
+
+function projectedVeHndBalance(project, amount) {
+  let lockEnd = project.veTokenMetadata.userLockEnd
+  let now = moment().unix()
+  if (lockEnd > now) {
+    return +amount * (lockEnd - now) / (4 * 365 * 24 * 3600)
+  }
+  return 0
 }
