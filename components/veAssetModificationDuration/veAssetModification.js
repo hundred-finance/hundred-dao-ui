@@ -145,7 +145,7 @@ export default function VeAssetGeneration(props) {
         <div className={classes.inputTitleContainer}>
           <div className={classes.inputTitle}>
             <Typography variant="h5" noWrap>
-              Relock for { isLockIncreasePossible(project, selectedDate) ? `(new veHND balance: ${projectedVeHndBalance(project).toString()})` : ''  }
+              Relock for { isLockIncreasePossible(project, selectedDate) ? `(new veHND balance: ${projectedVeHndBalance(project).toFixed(2)})` : ''  }
             </Typography>
           </div>
         </div>
@@ -175,7 +175,7 @@ export default function VeAssetGeneration(props) {
         </Button>
       </div>
       <div className={classes.textField}>
-        Currently locked HND <span style={{ color: '#26ff91' }}>{project?.veTokenMetadata?.userLocked}</span>
+        Currently locked HND <span style={{ color: '#26ff91' }}>{(+project?.veTokenMetadata?.userLocked).toFixed(2)}</span>
       </div>
       <div className={classes.actionButton}>
         <Button
@@ -210,7 +210,7 @@ function projectedVeHndBalance(project, newLockEnd) {
   let oldLockEnd = project.veTokenMetadata.userLockEnd
   if (newLockEnd > oldLockEnd) {
     let now = moment().unix()
-    return project.veTokenMetadata.userLocked * (newLockEnd - now) / (oldLockEnd - now)
+    return +project.veTokenMetadata.userLocked * (newLockEnd - now) / (oldLockEnd - now)
   }
-  return project.veTokenMetadata.userLocked
+  return +project.veTokenMetadata.userLocked
 }
