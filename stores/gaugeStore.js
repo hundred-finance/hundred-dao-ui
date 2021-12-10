@@ -457,7 +457,7 @@ class Store {
       .div(10 ** project.tokenMetadata.decimals)
       .toFixed(project.tokenMetadata.decimals);
 
-    project.veTokenMetadata.userLockEnd = userLocked.end * 1000;
+    project.veTokenMetadata.userLockEnd = userLocked.end;
 
     let gaugeControllerContract = null
     let voteWeights = []
