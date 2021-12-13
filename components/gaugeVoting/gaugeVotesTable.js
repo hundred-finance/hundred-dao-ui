@@ -304,7 +304,9 @@ export default function EnhancedTable({ project }) {
   }
 
   function displayBoost(gauge) {
-    if (gauge.appliedBoost === 2.5) {
+    console.log("gauge", gauge);
+
+    if (gauge.appliedBoost === 2.5 || isNaN(gauge.appliedBoost)) {
       return <Typography variant="h5" className={classes.textSpaced}>
           {formatCurrency(gauge.appliedBoost)}x
         </Typography>
