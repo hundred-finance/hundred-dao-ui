@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { lighten, makeStyles } from '@material-ui/core/styles';
 import Skeleton from '@material-ui/lab/Skeleton';
@@ -12,7 +12,9 @@ import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Typography from '@material-ui/core/Typography';
 
 import { formatCurrency, formatAddress } from '../../utils';
-import { Tooltip } from '@material-ui/core';
+import { Button, CircularProgress, Tooltip } from '@material-ui/core';
+import stores from '../../stores';
+import { APPLY_BOOST, APPLY_BOOST_RETURNED, ERROR, VOTE_RETURNED } from '../../stores/constants';
 
 function descendingComparator(a, b, orderBy) {
   if (!a || !b) {
@@ -260,11 +262,32 @@ export default function EnhancedTable({ project }) {
   const [orderBy, setOrderBy] = React.useState('balance');
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [resetLoading, setResetLoading] = useState(false);
+
+  useEffect(function () {
+    const applyBoostReturned = () => {
+      setResetLoading(false);
+    };
+
+    stores.emitter.on(APPLY_BOOST_RETURNED, applyBoostReturned);
+    stores.emitter.on(ERROR, applyBoostReturned);
+
+    return () => {
+      stores.emitter.removeListener(APPLY_BOOST_RETURNED, applyBoostReturned);
+      stores.emitter.removeListener(ERROR, applyBoostReturned);
+    };
+  }, []);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
+  };
+
+  const onApplyBoost = (gauge) => {
+    setResetLoading(true);
+
+    stores.dispatcher.dispatch({ type: APPLY_BOOST, content: { project: project, gaugeAddress: gauge.address } });
   };
 
   if (!project || !project.gauges) {
@@ -278,6 +301,43 @@ export default function EnhancedTable({ project }) {
         <Skeleton variant="rect" width={'100%'} height={70} className={classes.skelly} />
       </div>
     );
+  }
+
+  function displayBoost(gauge) {
+    if (gauge.appliedBoost === 2.5) {
+      return <Typography variant="h5" className={classes.textSpaced}>
+          {formatCurrency(gauge.appliedBoost)}x
+        </Typography>
+    }
+
+    if (gauge.appliedBoost === gauge.boost) {
+      return <Tooltip title={`You need ${formatCurrency(gauge.needVeHndForMaxBoost)} more veHND to get max boost`} followCursor>
+        <Typography variant="h5" className={classes.textSpacedClickable}>
+          {formatCurrency(gauge.appliedBoost)}x
+        </Typography>
+      </Tooltip>
+    }
+
+    return <>
+      <Tooltip title={`Your effective boost is ${formatCurrency(gauge.boost)} click on apply to update it`} followCursor>
+        <Typography variant="h5" className={classes.textSpacedClickable}>
+          {formatCurrency(gauge.appliedBoost)}x
+        </Typography>
+      </Tooltip>
+      <Button
+        disableElevation
+        variant="contained"
+        color="primary"
+        size="small"
+        onClick={() => {
+          onApplyBoost(gauge);
+        }}
+        disabled={resetLoading}
+      >
+        <Typography variant="h5">{resetLoading ? <CircularProgress size={15} /> : 'Apply'}</Typography>
+      </Button>
+    </>
+
   }
 
   return (
@@ -320,11 +380,7 @@ export default function EnhancedTable({ project }) {
                     </Typography>
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
-                      <Tooltip title={`You need ${formatCurrency(row.needVeHndForMaxBoost)} more veHND to get max boost`} followCursor>
-                        <Typography variant="h5" className={classes.textSpacedClickable}>
-                          {formatCurrency(row.boost)}x
-                        </Typography>
-                      </Tooltip>
+                    { displayBoost(row) }
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>

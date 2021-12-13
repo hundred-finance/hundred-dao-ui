@@ -21,7 +21,7 @@ import {
   INCREASE_LOCK_AMOUNT,
   INCREASE_LOCK_AMOUNT_RETURNED,
   INCREASE_LOCK_DURATION,
-  INCREASE_LOCK_DURATION_RETURNED, WITHDRAW, WITHDRAW_RETURNED,
+  INCREASE_LOCK_DURATION_RETURNED, WITHDRAW, WITHDRAW_RETURNED, APPLY_BOOST, APPLY_BOOST_RETURNED,
 } from './constants';
 
 import { ERC20_ABI, GAUGE_CONTROLLER_ABI, GAUGE_ABI, VOTING_ESCROW_ABI } from './abis';
@@ -140,6 +140,9 @@ class Store {
             break;
           case INCREASE_LOCK_DURATION:
             this.increaseLockDuration(payload);
+            break;
+          case APPLY_BOOST:
+            this.applyBoost(payload);
             break;
           default: {
           }
@@ -486,6 +489,15 @@ class Store {
 
     const balanceOf = await Promise.all(balanceOfPromise);
 
+    const workingBalanceOfPromise = project.gauges.map((gauge) => {
+      return new Promise((resolve, reject) => {
+        const gaugeContract = new web3.eth.Contract(GAUGE_ABI, gauge.address);
+        resolve(gaugeContract.methods.working_balances(account.address).call());
+      });
+    });
+
+    const workingBalanceOf = await Promise.all(workingBalanceOfPromise);
+
     const rewardPolicyMakerContract = new web3.eth.Contract(REWARD_POLICY_MAKER_ABI, project.rewardPolicyMaker);
     const currentRewardRate = await rewardPolicyMakerContract.methods.rate_at(currentEpochTime()).call();
     const nextEpochRewardRate = await rewardPolicyMakerContract.methods.rate_at(nextEpochTime()).call();
@@ -493,7 +505,11 @@ class Store {
     let totalPercentUsed = 0
 
     for (let i = 0; i < project.gauges.length; i++) {
+
       project.gauges[i].balance = BigNumber(balanceOf[i]).div(10 ** project.gauges[i].lpToken.underlyingDecimals).toNumber() * project.gauges[i].lpToken.conversionRate
+
+      project.gauges[i].workingBalance = BigNumber(workingBalanceOf[i])
+      project.gauges[i].rawBalance = BigNumber(balanceOf[i])
 
       const gaugeVotePercent = BigNumber(voteWeights[i]).div(100)
       project.gauges[i].userVotesPercent = gaugeVotePercent.toFixed(2)
@@ -501,6 +517,7 @@ class Store {
 
       project.gauges[i].liquidityShare = userLiquidityShare(project.gauges[i], veTokenBalance, totalVeTokenSupply);
       project.gauges[i].boost = userBoost(project.gauges[i], veTokenBalance, totalVeTokenSupply);
+      project.gauges[i].appliedBoost = userAppliedBoost(project.gauges[i]);
       project.gauges[i].needVeHndForMaxBoost =
         project.gauges[i].balance * project.veTokenMetadata.totalSupply / (project.gauges[i].totalStakeBalance - project.gauges[i].balance);
 
@@ -745,6 +762,34 @@ class Store {
     });
   };
 
+  applyBoost = async (payload) => {
+
+    const account = stores.accountStore.getStore('account');
+    if (!account) {
+      return false;
+      //maybe throw an error
+    }
+
+    const web3 = await stores.accountStore.getWeb3Provider();
+    if (!web3) {
+      return false;
+      //maybe throw an error
+    }
+
+    let { gaugeAddress, project } = payload.content;
+
+    const gaugeContract = new web3.eth.Contract(GAUGE_ABI, gaugeAddress);
+    await this._asyncCallContractWait(
+      web3, gaugeContract, 'user_checkpoint', [account.address], account, null,
+      GET_TOKEN_BALANCES, { id: project.id }, (err, result) => {
+        if (err) {
+          return this.emitter.emit(ERROR, err);
+        }
+        return this.emitter.emit(APPLY_BOOST_RETURNED, result);
+      });
+
+  }
+
   _callIncreaseUnlockTime = async (web3, project, account, selectedDate, callback) => {
     const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.veTokenMetadata.address);
 
@@ -833,8 +878,12 @@ function userLiquidityShare(gauge, veTokenBalance, totalVeTokenSupply) {
 }
 
 function userBoost(gauge, veTokenBalance, totalVeTokenSupply) {
-  return userLiquidityShare(gauge, veTokenBalance, totalVeTokenSupply) /
-    userLiquidityShare(gauge, 0, totalVeTokenSupply)
+  return Math.min(userLiquidityShare(gauge, veTokenBalance, totalVeTokenSupply) /
+    userLiquidityShare(gauge, 0, totalVeTokenSupply), 2.5)
+}
+
+function userAppliedBoost(gauge) {
+  return BigNumber(gauge.workingBalance).div(BigNumber(gauge.rawBalance).multipliedBy(0.4)).toNumber()
 }
 
 export default Store;
