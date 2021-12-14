@@ -311,7 +311,7 @@ export default function EnhancedTable({ project }) {
         </Typography>
     }
 
-    if (gauge.appliedBoost === gauge.boost) {
+    if (Math.round(gauge.appliedBoost * 1000) === Math.round(gauge.boost * 1000)) {
       return <Tooltip title={`You need ${formatCurrency(gauge.needVeHndForMaxBoost)} more veHND to get max boost`} followCursor>
         <Typography variant="h5" className={classes.textSpacedClickable}>
           {formatCurrency(gauge.appliedBoost)}x
@@ -320,7 +320,7 @@ export default function EnhancedTable({ project }) {
     }
 
     return <>
-      <Tooltip title={`Your effective boost is ${formatCurrency(gauge.boost)} click on apply to update it`} followCursor>
+      <Tooltip title={`Your effective boost is ${formatCurrency(gauge.boost)} click on apply if you wish to update it`} followCursor>
         <Typography variant="h5" className={classes.textSpacedClickable}>
           {formatCurrency(gauge.appliedBoost)}x
         </Typography>
