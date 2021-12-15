@@ -10,13 +10,12 @@ import { ERROR, INCREASE_LOCK_AMOUNT, INCREASE_LOCK_AMOUNT_RETURNED, APPROVE_LOC
 
 import classes from './veAssetModification.module.css';
 
-export default function VeAssetGeneration(props) {
+export default function VeAssetGeneration({ project }) {
   const [approveLoading, setApproveLoading] = useState(false);
   const [lockLoading, setLockLoading] = useState(false);
 
   const [amount, setAmount] = useState('');
   const [amountError, setAmountError] = useState(false);
-  const [project, setProject] = useState(null);
   const [selectedDateError, setSelectedDateError] = useState(false);
 
   useEffect(function () {
@@ -43,12 +42,6 @@ export default function VeAssetGeneration(props) {
 
     setAmount(BigNumber(project.tokenMetadata.balance).times(percent).div(100).toFixed(project.tokenMetadata.decimals));
   };
-
-  const updateProject = () => {
-    setProject(props.project);
-  };
-
-  useEffect(updateProject, [props]);
 
   const onLock = () => {
     setAmountError(false);

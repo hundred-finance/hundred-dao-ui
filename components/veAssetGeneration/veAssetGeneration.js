@@ -10,7 +10,7 @@ import { ERROR, LOCK, LOCK_RETURNED, APPROVE_LOCK, APPROVE_LOCK_RETURNED } from 
 
 import classes from './veAssetGeneration.module.css';
 
-export default function VeAssetGeneration(props) {
+export default function VeAssetGeneration({ project }) {
   const [approveLoading, setApproveLoading] = useState(false);
   const [lockLoading, setLockLoading] = useState(false);
 
@@ -19,7 +19,6 @@ export default function VeAssetGeneration(props) {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDateError, setSelectedDateError] = useState(false);
   const [selectedValue, setSelectedValue] = useState('week');
-  const [project, setProject] = useState(null);
 
   useEffect(function () {
     const lockReturned = () => {
@@ -68,12 +67,6 @@ export default function VeAssetGeneration(props) {
         setSelectedDate(moment().add(4, 'years').format('YYYY-MM-DD'));
     }
   };
-
-  const updateProject = () => {
-    setProject(props.project);
-  };
-
-  useEffect(updateProject, [props]);
 
   const onLock = () => {
     setAmountError(false);
@@ -227,12 +220,6 @@ export default function VeAssetGeneration(props) {
           <Typography variant="h5">{lockLoading ? <CircularProgress size={15} /> : `Lock ${project?.tokenMetadata?.symbol}`}</Typography>
         </Button>
       </div>
-      {/*<div className={classes.calculationResults}>
-        <div className={classes.calculationResult}>
-          <Typography variant="h2">You will receive: </Typography>
-          <Typography variant="h2" className={classes.bold}></Typography>
-        </div>
-      </div>*/}
     </Paper>
   );
 }

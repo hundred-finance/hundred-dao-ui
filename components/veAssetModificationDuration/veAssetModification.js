@@ -16,13 +16,12 @@ import {
 
 import classes from './veAssetModification.module.css';
 
-export default function VeAssetGeneration(props) {
+export default function VeAssetGeneration({ project }) {
   const [lockLoading, setLockLoading] = useState(false);
 
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDateError, setSelectedDateError] = useState(false);
   const [selectedValue, setSelectedValue] = useState('week');
-  const [project, setProject] = useState(null);
 
   useEffect(function () {
     const lockReturned = () => {
@@ -70,12 +69,6 @@ export default function VeAssetGeneration(props) {
 
     setSelectedDate(newDate);
   };
-
-  const updateProject = () => {
-    setProject(props.project);
-  };
-
-  useEffect(updateProject, [props]);
 
   const onLock = () => {
     setSelectedDateError(false);
