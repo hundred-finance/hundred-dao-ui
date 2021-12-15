@@ -320,23 +320,23 @@ export default function EnhancedTable({ project }) {
     }
 
     return <>
-      <Tooltip title={`Your effective boost is ${formatCurrency(gauge.boost)} click on apply if you wish to update it`} followCursor>
-        <Typography variant="h5" className={classes.textSpacedClickable}>
+        <Typography variant="h5" className={classes.textSpaced}>
           {formatCurrency(gauge.appliedBoost)}x
         </Typography>
-      </Tooltip>
-      <Button
-        disableElevation
-        variant="contained"
-        color="primary"
-        size="small"
-        onClick={() => {
-          onApplyBoost(gauge);
-        }}
-        disabled={resetLoading}
-      >
-        <Typography variant="h5">{resetLoading ? <CircularProgress size={15} /> : 'Apply'}</Typography>
-      </Button>
+        <Tooltip title={`Your effective boost is ${formatCurrency(gauge.boost)} click on apply if you wish to update it`} followCursor>
+          <Button
+            disableElevation
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={() => {
+              onApplyBoost(gauge);
+            }}
+            disabled={resetLoading}
+          >
+            <Typography variant="h5">{resetLoading ? <CircularProgress size={15} /> : 'Apply'}</Typography>
+          </Button>
+        </Tooltip>
     </>
 
   }
