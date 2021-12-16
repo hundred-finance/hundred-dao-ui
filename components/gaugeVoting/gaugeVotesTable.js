@@ -13,6 +13,7 @@ import Typography from '@material-ui/core/Typography';
 
 import { formatCurrency, formatAddress } from '../../utils';
 import { Button, CircularProgress, Tooltip } from '@material-ui/core';
+import InfoIcon from '@material-ui/icons/InfoOutlined';
 import stores from '../../stores';
 import { APPLY_BOOST, APPLY_BOOST_RETURNED, ERROR, VOTE_RETURNED } from '../../stores/constants';
 
@@ -97,12 +98,17 @@ function EnhancedTableHead(props) {
       <TableRow>
         {headCells.map((headCell) => (
           <TableCell key={headCell.id} align={headCell.numeric ? 'right' : 'left'} padding={'default'} sortDirection={orderBy === headCell.id ? order : false}>
-            <Tooltip title={headCell.tooltip ? headCell.tooltip : headCell.label}>
-              <TableSortLabel active={orderBy === headCell.id} direction={orderBy === headCell.id ? order : 'asc'} onClick={createSortHandler(headCell.id)}>
-                <Typography variant="h5">{headCell.label}</Typography>
-                {orderBy === headCell.id ? <span className={classes.visuallyHidden}>{order === 'desc' ? 'sorted descending' : 'sorted ascending'}</span> : null}
-              </TableSortLabel>
-            </Tooltip>
+            <TableSortLabel active={orderBy === headCell.id} direction={orderBy === headCell.id ? order : 'asc'} onClick={createSortHandler(headCell.id)}>
+              <Typography variant="h5">{headCell.label}</Typography>
+              {orderBy === headCell.id ? <span className={classes.visuallyHidden}>{order === 'desc' ? 'sorted descending' : 'sorted ascending'}</span> : null}
+            </TableSortLabel>
+            { headCell.tooltip ?
+              <Tooltip title={headCell.tooltip}>
+                <InfoIcon />
+              </Tooltip>
+              :
+              ''
+            }
           </TableCell>
         ))}
       </TableRow>
@@ -249,11 +255,7 @@ const useStyles = makeStyles((theme) => ({
   },
   statusSafe: {
     color: 'green',
-  },
-  infoIcon: {
-  fontSize: '1.5rem !important',
-  marginTop: '0.1rem'
-}
+  }
 }));
 
 export default function EnhancedTable({ project }) {
@@ -372,7 +374,7 @@ export default function EnhancedTable({ project }) {
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
-                      {formatCurrency(row.gaugeApr)}% -> {formatCurrency(row.nextEpochGaugeApr)}%
+                        {formatCurrency(row.gaugeApr)}% -> {formatCurrency(row.nextEpochGaugeApr)}%
                     </Typography>
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
