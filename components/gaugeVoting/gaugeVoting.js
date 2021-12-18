@@ -12,6 +12,7 @@ import stores from '../../stores/index.js';
 import { ERROR, VOTE, VOTE_RETURNED } from '../../stores/constants';
 
 import classes from './gaugeVoting.module.css';
+import moment from 'moment';
 
 export default function GaugeVoting({ project }) {
   const [amount, setAmount] = useState(0);
@@ -76,6 +77,10 @@ export default function GaugeVoting({ project }) {
     stores.dispatcher.dispatch({ type: VOTE, content: { gaugeAddress: gauge.address, amount: '0', project } });
   };
 
+  const canVoteFor = (gauge) => {
+      return !gauge || gauge.nextVoteTimestamp === 0 || gauge.nextVoteTimestamp <= moment().unix()
+  };
+
   return (
     <Paper elevation={1} className={classes.projectCardContainer}>
       <Typography variant="h3" className={classes.sectionHeader}>
@@ -138,8 +143,16 @@ export default function GaugeVoting({ project }) {
           />
         </div>
         <div className={classes.actionButton}>
-          <Button fullWidth disableElevation variant="contained" color="primary" size="large" onClick={onVote} disabled={voteLoading}>
-            <Typography variant="h5">{voteLoading ? <CircularProgress size={15} /> : 'Vote'}</Typography>
+          <Button fullWidth disableElevation variant="contained"
+                  color="primary" size="large" onClick={onVote}
+                  disabled={voteLoading || !canVoteFor(gauge)}
+          >
+            {
+              canVoteFor(gauge) ?
+                <Typography variant="h5">{voteLoading ? <CircularProgress size={15} /> : 'Vote'}</Typography>
+              :
+                <Typography variant="h5">Vote disabled until { moment.unix(gauge?.nextVoteTimestamp).format('YYYY-MM-DD HH:mm') }</Typography>
+            }
           </Button>
         </div>
         <div className={classes.calculationResults}>

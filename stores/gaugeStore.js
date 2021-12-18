@@ -498,6 +498,15 @@ class Store {
 
     const workingBalanceOf = await Promise.all(workingBalanceOfPromise);
 
+    const lastUserVotesPromise = project.gauges.map((gauge) => {
+      return new Promise((resolve, reject) => {
+        const gaugeContract = new web3.eth.Contract(GAUGE_CONTROLLER_ABI, project.gaugeProxyAddress);
+        resolve(gaugeContract.methods.last_user_vote(account.address, gauge.address).call());
+      });
+    });
+
+    const lastUserVotes = await Promise.all(lastUserVotesPromise);
+
     const rewardPolicyMakerContract = new web3.eth.Contract(REWARD_POLICY_MAKER_ABI, project.rewardPolicyMaker);
     const currentRewardRate = await rewardPolicyMakerContract.methods.rate_at(currentEpochTime()).call();
     const nextEpochRewardRate = await rewardPolicyMakerContract.methods.rate_at(nextEpochTime()).call();
@@ -542,6 +551,7 @@ class Store {
       project.gauges[i].gaugeApr = gaugeRewards * 100 / totalProvidedLiquidity
       project.gauges[i].nextEpochGaugeApr = nextEpochGaugeRewards * 100 / totalProvidedLiquidity
 
+      project.gauges[i].nextVoteTimestamp = +lastUserVotes[i] === 0 ? 0 : +lastUserVotes[i] + 10 * 86400
     }
 
     project.userVotesPercent = totalPercentUsed.toFixed(2)
