@@ -186,7 +186,7 @@ export default function GaugeVoting({ project }) {
                     onClick={() => {
                       onReset(gauge);
                     }}
-                    disabled={resetLoading}
+                    disabled={resetLoading || !canVoteFor(gauge)}
                   >
                     <Typography variant="h5">{resetLoading ? <CircularProgress size={15} /> : 'Reset'}</Typography>
                   </Button>
