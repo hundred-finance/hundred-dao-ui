@@ -17,14 +17,39 @@ const nextEpochTime = () => Math.floor(currentEpochTime() / WEEK) * WEEK + WEEK
 
 function Balances({ project }) {
 
-  const [timeToNextEpoch, setTimeToNextEpoch] = useState(moment().to(moment.unix(nextEpochTime())));
+  const timeDiff = () => {
+    let diff = moment.duration(moment.unix(nextEpochTime()).diff(moment()));
+    let days = Math.trunc(diff.asDays());
+    let hours = Math.trunc(diff.asHours() % 24);
+    let minutes = Math.trunc(diff.asMinutes() % 60);
+    let seconds = Math.trunc(diff.asSeconds() % 60);
 
-  const setTime = () => {
-    setTimeToNextEpoch(moment().to(moment.unix(nextEpochTime())));
+    let diffString = '';
+
+    if (days) {
+      diffString += `${days} d`
+    }
+
+    if (hours) {
+      diffString += ` ${hours} h`
+    }
+
+    if (minutes) {
+      diffString += ` ${minutes} m`
+    }
+
+    if (seconds) {
+      diffString += ` ${seconds} s`
+    }
+
+    return diffString
+
   }
 
+  const [timeToNextEpoch, setTimeToNextEpoch] = useState(timeDiff());
+
   useEffect(() => {
-    const timer = setTimeout(setTime, 10000);
+    const timer = setTimeout(() => setTimeToNextEpoch(timeDiff()), 1000);
     return () => clearTimeout(timer);
   });
 
