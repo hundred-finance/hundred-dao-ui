@@ -63,7 +63,7 @@ function Balances({ project }) {
       <div className={classes.overviewCard}>
         <div>
           <Typography variant="h5">Epoch ends</Typography>
-          <Typography>{ timeToNextEpoch }</Typography>
+          <Typography variant="h2">{ timeToNextEpoch }</Typography>
         </div>
       </div>
     </Paper>
