@@ -87,7 +87,7 @@ function Balances({ project }) {
       <div className={classes.separator}></div>
       <div className={classes.overviewCard}>
         <div>
-          <Typography variant="h5">Epoch ends</Typography>
+          <Typography variant="h5">Epoch ends in</Typography>
           <Typography variant="h2">{ timeToNextEpoch }</Typography>
         </div>
       </div>
