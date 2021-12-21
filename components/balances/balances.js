@@ -9,6 +9,11 @@ import stores from '../../stores/index.js';
 import { VAULTS_UPDATED, ETHERSCAN_URL, LEND_UPDATED } from '../../stores/constants';
 
 import { formatCurrency, formatAddress } from '../../utils';
+import moment from 'moment';
+
+const WEEK = 604800;
+const currentEpochTime = () => Math.floor(new Date().getTime() / 1000)
+const nextEpochTime = () => Math.floor(currentEpochTime() / WEEK) * WEEK + WEEK
 
 function Balances({ project }) {
 
@@ -41,6 +46,13 @@ function Balances({ project }) {
         <div>
           <Typography variant="h5">Total {project?.tokenMetadata?.symbol} staked</Typography>
           <Typography variant="h2">{!project ? <Skeleton style={{ minWidth: '200px ' }} /> : `${formatCurrency(project?.veTokenMetadata?.supply, 0)}`}</Typography>
+        </div>
+      </div>
+      <div className={classes.separator}></div>
+      <div className={classes.overviewCard}>
+        <div>
+          <Typography variant="h5">Next epoch start</Typography>
+          <Typography>{ moment.unix(nextEpochTime()).format("YYYY-MM-DD HH:mm Z") }</Typography>
         </div>
       </div>
     </Paper>
