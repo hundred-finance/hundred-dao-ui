@@ -27,19 +27,19 @@ function Balances({ project }) {
     let diffString = '';
 
     if (days) {
-      diffString += `${days} d`
+      diffString += `${days}d`
     }
 
     if (hours) {
-      diffString += ` ${hours} h`
+      diffString += ` ${hours}h`
     }
 
     if (minutes) {
-      diffString += ` ${minutes} m`
+      diffString += ` ${minutes}m`
     }
 
     if (seconds) {
-      diffString += ` ${seconds} s`
+      diffString += ` ${seconds}s`
     }
 
     return diffString
