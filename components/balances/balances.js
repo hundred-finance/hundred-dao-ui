@@ -6,7 +6,7 @@ import classes from './balances.module.css';
 import BigNumber from 'bignumber.js';
 
 import stores from '../../stores/index.js';
-import { VAULTS_UPDATED, ETHERSCAN_URL, LEND_UPDATED } from '../../stores/constants';
+import { VAULTS_UPDATED, ETHERSCAN_URL, LEND_UPDATED, CONFIGURE_RETURNED } from '../../stores/constants';
 
 import { formatCurrency, formatAddress } from '../../utils';
 import moment from 'moment';
@@ -16,6 +16,17 @@ const currentEpochTime = () => Math.floor(new Date().getTime() / 1000)
 const nextEpochTime = () => Math.floor(currentEpochTime() / WEEK) * WEEK + WEEK
 
 function Balances({ project }) {
+
+  const [timeToNextEpoch, setTimeToNextEpoch] = useState(moment().to(moment.unix(nextEpochTime())));
+
+  const setTime = () => {
+    setTimeToNextEpoch(moment().to(moment.unix(nextEpochTime())));
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(setTime, 10000);
+    return () => clearTimeout(timer);
+  });
 
   return (
     <Paper elevation={1} className={classes.overviewContainer}>
@@ -51,8 +62,8 @@ function Balances({ project }) {
       <div className={classes.separator}></div>
       <div className={classes.overviewCard}>
         <div>
-          <Typography variant="h5">Next epoch start</Typography>
-          <Typography>{ moment.unix(nextEpochTime()).format("YYYY-MM-DD HH:mm Z") }</Typography>
+          <Typography variant="h5">Epoch ends</Typography>
+          <Typography>{ timeToNextEpoch }</Typography>
         </div>
       </div>
     </Paper>
