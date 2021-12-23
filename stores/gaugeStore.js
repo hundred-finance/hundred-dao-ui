@@ -543,7 +543,7 @@ class Store {
       project.gauges[i].userVotesPercent = gaugeVotePercent.toFixed(2)
       totalPercentUsed = BigNumber(totalPercentUsed).plus(gaugeVotePercent)
 
-      project.gauges[i].liquidityShare = userLiquidityShare(project.gauges[i], veTokenBalance, totalVeTokenSupply);
+      project.gauges[i].liquidityShare = userAppliedLiquidityShare(project.gauges[i], veTokenBalance, totalVeTokenSupply);
       project.gauges[i].boost = userBoost(project.gauges[i], veTokenBalance, totalVeTokenSupply);
       project.gauges[i].appliedBoost = userAppliedBoost(project.gauges[i]);
       project.gauges[i].needVeHndForMaxBoost =
@@ -915,6 +915,10 @@ function userBoost(gauge, veTokenBalance, totalVeTokenSupply) {
 
 function userAppliedBoost(gauge) {
   return BigNumber(gauge.workingBalance).div(BigNumber(gauge.rawBalance).multipliedBy(0.4)).toNumber()
+}
+
+function userAppliedLiquidityShare(gauge) {
+  return gauge.balance * 0.4 * userAppliedBoost(gauge) * 100 / gauge.totalStakeBalance;
 }
 
 export default Store;
