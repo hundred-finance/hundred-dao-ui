@@ -64,7 +64,7 @@ export default function VeAssetGeneration({ project }) {
         setSelectedDate(moment().add(1, 'years').format('YYYY-MM-DD'));
         break;
       default:
-        setSelectedDate(moment().add(4, 'years').format('YYYY-MM-DD'));
+        setSelectedDate(moment().add(4, 'years').subtract(1, "hours").format('YYYY-MM-DD'));
     }
   };
 
