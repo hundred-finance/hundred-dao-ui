@@ -313,34 +313,31 @@ export default function EnhancedTable({ project }) {
         </Typography>
     }
 
-    if (Math.round(gauge.appliedBoost * 1000) === Math.round(gauge.boost * 1000)) {
-      return <Tooltip title={`You need ${formatCurrency(gauge.needVeHndForMaxBoost)} more veHND to get max boost`} followCursor>
-        <Typography variant="h5" className={classes.textSpacedClickable}>
-          {formatCurrency(gauge.appliedBoost)}x
-        </Typography>
+    return <Tooltip title={`You need ${formatCurrency(gauge.needVeHndForMaxBoost)} more veHND to get max boost`} followCursor>
+      <Typography variant="h5" className={classes.textSpacedClickable}>
+        {formatCurrency(gauge.appliedBoost)}x
+      </Typography>
+    </Tooltip>
+
+  }
+
+  function displayApplyBoost(gauge) {
+    if ((gauge.boost - gauge.appliedBoost) > 0.01) {
+      return  <Tooltip title={`Your effective boost is ${formatCurrency(gauge.boost)} click on apply if you wish to update it`} followCursor>
+        <Button
+          disableElevation
+          variant="contained"
+          color="primary"
+          size="small"
+          onClick={() => {
+            onApplyBoost(gauge);
+          }}
+          disabled={resetLoading}
+        >
+          <Typography variant="h5">{resetLoading ? <CircularProgress size={15} /> : 'Apply'}</Typography>
+        </Button>
       </Tooltip>
     }
-
-    return <>
-        <Typography variant="h5" className={classes.textSpaced}>
-          {formatCurrency(gauge.appliedBoost)}x
-        </Typography>
-        <Tooltip title={`Your effective boost is ${formatCurrency(gauge.boost)} click on apply if you wish to update it`} followCursor>
-          <Button
-            disableElevation
-            variant="contained"
-            color="primary"
-            size="small"
-            onClick={() => {
-              onApplyBoost(gauge);
-            }}
-            disabled={resetLoading}
-          >
-            <Typography variant="h5">{resetLoading ? <CircularProgress size={15} /> : 'Apply'}</Typography>
-          </Button>
-        </Tooltip>
-    </>
-
   }
 
   return (
@@ -384,6 +381,7 @@ export default function EnhancedTable({ project }) {
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
                     { displayBoost(row) }
+                    { displayApplyBoost(row) }
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
