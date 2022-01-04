@@ -13,6 +13,7 @@ import VeAssetGeneration from '../../../components/veAssetGeneration';
 import VeAssetModificationAmount from '../../../components/veAssetModificationAmount';
 import VeAssetModificationDuration from '../../../components/veAssetModificationDuration';
 import GaugeVoting from '../../../components/gaugeVoting';
+import BoostCalculator from '../../../components/boostCalculator';
 import Header from '../../../components/header';
 import Footer from '../../../components/footer';
 
@@ -107,22 +108,10 @@ function Projects({ changeTheme }) {
       <Header changeTheme={changeTheme} backClicked={backClicked} />
 
         <div className={classes.projectContainer}>
-          <Balances project={project} />
-            {isLockIncreasePossible(project) ?
-              <div className={classes.projectCardContainer}>
-                <VeAssetModificationAmount project={project} />
-                <VeAssetModificationDuration project={project} />
-                <LockDurationChart project={project} />
-              </div>
-              :
-              <div className={classes.projectCardContainer2Columns}>
-                <VeAssetGeneration project={project} />
-                <LockDurationChart project={project} />
-              </div>
-            }
 
-          <div className={classes.projectCardContainer}>
-            <GaugeVoting project={project}/>
+          <Balances project={project} />
+
+          <div className={classes.projectCardContainer2EqualColumns}>
             <Paper elevation={1} className={classes.ChartContainer}>
               <Typography variant="h3">
                 Current Vote weighting
@@ -142,11 +131,31 @@ function Projects({ changeTheme }) {
               />
             </Paper>
           </div>
+
+          {isLockIncreasePossible(project) ?
+            <div className={classes.projectCardContainer}>
+              <VeAssetModificationAmount project={project} />
+              <VeAssetModificationDuration project={project} />
+              <LockDurationChart project={project} />
+            </div>
+            :
+            <div className={classes.projectCardContainer2Columns}>
+              <VeAssetGeneration project={project} />
+              <LockDurationChart project={project} />
+            </div>
+          }
+
+          <div className={classes.projectCardContainer2EqualColumns}>
+            <GaugeVoting project={project}/>
+            <BoostCalculator project={project}/>
+          </div>
+
           <div className={classes.fakeGrid}>
             <Paper elevation={1}>
               <GaugeVotesTable project={project} />
             </Paper>
           </div>
+
         </div>
 
       <Footer />

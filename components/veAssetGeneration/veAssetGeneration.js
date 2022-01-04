@@ -175,6 +175,7 @@ export default function VeAssetGeneration({ project }) {
           }}
         />
       </div>
+
       <div className={classes.textField}>
         <div className={classes.inputTitleContainer}>
           <div className={classes.inputTitle}>
@@ -194,6 +195,7 @@ export default function VeAssetGeneration({ project }) {
           }
         </RadioGroup>
       </div>
+
       <div className={classes.actionButton}>
         <Button
           fullWidth
