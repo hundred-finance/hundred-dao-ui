@@ -49,17 +49,20 @@ export default function BoostCalculator({ project }) {
   };
 
   const calculatedBoost = (project, gauge, stake, lock, endLockDate) => {
-    const lockDuration = moment.duration(moment(endLockDate).diff(moment())).asDays()
-    const maxLockDuration = moment.duration(moment().add(4, 'years').diff(moment())).asDays()
-
-    const veHndForLock = lock * lockDuration / maxLockDuration
+    const veHndForLock = veTokenForLock(lock, endLockDate)
     const totalVeTokenSupply = project?.veTokenMetadata.totalSupply;
 
-    console.log(lockDuration, maxLockDuration, lock, stake)
-    console.log(veHndForLock, +totalVeTokenSupply)
-
-    return userBoost(gauge, stake, veHndForLock ? veHndForLock : 0, +totalVeTokenSupply)
+    return userBoost(gauge, stake, veHndForLock, +totalVeTokenSupply)
   }
+
+   const veTokenForLock = (lock, endLockDate) => {
+     const lockDuration = moment.duration(moment(endLockDate).diff(moment())).asDays()
+     const maxLockDuration = moment.duration(moment().add(4, 'years').diff(moment())).asDays()
+
+     let amount = lock * lockDuration / maxLockDuration
+
+     return amount ? amount : 0
+   }
 
   const userBoost = (gauge, stake, veTokenBalance, totalVeTokenSupply) => {
     if (!gauge) {
@@ -202,10 +205,26 @@ export default function BoostCalculator({ project }) {
           </RadioGroup>
         </div>
 
-        <div className={classes.textField}>
-          <Typography variant="h3">
-            Estimated boost: { formatCurrency(calculatedBoost(project, gauge, stakeAmount, lockAmount, selectedDate)) }
-          </Typography>
+        <div className={classes.boost}>
+          <div>
+            <Typography >
+              Estimated veHND: { formatCurrency(veTokenForLock(lockAmount, selectedDate)) }
+            </Typography>
+            <Typography >
+              Total veHND: { formatCurrency(+project?.veTokenMetadata.totalSupply) }
+            </Typography>
+            { gauge ?
+              <Typography>
+                Total staked in gauge: { formatCurrency(gauge.totalStakeBalance) }
+              </Typography>
+              : ''
+            }
+          </div>
+          <div>
+            <Typography variant="h3">
+              Estimated boost: { formatCurrency(calculatedBoost(project, gauge, stakeAmount, lockAmount, selectedDate)) }
+            </Typography>
+          </div>
         </div>
 
       </div>
