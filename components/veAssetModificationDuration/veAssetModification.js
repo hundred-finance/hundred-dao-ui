@@ -92,19 +92,8 @@ export default function VeAssetGeneration({ project }) {
   };
 
   const onUnlock = () => {
-    setSelectedDateError(false);
-    let error = false;
-
-    if (!selectedDate) {
-      setSelectedDateError(true);
-      error = true;
-    }
-
-    if (!error) {
-      setLockLoading(true);
-
-      stores.dispatcher.dispatch({ type: WITHDRAW, content: { project } });
-    }
+    setLockLoading(true);
+    stores.dispatcher.dispatch({ type: WITHDRAW, content: { project } });
   };
 
   return (
