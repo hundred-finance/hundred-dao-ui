@@ -517,6 +517,15 @@ class Store {
 
     const workingBalanceOf = await Promise.all(workingBalanceOfPromise);
 
+    const workingSupplyPromise = project.gauges.map((gauge) => {
+      return new Promise((resolve, reject) => {
+        const gaugeContract = new web3.eth.Contract(GAUGE_ABI, gauge.address);
+        resolve(gaugeContract.methods.working_supply().call());
+      });
+    });
+
+    const workingSupply = await Promise.all(workingSupplyPromise);
+
     const lastUserVotesPromise = project.gauges.map((gauge) => {
       return new Promise((resolve, reject) => {
         const gaugeContract = new web3.eth.Contract(GAUGE_CONTROLLER_ABI, project.gaugeProxyAddress);
@@ -537,13 +546,14 @@ class Store {
       project.gauges[i].balance = BigNumber(balanceOf[i]).div(10 ** project.gauges[i].lpToken.underlyingDecimals).toNumber() * project.gauges[i].lpToken.conversionRate
 
       project.gauges[i].workingBalance = BigNumber(workingBalanceOf[i])
+      project.gauges[i].workingSupply = BigNumber(workingSupply[i])
       project.gauges[i].rawBalance = BigNumber(balanceOf[i])
 
       const gaugeVotePercent = BigNumber(voteWeights[i]).div(100)
       project.gauges[i].userVotesPercent = gaugeVotePercent.toFixed(2)
       totalPercentUsed = BigNumber(totalPercentUsed).plus(gaugeVotePercent)
 
-      project.gauges[i].liquidityShare = userAppliedLiquidityShare(project.gauges[i], veTokenBalance, totalVeTokenSupply);
+      project.gauges[i].liquidityShare = userAppliedLiquidityShare(project.gauges[i]);
       project.gauges[i].boost = userBoost(project.gauges[i], veTokenBalance, totalVeTokenSupply);
       project.gauges[i].appliedBoost = userAppliedBoost(project.gauges[i]);
       project.gauges[i].needVeHndForMaxBoost =
@@ -556,11 +566,11 @@ class Store {
 
       let totalRewards = currentRewardRate * 365 * 24 * 3600 * project.hndPrice / 1e18;
       let gaugeRewards = totalRewards * project.gauges[i].currentEpochRelativeWeight / 100
-      let rewards = gaugeRewards * project.gauges[i].liquidityShare / 100
+      let rewards = gaugeRewards * project.gauges[i].liquidityShare
 
       let nextEpochTotalRewards = nextEpochRewardRate * 365 * 24 * 3600 * project.hndPrice / 1e18;
       let nextEpochGaugeRewards = nextEpochTotalRewards * project.gauges[i].nextEpochRelativeWeight / 100;
-      let nextEpochRewards = nextEpochGaugeRewards * project.gauges[i].liquidityShare / 100
+      let nextEpochRewards = nextEpochGaugeRewards * project.gauges[i].liquidityShare
 
       if (providedLiquidity > 0) {
         project.gauges[i].apr = rewards * 100 / providedLiquidity
@@ -914,11 +924,14 @@ function userBoost(gauge, veTokenBalance, totalVeTokenSupply) {
 }
 
 function userAppliedBoost(gauge) {
-  return BigNumber(gauge.workingBalance).div(BigNumber(gauge.rawBalance).multipliedBy(0.4)).toNumber()
+  return BigNumber(gauge.workingBalance)
+            .multipliedBy(2.5)
+            .div(BigNumber(gauge.rawBalance))
+            .toNumber()
 }
 
 function userAppliedLiquidityShare(gauge) {
-  return gauge.balance * 0.4 * userAppliedBoost(gauge) * 100 / gauge.totalStakeBalance;
+  return gauge.workingBalance / gauge.workingSupply;
 }
 
 export default Store;
