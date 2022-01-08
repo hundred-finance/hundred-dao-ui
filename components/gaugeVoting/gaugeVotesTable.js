@@ -63,7 +63,7 @@ const headCells = [
     id: 'gaugeApr',
     numeric: true,
     disablePadding: false,
-    label: 'APR',
+    label: 'Average APR',
     tooltip: "Current Epoch APR -> Next Epoch APR"
   },
   {
