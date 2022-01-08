@@ -74,10 +74,24 @@ export default function BoostCalculator({ project }) {
   }
 
   const userLiquidityShare = (gauge, balance, veTokenBalance, totalVeTokenSupply) => {
-    return Math.min(
+
+    let workingBalance = Math.min(
       balance * 0.4 + (gauge.totalStakeBalance + balance) * 0.6 * veTokenBalance / (totalVeTokenSupply + veTokenBalance),
       balance
-    ) * 100 / (gauge.totalStakeBalance + balance);
+    )
+
+    let totalWorkingSupply =
+      gauge.workingSupply.div(10 ** gauge.lpToken.underlyingDecimals).toNumber() * gauge.lpToken.conversionRate
+
+    return workingBalance * 100 / (totalWorkingSupply + workingBalance);
+  }
+
+  const userAPR = (gauge, balance, lock, endLockDate) => {
+    const veHndForLock = veTokenForLock(lock, endLockDate)
+    const totalVeTokenSupply = project?.veTokenMetadata.totalSupply;
+    const liquidityShare = userLiquidityShare(gauge, +balance, +veHndForLock, +totalVeTokenSupply)
+
+    return gauge.gaugeRewards * liquidityShare / (+balance * gauge.lpToken.price)
   }
 
   return (
@@ -224,6 +238,12 @@ export default function BoostCalculator({ project }) {
             <Typography variant="h3">
               Estimated boost: { formatCurrency(calculatedBoost(project, gauge, stakeAmount, lockAmount, selectedDate)) }
             </Typography>
+            { gauge ?
+              <Typography>
+                Estimated APR: { formatCurrency(userAPR(gauge, stakeAmount, lockAmount, selectedDate)) }%
+              </Typography>
+              : ''
+            }
           </div>
         </div>
 
