@@ -108,7 +108,7 @@ class Store {
 
   updateAccount = () => {
     const that = this;
-    const res = window.ethereum.on("accountsChanged", function(accounts) {
+    window.ethereum.on("accountsChanged", function(accounts) {
       that.setStore({
         account: { address: accounts[0] },
         web3context: { library: { provider: window.ethereum } }
@@ -118,6 +118,12 @@ class Store {
 
       that.dispatcher.dispatch({ type: CONFIGURE_GAUGES });
     });
+
+    window.ethereum.on("chainChanged", function(networkId) {
+      history.replaceState({}, '',"/")
+      location.reload();
+    });
+
   };
 
   getCurrentBlock = async payload => {
