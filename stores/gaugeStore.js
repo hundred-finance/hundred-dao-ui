@@ -50,25 +50,6 @@ class Store {
       projects: [
         {
           type: 'hundredfinance',
-          id: 'hundred-finance-kovan',
-          name: 'Ethereum Kovan',
-          logo: '/unknown-logo.png',
-          url: '',
-          chainId: 42,
-          gaugeProxyAddress: "0xFa0F5d0cA1031aC6A47CA8Db9cf9dcfd45B3659a",
-          lpPriceOracle: "0x10010069DE6bD5408A6dEd075Cf6ae2498073c73",
-          rewardPolicyMaker: "0x0d9459A2d7252c4cd62cF13416Cd319c3e0C5bB4",
-          gauges: [],
-          vaults: [],
-          tokenMetadata: {},
-          veTokenMetadata: {},
-          otherTokenMetadata: {},
-          useDays: false,
-          maxDurationYears: 4,
-          onload: null
-        },
-        {
-          type: 'hundredfinance',
           id: 'hundred-finance-arbitrum',
           name: 'Arbitrum',
           logo: '/arbitrum.png',
