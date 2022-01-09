@@ -18,6 +18,7 @@ import {
 } from "./connectors";
 
 import Web3 from "web3";
+import stores from './index';
 
 class Store {
   constructor(dispatcher, emitter) {
@@ -35,13 +36,6 @@ class Store {
         Fortmatic: fortmatic,
         Portis: portis
       },
-      chains: {
-        mainnet: 1,
-        polygon: 137,
-        fantom: 250,
-        arbitrum: 42161
-      },
-      currentBlock: 11743358
     };
 
     dispatcher.register(
@@ -68,14 +62,13 @@ class Store {
   }
 
   configure = async () => {
-    this.getCurrentBlock();
 
-    injected.isAuthorized()
-      .then(isAuthorized => {
+    await injected.isAuthorized()
+      .then(async isAuthorized => {
         if (isAuthorized) {
-          injected
+          await injected
             .activate()
-            .then(a => {
+            .then(async (a) => {
               this.setStore({
                 account: { address: a.account },
                 web3context: { library: { provider: a.provider } }
@@ -97,7 +90,7 @@ class Store {
       });
 
     if (window.ethereum) {
-      this.updateAccount();
+      await this.updateAccount();
     } else {
       window.removeEventListener("ethereum#initialized", this.updateAccount);
       window.addEventListener("ethereum#initialized", this.updateAccount, {
@@ -106,13 +99,19 @@ class Store {
     }
   };
 
-  updateAccount = () => {
+  updateAccount = async () => {
     const that = this;
-    window.ethereum.on("accountsChanged", function(accounts) {
+
+    window.ethereum.on("accountsChanged", async function(accounts) {
+
+      let provider = await stores.accountStore.getWeb3Provider()
+      let connectedChainId = await provider.eth.getChainId()
+
       that.setStore({
-        account: { address: accounts[0] },
+        account: { address: accounts[0], chainId: connectedChainId },
         web3context: { library: { provider: window.ethereum } }
       });
+
       that.emitter.emit(ACCOUNT_CHANGED);
       that.emitter.emit(CONFIGURE_RETURNED);
 
@@ -120,20 +119,14 @@ class Store {
     });
 
     window.ethereum.on("chainChanged", function(networkId) {
-      history.replaceState({}, '',"/")
+      history.replaceState({}, '',"/");
       location.reload();
     });
 
-  };
+    that.setStore({
+      account: { address: that.store.account.address, chainId: parseInt(window.ethereum.chainId) }
+    });
 
-  getCurrentBlock = async payload => {
-    try {
-      var web3 = new Web3(process.env.NEXT_PUBLIC_PROVIDER);
-      const block = await web3.eth.getBlockNumber();
-      this.setStore({ currentBlock: block });
-    } catch (ex) {
-      console.log(ex);
-    }
   };
 
   getWeb3Provider = async () => {

@@ -172,13 +172,15 @@ class Store {
       (project, callback) => {
         this._getProjectData(project, callback);
       },
-      (err, data) => {
+      (err, project) => {
         if (err) {
           this.emitter.emit(ERROR);
           return;
         }
-        console.log("projects", data)
-        this.setStore({ projects: data, configured: true });
+        const updatedProjects =
+          projects.filter(p => p.chainId !== chainId).concat(project)
+
+        this.setStore({ projects: updatedProjects, configured: true });
 
         this.emitter.emit(GAUGES_CONFIGURED);
       },

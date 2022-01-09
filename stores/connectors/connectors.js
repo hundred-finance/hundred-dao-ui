@@ -13,14 +13,55 @@ import { NetworkConnector } from "@web3-react/network-connector";
 
 const POLLING_INTERVAL = 12000;
 const RPC_URLS = {
-  // 1: process.env.NEXT_PUBLIC_PROVIDER,
-  1: "https://mainnet.infura.io/v3/2b150eabf65140efb3d5508a888ee93e"
+  1: "https://mainnet.infura.io/v3/2b150eabf65140efb3d5508a888ee93e",
+  250: "https://rpc.ftm.tools",
+  42161: "https://arb1.arbitrum.io/rpc",
+  1666600000: "https://harmony-0-rpc.gateway.pokt.network/"
 };
+
+export const NETWORKS_CONFIG = [
+  {
+    chainId: "0xfa",
+    chainName: "Fantom Mainnet",
+    nativeCurrency: {
+      "name": "Fantom",
+      "symbol": "FTM",
+      "decimals": 18
+    },
+    rpcUrls: ["https://rpc.ftm.tools"],
+    blockExplorerUrls: ["https://ftmscan.com"]
+  },
+  {
+    chainId: "0xa4b1",
+    chainName: "Arbitrum One",
+    nativeCurrency: {
+      "name": "AETH",
+      "symbol": "AETH",
+      "decimals": 18
+    },
+    rpcUrls: ["https://arb1.arbitrum.io/rpc"],
+    blockExplorerUrls: ["https://arbiscan.io"],
+  },
+  {
+    chainId: "0x63564c40",
+    chainName: "Harmony",
+    nativeCurrency: {
+      "name": "ONE",
+      "symbol": "ONE",
+      "decimals": 18
+    },
+    rpcUrls: ["https://api.harmony.one",
+      "https://s1.api.harmony.one",
+      "https://s2.api.harmony.one",
+      "https://s3.api.harmony.one"],
+    blockExplorerUrls: ["https://explorer.harmony.one/"],
+  },
+]
 
 export const network = new NetworkConnector({ urls: { 1: RPC_URLS[1] } });
 
 export const injected = new InjectedConnector({
-  supportedChainIds: [1, 3, 4, 5, 42]
+  supportedChainIds: [1, 250, 42161, 1666600000]
 });
 
 export const walletconnect = new WalletConnectConnector({
