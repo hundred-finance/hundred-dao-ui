@@ -577,9 +577,13 @@ class Store {
         project.gauges[i].nextEpochApr = nextEpochRewards * 100 / providedLiquidity
       }
 
+      const referenceBalance = 10000
+      const referenceWorkingSupply = project.gauges[i].workingSupply.div(10 ** project.gauges[i].lpToken.underlyingDecimals).toNumber() * project.gauges[i].lpToken.conversionRate
+      const referenceLiquidityShare = referenceBalance / (referenceWorkingSupply + referenceBalance)
+
       project.gauges[i].gaugeRewards = gaugeRewards
-      project.gauges[i].gaugeApr = gaugeRewards * 100 / totalProvidedLiquidity
-      project.gauges[i].nextEpochGaugeApr = nextEpochGaugeRewards * 100 / totalProvidedLiquidity
+      project.gauges[i].gaugeApr = gaugeRewards * referenceLiquidityShare * 100 / (referenceBalance * project.gauges[i].lpToken.price)
+      project.gauges[i].nextEpochGaugeApr = nextEpochGaugeRewards * referenceLiquidityShare * 100 / (referenceBalance * project.gauges[i].lpToken.price)
 
       project.gauges[i].nextVoteTimestamp = +lastUserVotes[i] === 0 ? 0 : +lastUserVotes[i] + 10 * 86400
     }
@@ -906,22 +910,22 @@ class Store {
   };
 }
 
-function userLiquidityShare(gauge, veTokenBalance, totalVeTokenSupply) {
+function userLiquidityShare(gauge, balance, totalBalance, veTokenBalance, totalVeTokenSupply) {
   return Math.min(
-    BigNumber(gauge.balance).multipliedBy(0.4)
+    BigNumber(balance).multipliedBy(0.4)
       .plus(
-        BigNumber(gauge.totalStakeBalance)
+        BigNumber(totalBalance)
           .multipliedBy(0.6)
           .multipliedBy(BigNumber(veTokenBalance))
           .div(BigNumber(totalVeTokenSupply))
       ).toNumber(),
-    gauge.balance
-  ) * 100 / gauge.totalStakeBalance;
+    balance
+  ) * 100 / totalBalance;
 }
 
 function userBoost(gauge, veTokenBalance, totalVeTokenSupply) {
-  return Math.min(userLiquidityShare(gauge, veTokenBalance, totalVeTokenSupply) /
-    userLiquidityShare(gauge, 0, totalVeTokenSupply), 2.5)
+  return Math.min(userLiquidityShare(gauge, gauge.balance, gauge.totalStakeBalance, veTokenBalance, totalVeTokenSupply) /
+    userLiquidityShare(gauge, gauge.balance, gauge.totalStakeBalance, 0, totalVeTokenSupply), 2.5)
 }
 
 function userAppliedBoost(gauge) {

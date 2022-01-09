@@ -64,7 +64,7 @@ const headCells = [
     numeric: true,
     disablePadding: false,
     label: 'Average APR',
-    tooltip: "Current Epoch APR -> Next Epoch APR"
+    tooltip: "Current Epoch APR -> Next Epoch APR, value is average APR at max boost"
   },
   {
     id: 'balance',
