@@ -57,6 +57,15 @@ function Balances({ project }) {
     <Paper elevation={1} className={classes.overviewContainer}>
       <div className={classes.overviewCard}>
         <div>
+          <Typography variant="h5">{project?.tokenMetadata?.symbol} price</Typography>
+          <Typography variant="h2">
+            {!project?.hndPrice ? <Skeleton style={{ minWidth: '200px ' }} /> : `$${formatCurrency(project?.hndPrice, 2)}`}
+          </Typography>
+        </div>
+      </div>
+      <div className={classes.separator}></div>
+      <div className={classes.overviewCard}>
+        <div>
           <Typography variant="h5">{project?.tokenMetadata?.symbol} balance</Typography>
           <Typography variant="h2">
             {!project?.tokenMetadata?.balance ? <Skeleton style={{ minWidth: '200px ' }} /> : `${formatCurrency(project?.tokenMetadata?.balance, 4)}`}

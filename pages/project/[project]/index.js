@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
-import { Typography, Paper, Button } from '@material-ui/core';
-import Skeleton from '@material-ui/lab/Skeleton';
+import { Typography, Paper } from '@material-ui/core';
 
 import Layout from '../../../components/layout/layout.js';
 import Balances from '../../../components/balances';
 import LockDurationChart from '../../../components/lockDuration';
 
-import GaugeCalculator from '../../../components/gaugeCalculator';
 import VeAssetGeneration from '../../../components/veAssetGeneration';
 import VeAssetModificationAmount from '../../../components/veAssetModificationAmount';
 import VeAssetModificationDuration from '../../../components/veAssetModificationDuration';
@@ -21,7 +19,6 @@ import classes from './project.module.css';
 
 import stores from '../../../stores/index.js';
 import {
-  ERROR,
   GET_PROJECT,
   PROJECT_RETURNED,
   GAUGES_CONFIGURED,
