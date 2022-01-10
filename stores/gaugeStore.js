@@ -109,7 +109,7 @@ class Store {
           type: 'hundredfinance',
           id: 'hundred-finance-moonriver',
           name: 'Moonriver',
-          logo: '',
+          logo: '/moonriver.png',
           url: '',
           chainId: 1285,
           gaugeProxyAddress: '0xb4300e088a3AE4e624EE5C71Bc1822F68BB5f2bc',
