@@ -104,6 +104,25 @@ class Store {
           useDays: false,
           maxDurationYears: 4,
           onload: null
+        },
+        {
+          type: 'hundredfinance',
+          id: 'hundred-finance-moonriver',
+          name: 'Moonriver',
+          logo: '',
+          url: '',
+          chainId: 1285,
+          gaugeProxyAddress: '0xb4300e088a3AE4e624EE5C71Bc1822F68BB5f2bc',
+          lpPriceOracle: '0x10010069de6bd5408a6ded075cf6ae2498073c73',
+          rewardPolicyMaker: '0xa8cD5D59827514BCF343EC19F531ce1788Ea48f8',
+          gauges: [],
+          vaults: [],
+          tokenMetadata: {},
+          veTokenMetadata: {},
+          otherTokenMetadata: {},
+          useDays: false,
+          maxDurationYears: 4,
+          onload: null
         }
       ],
     };
