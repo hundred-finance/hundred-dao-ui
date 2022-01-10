@@ -15,8 +15,9 @@ const POLLING_INTERVAL = 12000;
 const RPC_URLS = {
   1: "https://mainnet.infura.io/v3/2b150eabf65140efb3d5508a888ee93e",
   250: "https://rpc.ftm.tools",
+  1285: "https://rpc.moonriver.moonbeam.network",
   42161: "https://arb1.arbitrum.io/rpc",
-  1666600000: "https://harmony-0-rpc.gateway.pokt.network/"
+  1666600000: "https://harmony-0-rpc.gateway.pokt.network/",
 };
 
 export const NETWORKS_CONFIG = [
@@ -30,6 +31,17 @@ export const NETWORKS_CONFIG = [
     },
     rpcUrls: ["https://rpc.ftm.tools"],
     blockExplorerUrls: ["https://ftmscan.com"]
+  },
+  {
+    chainId: "0x505",
+    chainName: "Moonriver",
+    nativeCurrency: {
+      "name": "Moonriver",
+      "symbol": "MOVR",
+      "decimals": 18
+    },
+    rpcUrls: ["https://rpc.moonriver.moonbeam.network"],
+    blockExplorerUrls: ["https://moonriver.moonscan.io/"]
   },
   {
     chainId: "0xa4b1",
