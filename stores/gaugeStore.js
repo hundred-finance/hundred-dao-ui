@@ -42,6 +42,7 @@ const nextEpochTime = () => Math.floor(currentEpochTime() / WEEK) * WEEK + WEEK 
 
 class Store {
   constructor(dispatcher, emitter) {
+
     this.dispatcher = dispatcher;
     this.emitter = emitter;
 
@@ -127,41 +128,43 @@ class Store {
       ],
     };
 
+    const that = this;
+
     dispatcher.register(
       function (payload) {
         switch (payload.type) {
           case CONFIGURE_GAUGES:
-            this.configure(payload);
+            that.configure(payload);
             break;
           case GET_PROJECTS:
-            this.getProjects(payload);
+            that.getProjects(payload);
             break;
           case GET_PROJECT:
-            this.getProject(payload);
+            that.getProject(payload);
             break;
           case GET_TOKEN_BALANCES:
-            this.getTokenBalances(payload);
+            that.getTokenBalances(payload);
             break;
           case LOCK:
-            this.lock(payload);
+            that.lock(payload);
             break;
           case WITHDRAW:
-            this.unlock(payload);
+            that.unlock(payload);
             break;
           case APPROVE_LOCK:
-            this.approveLock(payload);
+            that.approveLock(payload);
             break;
           case VOTE:
-            this.vote(payload);
+            that.vote(payload);
             break;
           case INCREASE_LOCK_AMOUNT:
-            this.increaseLockAmount(payload);
+            that.increaseLockAmount(payload);
             break;
           case INCREASE_LOCK_DURATION:
-            this.increaseLockDuration(payload);
+            that.increaseLockDuration(payload);
             break;
           case APPLY_BOOST:
-            this.applyBoost(payload);
+            that.applyBoost(payload);
             break;
           default: {
           }
@@ -170,17 +173,17 @@ class Store {
     );
   }
 
-  getStore = (index) => {
+  getStore(index) {
     return this.store[index];
-  };
+  }
 
-  setStore = (obj) => {
+  setStore(obj) {
     this.store = { ...this.store, ...obj };
     console.log(this.store);
     return this.emitter.emit(STORE_UPDATED);
-  };
+  }
 
-  configure = async (payload) => {
+  async configure(payload) {
     const projects = this.getStore('projects');
 
     const web3 = await stores.accountStore.getWeb3Provider();
@@ -204,9 +207,9 @@ class Store {
         this.emitter.emit(GAUGES_CONFIGURED);
       },
     );
-  };
+  }
 
-  _getProjectData = async (project, callback) => {
+  async _getProjectData(project, callback) {
 
     const web3 = await stores.accountStore.getWeb3Provider();
     if (!web3) {
@@ -378,13 +381,13 @@ class Store {
     callback(null, project);
   }
 
-  getProjects = async (payload) => {
+  async getProjects(payload) {
     const projects = await this._getProjects();
 
     this.emitter.emit(PROJECTS_RETURNED, projects);
-  };
+  }
 
-  _getProjects = async () => {
+  async _getProjects() {
     // ...
     // get contract where we store projects
     // get project info
@@ -392,9 +395,9 @@ class Store {
 
     // for now just return stored projects
     return this.getStore('projects');
-  };
+  }
 
-  getProject = async (payload) => {
+  async getProject(payload) {
 
     const configured = this.getStore('configured')
     if(!configured) {
@@ -417,9 +420,9 @@ class Store {
     }
 
     this.emitter.emit(PROJECT_RETURNED, project);
-  };
+  }
 
-  getTokenBalances = async (payload) => {
+  async getTokenBalances(payload) {
     const configured = this.getStore('configured')
     if(!configured) {
       return;
@@ -603,9 +606,9 @@ class Store {
     this.setStore({ projects: newProjects });
 
     this.emitter.emit(TOKEN_BALANCES_RETURNED, project);
-  };
+  }
 
-  approveLock = async (payload) => {
+  async approveLock(payload) {
     const account = stores.accountStore.getStore('account');
     if (!account) {
       return false;
@@ -627,9 +630,9 @@ class Store {
 
       return this.emitter.emit(APPROVE_LOCK_RETURNED, approveResult);
     });
-  };
+  }
 
-  _callApproveLock = async (web3, project, account, amount, callback) => {
+  async _callApproveLock(web3, project, account, amount, callback) {
     const tokenContract = new web3.eth.Contract(ERC20_ABI, project.tokenMetadata.address);
 
     let amountToSend = '0';
@@ -642,9 +645,9 @@ class Store {
     }
 
     await this._asyncCallContractWait(web3, tokenContract, 'approve', [project.veTokenMetadata.address, amountToSend], account, null, GET_TOKEN_BALANCES, { id: project.id }, callback);
-  };
+  }
 
-  lock = async (payload) => {
+  async lock(payload) {
     const account = stores.accountStore.getStore('account');
     if (!account) {
       return false;
@@ -666,9 +669,9 @@ class Store {
 
       return this.emitter.emit(LOCK_RETURNED, lockResult);
     });
-  };
+  }
 
-  unlock = async (payload) => {
+  async unlock(payload) {
     const account = stores.accountStore.getStore('account');
     if (!account) {
       return false;
@@ -690,9 +693,9 @@ class Store {
 
       return this.emitter.emit(WITHDRAW_RETURNED, lockResult);
     });
-  };
+  }
 
-  _callLock = async (web3, project, account, amount, selectedDate, callback) => {
+  async _callLock(web3, project, account, amount, selectedDate, callback) {
     const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.veTokenMetadata.address);
 
     const amountToSend = BigNumber(amount)
@@ -700,15 +703,15 @@ class Store {
       .toFixed(0);
 
     await this._asyncCallContractWait(web3, escrowContract, 'create_lock', [amountToSend, selectedDate], account, null, GET_TOKEN_BALANCES, { id: project.id }, callback);
-  };
+  }
 
-  _callUnlock = async (web3, project, account, callback) => {
+  async _callUnlock(web3, project, account, callback) {
     const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.veTokenMetadata.address);
 
     await this._asyncCallContractWait(web3, escrowContract, 'withdraw', [], account, null, GET_TOKEN_BALANCES, { id: project.id }, callback);
-  };
+  }
 
-  vote = async (payload) => {
+  async vote(payload) {
     const account = stores.accountStore.getStore('account');
     if (!account) {
       return false;
@@ -730,9 +733,9 @@ class Store {
 
       return this.emitter.emit(VOTE_RETURNED, voteResult);
     });
-  };
+  }
 
-  _calVoteForGaugeWeights = async (web3, project, account, amount, gaugeAddress, callback) => {
+  async _calVoteForGaugeWeights(web3, project, account, amount, gaugeAddress, callback) {
     const gaugeControllerContract = new web3.eth.Contract(GAUGE_CONTROLLER_ABI, project.gaugeProxyAddress);
 
     const amountToSend = BigNumber(amount)
@@ -745,9 +748,9 @@ class Store {
     console.log([gaugeAddress, amountToSend])
 
     await this._asyncCallContractWait(web3, gaugeControllerContract, 'vote_for_gauge_weights', [gaugeAddress, amountToSend], account, null, GET_TOKEN_BALANCES, { id: project.id }, callback);
-  };
+  }
 
-  increaseLockAmount = async (payload) => {
+  async increaseLockAmount(payload) {
     const account = stores.accountStore.getStore('account');
     if (!account) {
       return false;
@@ -769,9 +772,9 @@ class Store {
 
       return this.emitter.emit(INCREASE_LOCK_AMOUNT_RETURNED, lockResult);
     });
-  };
+  }
 
-  _callIncreaseAmount = async (web3, project, account, amount, callback) => {
+  async _callIncreaseAmount(web3, project, account, amount, callback) {
     const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.veTokenMetadata.address);
 
     const amountToSend = BigNumber(amount)
@@ -780,9 +783,9 @@ class Store {
 
 
     await this._asyncCallContractWait(web3, escrowContract, 'increase_amount', [amountToSend], account, null, GET_TOKEN_BALANCES, { id: project.id }, callback);
-  };
+  }
 
-  increaseLockDuration = async (payload) => {
+  async increaseLockDuration(payload) {
     const account = stores.accountStore.getStore('account');
     if (!account) {
       return false;
@@ -808,9 +811,9 @@ class Store {
 
       return this.emitter.emit(INCREASE_LOCK_DURATION_RETURNED, lockResult);
     });
-  };
+  }
 
-  applyBoost = async (payload) => {
+  async applyBoost(payload) {
 
     const account = stores.accountStore.getStore('account');
     if (!account) {
@@ -838,13 +841,13 @@ class Store {
 
   }
 
-  _callIncreaseUnlockTime = async (web3, project, account, selectedDate, callback) => {
+  async _callIncreaseUnlockTime(web3, project, account, selectedDate, callback) {
     const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.veTokenMetadata.address);
 
     await this._asyncCallContractWait(web3, escrowContract, 'increase_unlock_time', [selectedDate], account, null, WITHDRAW_RETURNED, { id: project.id }, callback);
-  };
+  }
 
-  _asyncCallContractWait = async(web3, contract, method, params, account, gasPrice, dispatchEvent, dispatchEventPayload, callback) => {
+  async _asyncCallContractWait(web3, contract, method, params, account, gasPrice, dispatchEvent, dispatchEventPayload, callback) {
     let sendPayload = {
       from: account.address
     }
@@ -852,7 +855,7 @@ class Store {
     this._callContractWait(web3, contract, method, params, account, sendPayload, dispatchEvent, dispatchEventPayload, callback);
   }
 
-  _callContractWait = (web3, contract, method, params, account, sendPayload, dispatchEvent, dispatchEventPayload, callback) => {
+  _callContractWait(web3, contract, method, params, account, sendPayload, dispatchEvent, dispatchEventPayload, callback) {
     const context = this;
 
     contract.methods[method](...params)
@@ -887,9 +890,9 @@ class Store {
           callback(error);
         }
       });
-  };
+  }
 
-  _getHndPrice = async () => {
+  async _getHndPrice() {
       try{
       const url =  "https://api.coingecko.com/api/v3/simple/price?ids=hundred-finance&vs_currencies=usd"
       const headers = {}
@@ -909,7 +912,7 @@ class Store {
       console.log(err)
     }
     return 0;
-  };
+  }
 }
 
 function userLiquidityShare(gauge, balance, totalBalance, veTokenBalance, totalVeTokenSupply) {

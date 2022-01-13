@@ -13,7 +13,6 @@ import {
   walletconnect,
   walletlink,
   fortmatic,
-  portis,
   network
 } from "./connectors";
 
@@ -33,16 +32,17 @@ class Store {
         TrustWallet: injected,
         WalletConnect: walletconnect,
         WalletLink: walletlink,
-        Fortmatic: fortmatic,
-        Portis: portis
+        Fortmatic: fortmatic
       },
     };
+
+    const that = this;
 
     dispatcher.register(
       function(payload) {
         switch (payload.type) {
           case CONFIGURE:
-            this.configure(payload);
+            that.configure(payload);
             break;
           default: {
           }
@@ -61,7 +61,7 @@ class Store {
     return this.emitter.emit(STORE_UPDATED);
   }
 
-  configure = async () => {
+  async configure() {
 
     await injected.isAuthorized()
       .then(async isAuthorized => {
@@ -97,9 +97,9 @@ class Store {
         once: true
       });
     }
-  };
+  }
 
-  updateAccount = async () => {
+  async updateAccount() {
     const that = this;
 
     window.ethereum.on("accountsChanged", async function(accounts) {
@@ -127,9 +127,9 @@ class Store {
       account: { address: that.store.account.address, chainId: parseInt(window.ethereum.chainId) }
     });
 
-  };
+  }
 
-  getWeb3Provider = async () => {
+  async getWeb3Provider() {
     try {
       let web3context = this.getStore("web3context");
       let provider = null;
@@ -148,7 +148,7 @@ class Store {
       console.log(ex)
       return null
     }
-  };
+  }
 }
 
 export default Store;

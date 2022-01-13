@@ -1,11 +1,11 @@
 import AccountStore from './accountStore';
 import GaugeStore from './gaugeStore';
 
-const Dispatcher = require('flux').Dispatcher;
-const Emitter = require('events').EventEmitter;
+import {Dispatcher} from 'flux';
+import {EventEmitter} from 'events';
 
 const dispatcher = new Dispatcher();
-const emitter = new Emitter();
+const emitter = new EventEmitter();
 
 const accountStore = new AccountStore(dispatcher, emitter);
 const gaugeStore = new GaugeStore(dispatcher, emitter);
