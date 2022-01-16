@@ -340,6 +340,14 @@ export default function EnhancedTable({ project }) {
     }
   }
 
+  function displayStakeAtMaxBoost(gauge) {
+    return <Tooltip title={`You can stake ${formatCurrency(gauge.remainingBalance)} ${gauge.lpToken.underlyingSymbol} more at max boost`} followCursor>
+      <Typography variant="h5" className={classes.textSpacedClickable}>
+        {formatCurrency(gauge.balance)}
+      </Typography>
+    </Tooltip>
+  }
+
   return (
     <div className={classes.root}>
       <TableContainer>
@@ -375,9 +383,13 @@ export default function EnhancedTable({ project }) {
                     </Typography>
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
-                    <Typography variant="h5" className={classes.textSpaced}>
-                      {formatCurrency(row.balance)}
-                    </Typography>
+                    {row.remainingBalance > 0 ?
+                      displayStakeAtMaxBoost(row)
+                      :
+                      <Typography variant="h5" className={classes.textSpaced}>
+                        {formatCurrency(row.balance)}
+                      </Typography>
+                    }
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
                     { displayBoost(row) }

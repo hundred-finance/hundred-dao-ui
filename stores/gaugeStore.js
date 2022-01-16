@@ -555,10 +555,13 @@ class Store {
     for (let i = 0; i < project.gauges.length; i++) {
 
       project.gauges[i].balance = BigNumber(balanceOf[i]).div(10 ** project.gauges[i].lpToken.underlyingDecimals).toNumber() * project.gauges[i].lpToken.conversionRate
-
       project.gauges[i].workingBalance = BigNumber(workingBalanceOf[i])
       project.gauges[i].workingSupply = BigNumber(workingSupply[i])
       project.gauges[i].rawBalance = BigNumber(balanceOf[i])
+
+      project.gauges[i].remainingBalance = userRemainingStake(
+        project.gauges[i].balance, project.gauges[i].totalStakeBalance, veTokenBalance, totalVeTokenSupply
+      )
 
       const gaugeVotePercent = BigNumber(voteWeights[i]).div(100)
       project.gauges[i].userVotesPercent = gaugeVotePercent.toFixed(2)
@@ -922,6 +925,30 @@ class Store {
     }
     return 0;
   }
+}
+
+function userRemainingStake(balance, totalBalance, veTokenBalance, totalVeTokenSupply) {
+
+  let currentStake = BigNumber(balance)
+
+  let maxStake = BigNumber(totalBalance)
+    .multipliedBy(BigNumber(veTokenBalance))
+    .div(BigNumber(totalVeTokenSupply))
+
+  console.log(
+    balance.toString(),
+    totalBalance.toString(),
+    veTokenBalance.toString(),
+    totalVeTokenSupply.toString(),
+    maxStake.toString()
+  )
+
+  if (currentStake.gte(maxStake)) {
+    return BigNumber(0);
+  }
+
+  return maxStake.minus(currentStake);
+
 }
 
 function userLiquidityShare(gauge, balance, totalBalance, veTokenBalance, totalVeTokenSupply) {
