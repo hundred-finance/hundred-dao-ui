@@ -31,6 +31,7 @@ import BigNumber from 'bignumber.js';
 import { PRICE_ORACLE_ABI } from './abis/HundredFinancePriceOracleABI';
 import { CTOKEN_ABI } from './abis/CtokenABI';
 import { REWARD_POLICY_MAKER_ABI } from './abis/RewardPolicyMaker';
+import { NETWORKS_CONFIG } from './connectors';
 
 const fetch = require('node-fetch');
 
@@ -852,16 +853,19 @@ class Store {
       from: account.address
     }
 
-    this._callContractWait(web3, contract, method, params, account, sendPayload, dispatchEvent, dispatchEventPayload, callback);
+    await this._callContractWait(web3, contract, method, params, account, sendPayload, dispatchEvent, dispatchEventPayload, callback);
   }
 
-  _callContractWait(web3, contract, method, params, account, sendPayload, dispatchEvent, dispatchEventPayload, callback) {
+  async _callContractWait(web3, contract, method, params, account, sendPayload, dispatchEvent, dispatchEventPayload, callback) {
     const context = this;
+
+    let chainId = await web3?.eth?.getChainId();
+    let chain = NETWORKS_CONFIG.find(chain => parseInt(chain.chainId) === chainId);
 
     contract.methods[method](...params)
       .send(sendPayload)
       .on('transactionHash', function (hash) {
-        context.emitter.emit(TX_SUBMITTED, hash);
+        context.emitter.emit(TX_SUBMITTED, { hash: hash, baseUrl: chain.blockExplorerUrls[0] });
       })
       .on('receipt', function (receipt) {
         console.log(receipt)

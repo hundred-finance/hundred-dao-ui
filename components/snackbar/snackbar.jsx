@@ -68,10 +68,6 @@ class MySnackbar extends Component {
     open: this.props.open,
   };
 
-  handleClick = () => {
-    this.setState({ open: true });
-  };
-
   handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
@@ -118,7 +114,8 @@ class MySnackbar extends Component {
         color = colors.blue;
         messageType = 'Hash';
 
-        let snackbarMessage = 'https://etherscan.io/tx/' + message;
+        let snackbarMessage = `${message.baseUrl}/tx/${message.hash}`;
+
         actions = [
           <Button variant="text" size="small" onClick={() => window.open(snackbarMessage, '_blank')}>
             View
@@ -165,7 +162,7 @@ class MySnackbar extends Component {
                 {messageType}
               </Typography>
               <Typography variant="body1" style={{ fontSize: '10px' }}>
-                {message}
+                {message.hash}
               </Typography>
             </div>
           </div>

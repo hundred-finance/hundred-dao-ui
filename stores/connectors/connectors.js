@@ -34,7 +34,7 @@ export const NETWORKS_CONFIG = [
       "decimals": 18
     },
     rpcUrls: ["https://rpc.moonriver.moonbeam.network"],
-    blockExplorerUrls: ["https://moonriver.moonscan.io/"]
+    blockExplorerUrls: ["https://moonriver.moonscan.io"]
   },
   {
     chainId: "0xa4b1",
@@ -59,7 +59,7 @@ export const NETWORKS_CONFIG = [
       "https://s1.api.harmony.one",
       "https://s2.api.harmony.one",
       "https://s3.api.harmony.one"],
-    blockExplorerUrls: ["https://explorer.harmony.one/"],
+    blockExplorerUrls: ["https://explorer.harmony.one"],
   },
 ]
 
