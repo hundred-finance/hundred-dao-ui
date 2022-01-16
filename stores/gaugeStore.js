@@ -312,12 +312,16 @@ class Store {
         const underlyingDecimalsPromise = new Promise((resolve, reject) => {
           resolve(lpUnderlyingTokenContract.methods.decimals().call());
         });
+        const underlyingSymbolPromise = new Promise((resolve, reject) => {
+          resolve(lpUnderlyingTokenContract.methods.symbol().call());
+        });
 
         promises.push(namePromise);
         promises.push(symbolPromise);
         promises.push(decimalsPromise);
         promises.push(totalStakePromise);
         promises.push(underlyingDecimalsPromise);
+        promises.push(underlyingSymbolPromise);
 
         return promises;
       })
@@ -327,22 +331,23 @@ class Store {
 
     let projectGauges = [];
     for (let i = 0; i < gauges.length; i++) {
-      let lpPrice = BigNumber(lpTokenUnderlyingInfo[i * 3]).div(10 ** (36-lpTokens[i * 5 + 4])).toNumber();
+      let lpPrice = BigNumber(lpTokenUnderlyingInfo[i * 3]).div(10 ** (36-lpTokens[i * 6 + 4])).toNumber();
       let convRate = BigNumber(lpTokenUnderlyingInfo[i * 3 + 1]).div(10 ** 18).toNumber();
       const gauge = {
         address: gauges[i],
         weight: BigNumber(gaugesWeights[i]).div(1e18).toNumber(),
         currentEpochRelativeWeight: BigNumber(gaugesCurrentEpochRelativeWeights[i]).times(100).div(1e18).toNumber(),
         nextEpochRelativeWeight: BigNumber(gaugesNextEpochRelativeWeights[i]).times(100).div(1e18).toNumber(),
-        totalStakeBalance: BigNumber(lpTokens[i * 5 + 3]).div(10 ** lpTokens[i * 5 + 4]).toNumber() * convRate,
+        totalStakeBalance: BigNumber(lpTokens[i * 6 + 3]).div(10 ** lpTokens[i * 6 + 4]).toNumber() * convRate,
         liquidityShare: 0,
         apr: 0,
         lpToken: {
           address: gaugesLPTokens[i],
-          name: lpTokens[i * 5],
-          symbol: lpTokens[i * 5 + 1],
-          decimals: lpTokens[i * 5 + 2],
-          underlyingDecimals: lpTokens[i * 5 + 4],
+          name: lpTokens[i * 6],
+          symbol: lpTokens[i * 6 + 1],
+          decimals: lpTokens[i * 6 + 2],
+          underlyingDecimals: lpTokens[i * 6 + 4],
+          underlyingSymbol: lpTokens[i * 6 + 5],
           price: lpPrice,
           conversionRate: convRate
         },

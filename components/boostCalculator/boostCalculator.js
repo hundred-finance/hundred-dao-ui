@@ -140,7 +140,7 @@ export default function BoostCalculator({ project }) {
           <div className={classes.inputTitleContainer}>
             <div className={classes.inputTitle}>
               <Typography variant="h5" noWrap>
-                Staked amount
+                { gauge ? gauge.lpToken.underlyingSymbol : '' } staked amount
               </Typography>
             </div>
           </div>
@@ -229,7 +229,7 @@ export default function BoostCalculator({ project }) {
             </Typography>
             { gauge ?
               <Typography>
-                Total staked in gauge: { formatCurrency(gauge.totalStakeBalance) }
+                Total { gauge.lpToken.underlyingSymbol } staked in gauge: { formatCurrency(gauge.totalStakeBalance) }
               </Typography>
               : ''
             }
