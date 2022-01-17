@@ -140,7 +140,7 @@ export default function BoostCalculator({ project }) {
           <div className={classes.inputTitleContainer}>
             <div className={classes.inputTitle}>
               <Typography variant="h5" noWrap>
-                { gauge ? gauge.lpToken.underlyingSymbol : '' } staked amount
+                { gauge ? gauge.lpToken.underlyingSymbol : '' } staked amount { gauge ? `($${formatCurrency(stakeAmount * gauge.lpToken.price)})` : '' }
               </Typography>
             </div>
           </div>
@@ -160,7 +160,7 @@ export default function BoostCalculator({ project }) {
           <div className={classes.inputTitleContainer}>
             <div className={classes.inputTitle}>
               <Typography variant="h5" noWrap>
-                locked HND amount
+                locked HND amount { lockAmount ? `($${formatCurrency(lockAmount * project.hndPrice)})` : '' }
               </Typography>
             </div>
           </div>
