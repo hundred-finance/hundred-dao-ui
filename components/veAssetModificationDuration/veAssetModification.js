@@ -127,7 +127,7 @@ export default function VeAssetGeneration({ project }) {
         <div className={classes.inputTitleContainer}>
           <div className={classes.inputTitle}>
             <Typography variant="h5" noWrap>
-              Relock for { isLockIncreasePossible(project, selectedDate) ? `(new veHND balance: ${projectedVeHndBalance(project).toFixed(2)})` : ''  }
+              Relock for { isLockIncreasePossible(project, selectedDate) ? `(new veHND balance: ${projectedVeHndBalance(project, selectedDate).toFixed(2)})` : ''  }
             </Typography>
           </div>
         </div>
@@ -188,11 +188,13 @@ function isUnLockPossible(project) {
     moment().unix() >= project.veTokenMetadata.userLockEnd
 }
 
-function projectedVeHndBalance(project, newLockEnd) {
+function projectedVeHndBalance(project, selectedDate) {
   let oldLockEnd = project.veTokenMetadata.userLockEnd
+  let newLockEnd = moment(selectedDate).unix()
   if (newLockEnd > oldLockEnd) {
     let now = moment().unix()
-    return +project.veTokenMetadata.userLocked * (newLockEnd - now) / (oldLockEnd - now)
+    let maxLockEnd = moment().add(4, 'years').unix()
+    return +project.veTokenMetadata.userLocked * (newLockEnd - now) / (maxLockEnd - now)
   }
   return +project.veTokenMetadata.userLocked
 }
