@@ -114,11 +114,11 @@ export default function BoostCalculator({ project }) {
             options={project?.gauges}
             value={gauge}
             onChange={onGaugeSelectChanged}
-            getOptionLabel={(option) => option.lpToken.symbol}
+            getOptionLabel={(option) => option.lpToken.underlyingSymbol}
             fullWidth={true}
             renderOption={(option, { selected }) => (
               <React.Fragment>
-                <div className={classes.text}>{option.lpToken.symbol}</div>
+                <div className={classes.text}>{option.lpToken.underlyingSymbol}</div>
               </React.Fragment>
             )}
             renderInput={(params) => (
@@ -140,7 +140,7 @@ export default function BoostCalculator({ project }) {
           <div className={classes.inputTitleContainer}>
             <div className={classes.inputTitle}>
               <Typography variant="h5" noWrap>
-                { gauge ? gauge.lpToken.underlyingSymbol : '' } staked amount { gauge ? `($${formatCurrency(stakeAmount * gauge.lpToken.price)})` : '' }
+                Staked amount { gauge ? `($${formatCurrency(stakeAmount * gauge.lpToken.price)})` : '' }
               </Typography>
             </div>
           </div>
@@ -160,7 +160,7 @@ export default function BoostCalculator({ project }) {
           <div className={classes.inputTitleContainer}>
             <div className={classes.inputTitle}>
               <Typography variant="h5" noWrap>
-                locked HND amount { lockAmount ? `($${formatCurrency(lockAmount * project.hndPrice)})` : '' }
+                Locked HND amount { lockAmount ? `($${formatCurrency(lockAmount * project.hndPrice)})` : '' }
               </Typography>
             </div>
           </div>
