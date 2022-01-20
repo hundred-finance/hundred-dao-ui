@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Typography, Paper, TextField, InputAdornment, Button, Tooltip, Radio, RadioGroup, FormControlLabel, CircularProgress } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import BigNumber from 'bignumber.js';
-import { formatCurrency } from '../../utils';
+import { formatCurrency, normalizeDate } from '../../utils';
 import moment from 'moment';
 
 import stores from '../../stores/index.js';
@@ -39,7 +39,7 @@ export default function VeAssetGeneration({ project }) {
   }, []);
 
   const handleDateChange = (event) => {
-    setSelectedDate(event.target.value);
+    setSelectedDate(normalizeDate(event.target.value));
     setSelectedValue(null);
   };
 
@@ -67,7 +67,7 @@ export default function VeAssetGeneration({ project }) {
     }
     const newDate = moment().add(days, 'days').format('YYYY-MM-DD');
 
-    setSelectedDate(newDate);
+    setSelectedDate(normalizeDate(newDate));
   };
 
   const onLock = () => {

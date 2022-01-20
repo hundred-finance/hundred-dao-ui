@@ -9,7 +9,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 
 import classes from './boostCalculator.module.css';
 import moment from 'moment';
-import { formatCurrency } from '../../utils';
+import { formatCurrency, normalizeDate } from '../../utils';
 
 export default function BoostCalculator({ project }) {
   const [stakeAmount, setStakeAmount] = useState(0);
@@ -26,26 +26,30 @@ export default function BoostCalculator({ project }) {
   };
 
   const handleDateChange = (event) => {
-    setSelectedDate(event.target.value);
+    setSelectedDate(normalizeDate(event.target.value));
     setSelectedValue(null);
   };
 
   const handleChange = (event) => {
     setSelectedValue(event.target.value);
 
+    let newDate;
+
     switch (event.target.value) {
       case 'month':
-        setSelectedDate(moment().add(1, 'months').format('YYYY-MM-DD'));
+        newDate = moment().add(1, 'months').format('YYYY-MM-DD');
         break;
       case 'year':
-        setSelectedDate(moment().add(1, 'years').format('YYYY-MM-DD'));
+        newDate = moment().add(1, 'years').format('YYYY-MM-DD');
         break;
       case '2year':
-        setSelectedDate(moment().add(2, 'years').format('YYYY-MM-DD'));
+        newDate = moment().add(2, 'years').format('YYYY-MM-DD');
         break;
       default:
-        setSelectedDate(moment().add(4, 'years').subtract(1, "days").format('YYYY-MM-DD'));
+        newDate = moment().add(4, 'years').subtract(1, "days").format('YYYY-MM-DD');
     }
+
+    setSelectedDate(normalizeDate(newDate))
   };
 
   const calculatedBoost = (project, gauge, stake, lock, endLockDate) => {

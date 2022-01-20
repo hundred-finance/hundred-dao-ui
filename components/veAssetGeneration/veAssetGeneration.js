@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Typography, Paper, TextField, InputAdornment, Button, Tooltip, Radio, RadioGroup, FormControlLabel, CircularProgress } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import BigNumber from 'bignumber.js';
-import { formatCurrency } from '../../utils';
+import { formatCurrency, normalizeDate } from '../../utils';
 import moment from 'moment';
 
 import stores from '../../stores/index.js';
@@ -46,26 +46,30 @@ export default function VeAssetGeneration({ project }) {
   };
 
   const handleDateChange = (event) => {
-    setSelectedDate(event.target.value);
+    setSelectedDate(normalizeDate(event.target.value));
     setSelectedValue(null);
   };
 
   const handleChange = (event) => {
+
     setSelectedValue(event.target.value);
+    let newDate;
 
     switch (event.target.value) {
       case 'month':
-        setSelectedDate(moment().add(1, 'months').format('YYYY-MM-DD'));
+        newDate = moment().add(1, 'months').format('YYYY-MM-DD');
         break;
       case 'year':
-        setSelectedDate(moment().add(1, 'years').format('YYYY-MM-DD'));
+        newDate = moment().add(1, 'years').format('YYYY-MM-DD');
         break;
       case '2year':
-        setSelectedDate(moment().add(2, 'years').format('YYYY-MM-DD'));
+        newDate = moment().add(2, 'years').format('YYYY-MM-DD');
         break;
       default:
-        setSelectedDate(moment().add(4, 'years').subtract(1, "days").format('YYYY-MM-DD'));
+        newDate = moment().add(4, 'years').subtract(1, "days").format('YYYY-MM-DD');
     }
+
+    setSelectedDate(normalizeDate(newDate))
   };
 
   const onLock = () => {
