@@ -21,7 +21,7 @@ export default function VeAssetGeneration({ project }) {
 
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDateError, setSelectedDateError] = useState(false);
-  const [selectedValue, setSelectedValue] = useState('week');
+  const [selectedValue, setSelectedValue] = useState('month');
 
   useEffect(function () {
     const lockReturned = () => {

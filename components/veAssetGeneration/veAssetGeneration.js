@@ -18,7 +18,7 @@ export default function VeAssetGeneration({ project }) {
   const [amountError, setAmountError] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDateError, setSelectedDateError] = useState(false);
-  const [selectedValue, setSelectedValue] = useState('week');
+  const [selectedValue, setSelectedValue] = useState('month');
 
   useEffect(function () {
     const lockReturned = () => {
@@ -54,14 +54,14 @@ export default function VeAssetGeneration({ project }) {
     setSelectedValue(event.target.value);
 
     switch (event.target.value) {
-      case 'week':
-        setSelectedDate(moment().add(1, 'weeks').format('YYYY-MM-DD'));
-        break;
       case 'month':
         setSelectedDate(moment().add(1, 'months').format('YYYY-MM-DD'));
         break;
       case 'year':
         setSelectedDate(moment().add(1, 'years').format('YYYY-MM-DD'));
+        break;
+      case '2year':
+        setSelectedDate(moment().add(2, 'years').format('YYYY-MM-DD'));
         break;
       default:
         setSelectedDate(moment().add(4, 'years').subtract(1, "days").format('YYYY-MM-DD'));
@@ -185,9 +185,9 @@ export default function VeAssetGeneration({ project }) {
           </div>
         </div>
         <RadioGroup row aria-label="position" name="position" onChange={handleChange} value={selectedValue}>
-          <FormControlLabel value="week" control={<Radio color="primary" />} label="1 week" labelPlacement="bottom" />
           <FormControlLabel value="month" control={<Radio color="primary" />} label="1 month" labelPlacement="bottom" />
           <FormControlLabel value="year" control={<Radio color="primary" />} label="1 year" labelPlacement="bottom" />
+          <FormControlLabel value="2year" control={<Radio color="primary" />} label="2 years" labelPlacement="bottom" />
           {project?.maxDurationYears == 3 ? 
             <FormControlLabel value="3year" control={<Radio color="primary" />} label="3 years" labelPlacement="bottom" />
             :
