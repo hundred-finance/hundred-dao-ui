@@ -32,6 +32,8 @@ import { PRICE_ORACLE_ABI } from './abis/HundredFinancePriceOracleABI';
 import { CTOKEN_ABI } from './abis/CtokenABI';
 import { REWARD_POLICY_MAKER_ABI } from './abis/RewardPolicyMaker';
 import { NETWORKS_CONFIG } from './connectors';
+import { Contract, Provider} from 'ethcall'
+import { ethers } from 'ethers';
 
 const fetch = require('node-fetch');
 
@@ -124,7 +126,8 @@ class Store {
           otherTokenMetadata: {},
           useDays: false,
           maxDurationYears: 4,
-          onload: null
+          onload: null,
+          multicallAddress:"0x9fdd7e3e2df5998c7866cd2471d7d30e04496dfa"
         }
       ],
     };
@@ -213,141 +216,132 @@ class Store {
   async _getProjectData(project, callback) {
 
     const web3 = await stores.accountStore.getWeb3Provider();
-    if (!web3) {
+    const ethersProvider = await stores.accountStore.getEthersProvider();
+    
+    if (!web3 || !ethersProvider) {
       return;
+    }
+
+    const ethcallProvider = new Provider();
+    await ethcallProvider.init(ethersProvider);
+   
+    if(project.multicallAddress) {
+      ethcallProvider.multicall = {address: project.multicallAddress, block: 0};
     }
 
     const hndPrice = await this._getHndPrice();
 
     const gaugeControllerContract = new web3.eth.Contract(GAUGE_CONTROLLER_ABI, project.gaugeProxyAddress);
+    const gaugeControllerMulticall = new Contract(project.gaugeProxyAddress, GAUGE_CONTROLLER_ABI);
+
     const priceOracleContract = new web3.eth.Contract(PRICE_ORACLE_ABI, project.lpPriceOracle);
+    const priceOracleMulticall = new Contract(project.lpPriceOracle, PRICE_ORACLE_ABI)
+
+    const [totalWeight, tokenAddress, veTokenAddress, n_gauges] = await ethcallProvider.all([gaugeControllerMulticall.get_total_weight(), gaugeControllerMulticall.token(), gaugeControllerMulticall.voting_escrow(), gaugeControllerMulticall.n_gauges()])
 
     // get how many gauges there are
-    const n_gauges = await gaugeControllerContract.methods.n_gauges().call();
+    // const n_gauges = await gaugeControllerContract.methods.n_gauges().call();
     const tmpArr = [...Array(parseInt(n_gauges)).keys()];
 
+
+    const tokenContract = new Contract(tokenAddress, ERC20_ABI)
+    const veTokenContract = new Contract(veTokenAddress, ERC20_ABI)
+
     // get all the gauges
-    const gaugesPromises = tmpArr.map((gauge, idx) => {
-      return new Promise((resolve, reject) => {
-        resolve(gaugeControllerContract.methods.gauges(idx).call());
-      });
+    const gaugesCall = [tokenContract.symbol(), tokenContract.decimals(), veTokenContract.symbol(), veTokenContract.decimals()]
+
+    tmpArr.forEach((gauge, idx) => {
+      gaugesCall.push(gaugeControllerMulticall.gauges(idx));
     });
 
-    const gauges = await Promise.all(gaugesPromises);
+    const gauges = await ethcallProvider.all(gaugesCall)
+
+    const metadata = gauges.splice(0, 4)
+    const tokenMetadata = {address: tokenAddress, symbol: metadata[0], decimals: metadata[1]}
+    const veTokenMetadata = {address: veTokenAddress, symbol: metadata[2], decimals: metadata[3]}
 
     // get the gauge relative weights
-    const gaugesWeightsPromise = gauges.map((gauge) => {
-      return new Promise((resolve, reject) => {
-        resolve(gaugeControllerContract.methods.get_gauge_weight(gauge).call());
+    
+    const gaugesCalls = []
+
+    gauges.forEach((gauge) => {
+      const gaugeContractMulticall = new Contract(gauge, GAUGE_ABI)
+        gaugesCalls.push(gaugeControllerMulticall.get_gauge_weight(gauge),
+                         gaugeControllerMulticall.gauge_relative_weight(gauge, currentEpochTime()),
+                         gaugeControllerMulticall.gauge_relative_weight(gauge, nextEpochTime()),
+                         gaugeContractMulticall.lp_token());
       });
-    });
 
-    const gaugesWeights = await Promise.all(gaugesWeightsPromise);
+      const gaugesData = await ethcallProvider.all(gaugesCalls)
+      
+      const gaugesWeights = []
+      const gaugesCurrentEpochRelativeWeights = []
+      const gaugesNextEpochRelativeWeights = []
+      const gaugesLPTokens = []
 
-    // get the gauge relative weights
-    const gaugesNextEpochRelativeWeightsPromise = gauges.map((gauge) => {
-      return new Promise((resolve, reject) => {
-        resolve(gaugeControllerContract.methods.gauge_relative_weight(gauge, nextEpochTime()).call());
-      });
-    });
+      for(let i=0; i<gauges.length; i++){
+        const data = gaugesData.splice(0, 4);
+        gaugesWeights.push(data[0])
+        gaugesCurrentEpochRelativeWeights.push(data[1])
+        gaugesNextEpochRelativeWeights.push(data[2])
+        gaugesLPTokens.push(data[3])
+      }
 
-    const gaugesCurrentEpochRelativeWeightsPromise = gauges.map((gauge) => {
-      return new Promise((resolve, reject) => {
-        resolve(gaugeControllerContract.methods.gauge_relative_weight(gauge, currentEpochTime()).call());
-      });
-    });
-
-    const gaugesCurrentEpochRelativeWeights = await Promise.all(gaugesCurrentEpochRelativeWeightsPromise);
-    const gaugesNextEpochRelativeWeights = await Promise.all(gaugesNextEpochRelativeWeightsPromise);
-
-    // get the gauge lp token
-    const gaugesLPTokensPromise = gauges.map((gauge) => {
-      return new Promise((resolve, reject) => {
-        const gaugeContract = new web3.eth.Contract(GAUGE_ABI, gauge);
-
-        resolve(gaugeContract.methods.lp_token().call());
-      });
-    });
-
-    const gaugesLPTokens = await Promise.all(gaugesLPTokensPromise);
-
-    const lpTokenUnderlyingInfo = await Promise.all(
-      gaugesLPTokens.map(lp => {
-        let pricePromise = new Promise((resolve, reject) => {
-          resolve(priceOracleContract.methods.getUnderlyingPrice(lp).call());
-        })
-        let exchangeRate = new Promise((resolve, reject) => {
-          resolve(new web3.eth.Contract(CTOKEN_ABI, lp).methods.exchangeRateStored().call());
-        })
-
-        let underlying = new Promise((resolve, reject) => {
-          resolve(new web3.eth.Contract(CTOKEN_ABI, lp).methods.underlying().call());
-        })
-
-        return [
-          pricePromise, exchangeRate, underlying
-        ];
-      }).flat()
-    )
-
-    // get LP token info
-    const lpTokensPromise = gaugesLPTokens
-      .map((lpToken, index) => {
-        const lpTokenContract = new web3.eth.Contract(ERC20_ABI, lpToken);
-        const lpUnderlyingTokenContract = new web3.eth.Contract(ERC20_ABI, lpTokenUnderlyingInfo[index * 3 + 2]);
-
-        const promises = [];
-        const namePromise = new Promise((resolve, reject) => {
-          resolve(lpTokenContract.methods.name().call());
-        });
-        const symbolPromise = new Promise((resolve, reject) => {
-          resolve(lpTokenContract.methods.symbol().call());
-        });
-        const decimalsPromise = new Promise((resolve, reject) => {
-          resolve(lpTokenContract.methods.decimals().call());
-        });
-        const totalStakePromise = new Promise((resolve, reject) => {
-          resolve(lpTokenContract.methods.balanceOf(gauges[index]).call());
-        });
-        const underlyingDecimalsPromise = new Promise((resolve, reject) => {
-          resolve(lpUnderlyingTokenContract.methods.decimals().call());
-        });
-        const underlyingSymbolPromise = new Promise((resolve, reject) => {
-          resolve(lpUnderlyingTokenContract.methods.symbol().call());
-        });
-
-        promises.push(namePromise);
-        promises.push(symbolPromise);
-        promises.push(decimalsPromise);
-        promises.push(totalStakePromise);
-        promises.push(underlyingDecimalsPromise);
-        promises.push(underlyingSymbolPromise);
-
-        return promises;
+      const lpCalls = [];
+      gaugesLPTokens.forEach(lp => {
+        const lpContract = new Contract(lp, CTOKEN_ABI);
+        lpCalls.push(priceOracleMulticall.getUnderlyingPrice(lp),
+                     lpContract.exchangeRateStored(),
+                     lpContract.underlying()
+        )
       })
-      .flat();
 
-    const lpTokens = await Promise.all(lpTokensPromise);
+      const lpData = await ethcallProvider.all(lpCalls);
+      const lpTokenUnderlyingInfo = gaugesLPTokens.map((lp, index) => {
+        const lptokenInfo = lpData.splice(0, 3)
+        return ({price: lptokenInfo[0], exchangeRate: lptokenInfo[1], underlying: lptokenInfo[2]})
+      })
+
+      const lpTokensCalls = []
+      gaugesLPTokens.forEach((lp, index) => {
+        const lpTokenContract = new Contract(lp, ERC20_ABI)
+        const lpUnderlyingTokenContract = new Contract(lpTokenUnderlyingInfo[index].underlying, ERC20_ABI)
+
+        lpTokensCalls.push(lpTokenContract.name(),
+                           lpTokenContract.symbol(),
+                           lpTokenContract.decimals(),
+                           lpTokenContract.balanceOf(gauges[index]),
+                           lpUnderlyingTokenContract.decimals(),
+                           lpUnderlyingTokenContract.symbol())
+      })
+
+      const lpTokensData = await ethcallProvider.all(lpTokensCalls)
+
+      const lpTokens = gaugesLPTokens.map((gauge, index) => {
+        const data = lpTokensData.splice(0, 6);
+        return ({name: data[0], symbol: data[1], decimals: data[2], balance: data[3], underlyingDecimals: data[4], underlyingSymbol: data[5]})
+      })
 
     let projectGauges = [];
     for (let i = 0; i < gauges.length; i++) {
-      let lpPrice = BigNumber(lpTokenUnderlyingInfo[i * 3]).div(10 ** (36-lpTokens[i * 6 + 4])).toNumber();
-      let convRate = BigNumber(lpTokenUnderlyingInfo[i * 3 + 1]).div(10 ** 18).toNumber();
+      let lpPrice = lpTokenUnderlyingInfo[i].price / 10 ** (36-lpTokens[i].underlyingDecimals);
+      let convRate = lpTokenUnderlyingInfo[i].exchangeRate / 1e18;
+      
       const gauge = {
         address: gauges[i],
         weight: BigNumber(gaugesWeights[i]).div(1e18).toNumber(),
-        currentEpochRelativeWeight: BigNumber(gaugesCurrentEpochRelativeWeights[i]).times(100).div(1e18).toNumber(),
-        nextEpochRelativeWeight: BigNumber(gaugesNextEpochRelativeWeights[i]).times(100).div(1e18).toNumber(),
-        totalStakeBalance: BigNumber(lpTokens[i * 6 + 3]).div(10 ** lpTokens[i * 6 + 4]).toNumber() * convRate,
+        currentEpochRelativeWeight: gaugesCurrentEpochRelativeWeights[i]*100/1e18,
+        nextEpochRelativeWeight: gaugesNextEpochRelativeWeights[i] * 100 /1e18,
+        totalStakeBalance:  (lpTokens[i].balance / 10 ** lpTokens[i].underlyingDecimals) * convRate,
         liquidityShare: 0,
         apr: 0,
         lpToken: {
           address: gaugesLPTokens[i],
-          name: lpTokens[i * 6],
-          symbol: lpTokens[i * 6 + 1],
-          decimals: lpTokens[i * 6 + 2],
-          underlyingDecimals: lpTokens[i * 6 + 4],
-          underlyingSymbol: lpTokens[i * 6 + 5],
+          name: lpTokens[i].name,
+          symbol: lpTokens[i].symbol,
+          decimals: lpTokens[i].decimals,
+          underlyingDecimals: lpTokens[i].underlyingDecimals,
+          underlyingSymbol: lpTokens[i].underlyingSymbol,
           price: lpPrice,
           conversionRate: convRate
         },
@@ -356,25 +350,25 @@ class Store {
       projectGauges.push(gauge);
     }
 
-    const totalWeight = await gaugeControllerContract.methods.get_total_weight().call();
+    // const totalWeight = await gaugeControllerContract.methods.get_total_weight().call();
 
-    const tokenAddress = await gaugeControllerContract.methods.token().call();
-    const tokenContract = new web3.eth.Contract(ERC20_ABI, tokenAddress);
+    // const tokenAddress = await gaugeControllerContract.methods.token().call();
+    // const tokenContract = new web3.eth.Contract(ERC20_ABI, tokenAddress);
 
-    const veTokenAddress = await gaugeControllerContract.methods.voting_escrow().call();
-    const veTokenContract = new web3.eth.Contract(ERC20_ABI, veTokenAddress);
+    // const veTokenAddress = await gaugeControllerContract.methods.voting_escrow().call();
+    // const veTokenContract = new web3.eth.Contract(ERC20_ABI, veTokenAddress);
 
     const projectTokenMetadata = {
-      address: web3.utils.toChecksumAddress(tokenAddress),
-      symbol: await tokenContract.methods.symbol().call(),
-      decimals: parseInt(await tokenContract.methods.decimals().call()),
+      address: web3.utils.toChecksumAddress(tokenMetadata.address),
+      symbol: tokenMetadata.symbol,
+      decimals: parseInt(tokenMetadata.decimals),
       logo: `/logo128.png`,
     };
 
     const projectVeTokenMetadata = {
-      address: web3.utils.toChecksumAddress(veTokenAddress),
-      symbol: await veTokenContract.methods.symbol().call(),
-      decimals: parseInt(await veTokenContract.methods.decimals().call()),
+      address: web3.utils.toChecksumAddress(veTokenMetadata.address),
+      symbol: veTokenMetadata.symbol,
+      decimals: parseInt(veTokenMetadata.decimals),
       logo: `https://assets.coingecko.com/coins/images/18445/thumb/hnd.PNG`,
     };
 
@@ -435,7 +429,8 @@ class Store {
     }
 
     const web3 = await stores.accountStore.getWeb3Provider();
-    if (!web3) {
+    const provider = await stores.accountStore.getEthersProvider()
+    if (!web3 || !provider) {
       return null;
     }
 
@@ -454,118 +449,92 @@ class Store {
       project = project[0];
     }
 
-    const tokenContract = new web3.eth.Contract(ERC20_ABI, project.tokenMetadata.address);
-    const tokenBalance = await tokenContract.methods.balanceOf(account.address).call();
-    const allowance = await tokenContract.methods.allowance(account.address, project.veTokenMetadata.address).call();
-    const totalLocked = await tokenContract.methods.balanceOf(project.veTokenMetadata.address).call();
+    const ethcallProvider = new Provider();
+    await ethcallProvider.init(provider)
+    if(project.multicallAddress) {
+      ethcallProvider.multicall = {address: project.multicallAddress, block: 0};
+    }
 
-    const veTokenContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.veTokenMetadata.address);
-    const veTokenBalance = await veTokenContract.methods.balanceOf(account.address).call();
-    const totalVeTokenSupply = await veTokenContract.methods.totalSupply().call();
-    const userLocked = await veTokenContract.methods.locked(account.address).call();
-    const supply = await veTokenContract.methods.supply().call();
+    const tokenContract = new Contract(project.tokenMetadata.address, ERC20_ABI)
+    const veTokenContract = new Contract(project.veTokenMetadata.address, VOTING_ESCROW_ABI);
+    const rewardPolicyMakerContract = new Contract(project.rewardPolicyMaker, REWARD_POLICY_MAKER_ABI);
+    const gaugeControllerContract = new Contract(project.gaugeProxyAddress, GAUGE_CONTROLLER_ABI)
 
-
-    project.tokenMetadata.balance = BigNumber(tokenBalance)
-      .div(10 ** project.tokenMetadata.decimals)
-      .toFixed(project.tokenMetadata.decimals);
-    project.tokenMetadata.allowance = BigNumber(allowance)
-      .div(10 ** project.tokenMetadata.decimals)
-      .toFixed(project.tokenMetadata.decimals);
-    project.tokenMetadata.totalLocked = BigNumber(totalLocked)
-      .div(10 ** project.tokenMetadata.decimals)
-      .toFixed(project.tokenMetadata.decimals);
-
-    project.veTokenMetadata.balance = BigNumber(veTokenBalance)
-      .div(10 ** project.veTokenMetadata.decimals)
-      .toFixed(project.veTokenMetadata.decimals);
-    project.veTokenMetadata.totalSupply = BigNumber(totalVeTokenSupply)
-      .div(10 ** project.veTokenMetadata.decimals)
-      .toFixed(project.veTokenMetadata.decimals);
-    project.veTokenMetadata.userLocked = BigNumber(userLocked.amount)
-      .div(10 ** project.veTokenMetadata.decimals)
-      .toFixed(project.veTokenMetadata.decimals);
-
-    project.veTokenMetadata.supply = BigNumber(supply)
-      .div(10 ** project.tokenMetadata.decimals)
-      .toFixed(project.tokenMetadata.decimals);
-
-    project.veTokenMetadata.userLockEnd = userLocked.end;
-
-    let gaugeControllerContract = null
-    let voteWeights = []
-
-    // get the gauge vote weights for the user
-    gaugeControllerContract = new web3.eth.Contract(GAUGE_CONTROLLER_ABI, project.gaugeProxyAddress);
-
-    const gaugesVoteWeightsPromise = project.gauges.map((gauge) => {
-      return new Promise((resolve, reject) => {
-        resolve(gaugeControllerContract.methods.vote_user_slopes(account.address, gauge.address).call());
-      });
-    });
-
-    voteWeights = await Promise.all(gaugesVoteWeightsPromise);
-    voteWeights = voteWeights.map((weight) => {
-      return weight.power
+    const calls = [tokenContract.balanceOf(account.address), 
+                    tokenContract.allowance(account.address, project.veTokenMetadata.address),
+                    tokenContract.balanceOf(project.veTokenMetadata.address),
+                    veTokenContract.balanceOf(account.address),
+                    veTokenContract.totalSupply(),
+                    veTokenContract.locked(account.address),
+                    veTokenContract.supply(),
+                    rewardPolicyMakerContract.rate_at(currentEpochTime()),
+                    rewardPolicyMakerContract.rate_at(nextEpochTime())]
+    
+    project.gauges.forEach((gauge) =>{
+      const erc20Contract = new Contract(gauge.address, ERC20_ABI);
+      const gaugeContract = new Contract(gauge.address, GAUGE_ABI);
+      calls.push(gaugeControllerContract.vote_user_slopes(account.address, gauge.address),
+                 erc20Contract.balanceOf(account.address),
+                 gaugeContract.working_balances(account.address),
+                 gaugeContract.working_supply(),
+                 gaugeControllerContract.last_user_vote(account.address, gauge.address))
     })
 
-    // get the balanceOf for the user
-    const balanceOfPromise = project.gauges.map((gauge) => {
-      return new Promise((resolve, reject) => {
-        const erc20Contract = new web3.eth.Contract(ERC20_ABI, gauge.address);
-        resolve(erc20Contract.methods.balanceOf(account.address).call());
-      });
-    });
+    const data = await ethcallProvider.all(calls)
+    
+    const tokenBalance = data[0]
+    const allowance = data[1]
+    const totalLocked = data[2]
+    const veTokenBalance = data[3]
+    const totalVeTokenSupply = data[4]
+    const userLocked = data[5]
+    const supply = data[6]
+    const currentRewardRate = data[7];
+    const nextEpochRewardRate = data[8];
 
-    const balanceOf = await Promise.all(balanceOfPromise);
+    data.splice(0, 9);
 
-    const workingBalanceOfPromise = project.gauges.map((gauge) => {
-      return new Promise((resolve, reject) => {
-        const gaugeContract = new web3.eth.Contract(GAUGE_ABI, gauge.address);
-        resolve(gaugeContract.methods.working_balances(account.address).call());
-      });
-    });
+    const gaugesData = project.gauges.map(() => {
+      const d = data.splice(0, 5)
+      return({ voteWeight: d[0].power, 
+               balanceOf: d[1],
+               workingBalanceOf: d[2],
+               workingSupply: d[3],
+               lastUserVotes: d[4]})
+    })
 
-    const workingBalanceOf = await Promise.all(workingBalanceOfPromise);
 
-    const workingSupplyPromise = project.gauges.map((gauge) => {
-      return new Promise((resolve, reject) => {
-        const gaugeContract = new web3.eth.Contract(GAUGE_ABI, gauge.address);
-        resolve(gaugeContract.methods.working_supply().call());
-      });
-    });
+    project.tokenMetadata.balance = (tokenBalance/10**project.tokenMetadata.decimals).toFixed(project.tokenMetadata.decimals);
+    project.tokenMetadata.allowance = (allowance/10 ** project.tokenMetadata.decimals).toFixed(project.tokenMetadata.decimals);
+    project.tokenMetadata.totalLocked = (totalLocked/10 ** project.tokenMetadata.decimals).toFixed(project.tokenMetadata.decimals);
 
-    const workingSupply = await Promise.all(workingSupplyPromise);
+    project.veTokenMetadata.balance = (veTokenBalance/10 ** project.veTokenMetadata.decimals).toFixed(project.veTokenMetadata.decimals);
+    project.veTokenMetadata.totalSupply = (totalVeTokenSupply/10 ** project.veTokenMetadata.decimals).toFixed(project.veTokenMetadata.decimals);
+    project.veTokenMetadata.userLocked = (userLocked.amount/10 ** project.veTokenMetadata.decimals).toFixed(project.veTokenMetadata.decimals);
 
-    const lastUserVotesPromise = project.gauges.map((gauge) => {
-      return new Promise((resolve, reject) => {
-        const gaugeContract = new web3.eth.Contract(GAUGE_CONTROLLER_ABI, project.gaugeProxyAddress);
-        resolve(gaugeContract.methods.last_user_vote(account.address, gauge.address).call());
-      });
-    });
+    project.veTokenMetadata.supply = (supply/10 ** project.tokenMetadata.decimals).toFixed(project.tokenMetadata.decimals);
 
-    const lastUserVotes = await Promise.all(lastUserVotesPromise);
-
-    const rewardPolicyMakerContract = new web3.eth.Contract(REWARD_POLICY_MAKER_ABI, project.rewardPolicyMaker);
-    const currentRewardRate = await rewardPolicyMakerContract.methods.rate_at(currentEpochTime()).call();
-    const nextEpochRewardRate = await rewardPolicyMakerContract.methods.rate_at(nextEpochTime()).call();
+    project.veTokenMetadata.userLockEnd = userLocked.end;
 
     let totalPercentUsed = 0
 
     for (let i = 0; i < project.gauges.length; i++) {
 
-      project.gauges[i].balance = BigNumber(balanceOf[i]).div(10 ** project.gauges[i].lpToken.underlyingDecimals).toNumber() * project.gauges[i].lpToken.conversionRate
-      project.gauges[i].workingBalance = BigNumber(workingBalanceOf[i])
-      project.gauges[i].workingSupply = BigNumber(workingSupply[i])
-      project.gauges[i].rawBalance = BigNumber(balanceOf[i])
+      project.gauges[i].balance = gaugesData[i].balanceOf/10 ** project.gauges[i].lpToken.underlyingDecimals * project.gauges[i].lpToken.conversionRate
+      project.gauges[i].workingBalance = BigNumber(gaugesData[i].workingBalanceOf)
+      project.gauges[i].workingSupply = BigNumber(gaugesData[i].workingSupply)
+      project.gauges[i].rawBalance = BigNumber(gaugesData[i].balanceOf)
+      
+      console.log("project.gauges[i].rawBalance")
+      console.log(project.gauges[i].rawBalance)
 
       project.gauges[i].remainingBalance = userRemainingStake(
         project.gauges[i].balance, project.gauges[i].totalStakeBalance, veTokenBalance, totalVeTokenSupply
       )
 
-      const gaugeVotePercent = BigNumber(voteWeights[i]).div(100)
+      const gaugeVotePercent = gaugesData[i].voteWeight/100
       project.gauges[i].userVotesPercent = gaugeVotePercent.toFixed(2)
-      totalPercentUsed = BigNumber(totalPercentUsed).plus(gaugeVotePercent)
+      totalPercentUsed = totalPercentUsed + gaugeVotePercent
 
       project.gauges[i].liquidityShare = userAppliedLiquidityShare(project.gauges[i]);
       project.gauges[i].boost = userBoost(project.gauges[i], veTokenBalance, totalVeTokenSupply);
@@ -592,14 +561,14 @@ class Store {
       }
 
       const referenceBalance = 10000
-      const referenceWorkingSupply = project.gauges[i].workingSupply.div(10 ** project.gauges[i].lpToken.underlyingDecimals).toNumber() * project.gauges[i].lpToken.conversionRate
+      const referenceWorkingSupply = project.gauges[i].workingSupply/10 ** project.gauges[i].lpToken.underlyingDecimals * project.gauges[i].lpToken.conversionRate
       const referenceLiquidityShare = referenceBalance / (referenceWorkingSupply + referenceBalance)
 
       project.gauges[i].gaugeRewards = gaugeRewards
       project.gauges[i].gaugeApr = gaugeRewards * referenceLiquidityShare * 100 / (referenceBalance * project.gauges[i].lpToken.price)
       project.gauges[i].nextEpochGaugeApr = nextEpochGaugeRewards * referenceLiquidityShare * 100 / (referenceBalance * project.gauges[i].lpToken.price)
 
-      project.gauges[i].nextVoteTimestamp = +lastUserVotes[i] === 0 ? 0 : +lastUserVotes[i] + 10 * 86400
+      project.gauges[i].nextVoteTimestamp = +gaugesData[i].lastUserVotes === 0 ? 0 : +gaugesData[i].lastUserVotes + 10 * 86400
     }
 
     project.userVotesPercent = totalPercentUsed.toFixed(2)

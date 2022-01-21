@@ -1,4 +1,5 @@
 import async from "async";
+import {ethers} from "ethers";
 import {
   ERROR,
   STORE_UPDATED,
@@ -144,6 +145,27 @@ class Store {
         return null;
       }
       return new Web3(provider);
+    } catch(ex) {
+      console.log(ex)
+      return null
+    }
+  }
+
+  async getEthersProvider() {
+    try {
+      let web3context = this.getStore("web3context");
+      let provider = null;
+
+      if(web3context && web3context.library) {
+        provider = web3context.library.provider;
+      } else {
+        provider = network.providers['1'];
+      }
+
+      if (!provider) {
+        return null;
+      }
+      return new ethers.providers.Web3Provider(provider);
     } catch(ex) {
       console.log(ex)
       return null
