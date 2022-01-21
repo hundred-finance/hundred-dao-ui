@@ -329,7 +329,7 @@ class Store {
       
       const gauge = {
         address: gauges[i],
-        weight: BigNumber(gaugesWeights[i]).div(1e18).toNumber(),
+        weight: gaugesWeights[i]/1e18,
         currentEpochRelativeWeight: gaugesCurrentEpochRelativeWeights[i]*100/1e18,
         nextEpochRelativeWeight: gaugesNextEpochRelativeWeights[i] * 100 /1e18,
         totalStakeBalance:  (lpTokens[i].balance / 10 ** lpTokens[i].underlyingDecimals) * convRate,
@@ -521,13 +521,10 @@ class Store {
     for (let i = 0; i < project.gauges.length; i++) {
 
       project.gauges[i].balance = gaugesData[i].balanceOf/10 ** project.gauges[i].lpToken.underlyingDecimals * project.gauges[i].lpToken.conversionRate
-      project.gauges[i].workingBalance = BigNumber(gaugesData[i].workingBalanceOf)
-      project.gauges[i].workingSupply = BigNumber(gaugesData[i].workingSupply)
-      project.gauges[i].rawBalance = BigNumber(gaugesData[i].balanceOf)
-      
-      console.log("project.gauges[i].rawBalance")
-      console.log(project.gauges[i].rawBalance)
-
+      project.gauges[i].workingBalance = gaugesData[i].workingBalanceOf
+      project.gauges[i].workingSupply = gaugesData[i].workingSupply
+      project.gauges[i].rawBalance = gaugesData[i].balanceOf
+     
       project.gauges[i].remainingBalance = userRemainingStake(
         project.gauges[i].balance, project.gauges[i].totalStakeBalance, veTokenBalance, totalVeTokenSupply
       )
@@ -898,39 +895,29 @@ class Store {
 
 function userRemainingStake(balance, totalBalance, veTokenBalance, totalVeTokenSupply) {
 
-  let currentStake = BigNumber(balance)
+  let currentStake = balance
 
-  let maxStake = BigNumber(totalBalance)
-    .multipliedBy(BigNumber(veTokenBalance))
-    .div(BigNumber(totalVeTokenSupply))
+  let maxStake = totalBalance * veTokenBalance/totalVeTokenSupply
 
-  console.log(
-    balance.toString(),
-    totalBalance.toString(),
-    veTokenBalance.toString(),
-    totalVeTokenSupply.toString(),
-    maxStake.toString()
-  )
+  // console.log(
+  //   balance.toString(),
+  //   totalBalance.toString(),
+  //   veTokenBalance.toString(),
+  //   totalVeTokenSupply.toString(),
+  //   maxStake.toString()
+  // )
 
-  if (currentStake.gte(maxStake)) {
+  if (currentStake > maxStake) {
     return BigNumber(0);
   }
 
-  return maxStake.minus(currentStake);
+  return maxStake - currentStake;
 
 }
 
 function userLiquidityShare(gauge, balance, totalBalance, veTokenBalance, totalVeTokenSupply) {
   return Math.min(
-    BigNumber(balance).multipliedBy(0.4)
-      .plus(
-        BigNumber(totalBalance)
-          .multipliedBy(0.6)
-          .multipliedBy(BigNumber(veTokenBalance))
-          .div(BigNumber(totalVeTokenSupply))
-      ).toNumber(),
-    balance
-  ) * 100 / totalBalance;
+    balance * 0.4 + (totalBalance * 0.6 * (veTokenBalance/totalVeTokenSupply)),balance) * 100 / totalBalance;
 }
 
 function userBoost(gauge, veTokenBalance, totalVeTokenSupply) {
@@ -939,10 +926,7 @@ function userBoost(gauge, veTokenBalance, totalVeTokenSupply) {
 }
 
 function userAppliedBoost(gauge) {
-  return BigNumber(gauge.workingBalance)
-            .multipliedBy(2.5)
-            .div(BigNumber(gauge.rawBalance))
-            .toNumber()
+  return gauge.workingBalance * 2.5 / gauge.rawBalance
 }
 
 function userAppliedLiquidityShare(gauge) {
