@@ -19,7 +19,7 @@ export default function GaugeCalculator({ project }) {
       return;
     }
 
-    setAmount(BigNumber(project.tokenMetadata.balance).times(percent).div(100).toFixed(project.tokenMetadata.decimals));
+    setAmount((project.tokenMetadata.balance * percent/100).toFixed(project.tokenMetadata.decimals));
   };
 
   const onGaugeSelectChanged = (event, theOption) => {

@@ -85,7 +85,7 @@ export default function BoostCalculator({ project }) {
     )
 
     let totalWorkingSupply =
-      gauge.workingSupply.div(10 ** gauge.lpToken.underlyingDecimals).toNumber() * gauge.lpToken.conversionRate
+      gauge.workingSupply/10 ** gauge.lpToken.underlyingDecimals * gauge.lpToken.conversionRate
 
     return workingBalance * 100 / (totalWorkingSupply + workingBalance);
   }
