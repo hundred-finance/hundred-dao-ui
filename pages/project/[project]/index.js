@@ -161,7 +161,7 @@ function Projects({ changeTheme }) {
 }
 
 function isLockIncreasePossible(project) {
-  return project && project.veTokenMetadata && BigNumber(project.veTokenMetadata.userLocked).gt(0)
+  return project && project.veTokenMetadata && project.veTokenMetadata.userLocked > 0
 }
 
 export default Projects;

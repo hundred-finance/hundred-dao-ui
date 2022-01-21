@@ -372,7 +372,7 @@ class Store {
       logo: `https://assets.coingecko.com/coins/images/18445/thumb/hnd.PNG`,
     };
 
-    project.totalWeight = BigNumber(totalWeight).div(1e18).toNumber();
+    project.totalWeight = totalWeight/ 1e18;
     project.tokenMetadata = projectTokenMetadata;
     project.veTokenMetadata = projectVeTokenMetadata;
     project.gauges = projectGauges;
@@ -636,6 +636,8 @@ class Store {
     }
 
     const { amount, selectedDate, project } = payload.content;
+    console.log("amount")
+    console.log(amount)
 
     this._callLock(web3, project, account, amount, selectedDate, (err, lockResult) => {
       if (err) {
@@ -677,6 +679,9 @@ class Store {
       .times(10 ** project.tokenMetadata.decimals)
       .toFixed(0);
 
+      console.log("amount to send")
+      console.log(amountToSend)
+
     await this._asyncCallContractWait(web3, escrowContract, 'create_lock', [amountToSend, selectedDate], account, null, GET_TOKEN_BALANCES, { id: project.id }, callback);
   }
 
@@ -713,9 +718,7 @@ class Store {
   async _calVoteForGaugeWeights(web3, project, account, amount, gaugeAddress, callback) {
     const gaugeControllerContract = new web3.eth.Contract(GAUGE_CONTROLLER_ABI, project.gaugeProxyAddress);
 
-    const amountToSend = BigNumber(amount)
-      .times(100)
-      .toFixed(0);
+    const amountToSend = (amount * 100).toFixed(0);
 
 
     console.log(gaugeControllerContract)
@@ -908,7 +911,7 @@ function userRemainingStake(balance, totalBalance, veTokenBalance, totalVeTokenS
   // )
 
   if (currentStake > maxStake) {
-    return BigNumber(0);
+    return 0;
   }
 
   return maxStake - currentStake;

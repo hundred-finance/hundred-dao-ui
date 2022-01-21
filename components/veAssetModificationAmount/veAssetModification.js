@@ -40,7 +40,7 @@ export default function VeAssetGeneration({ project }) {
       return;
     }
 
-    setAmount(BigNumber(project.tokenMetadata.balance).times(percent).div(100).toFixed(project.tokenMetadata.decimals));
+    setAmount((project.tokenMetadata.balance * percent / 100).toFixed(project.tokenMetadata.decimals));
   };
 
   const onLock = () => {
@@ -124,7 +124,7 @@ export default function VeAssetGeneration({ project }) {
           color="primary"
           size="large"
           onClick={onApprove}
-          disabled={ approveLoading || !amount || amount === '' || isNaN(amount) || BigNumber(amount).eq(0) || BigNumber(project?.tokenMetadata?.allowance).gte(amount)}
+          disabled={ approveLoading || !amount || amount === '' || isNaN(amount) || amount === 0 || project?.tokenMetadata?.allowance >=amount}
           className={classes.button}
         >
           <Typography variant="h5">{approveLoading ? <CircularProgress size={15} /> : `Approve ${project?.tokenMetadata?.symbol}`}</Typography>
@@ -136,7 +136,7 @@ export default function VeAssetGeneration({ project }) {
           color="primary"
           size="large"
           onClick={onLock}
-          disabled={ lockLoading || !amount || amount === '' || isNaN(amount) || BigNumber(amount).eq(0) || BigNumber(project?.tokenMetadata?.allowance).lt(amount)}
+          disabled={ lockLoading || !amount || amount === '' || isNaN(amount) || amount === 0 || project?.tokenMetadata?.allowance < amount}
           className={classes.button}
         >
           <Typography variant="h5">{lockLoading ? <CircularProgress size={15} /> : `Lock ${project?.tokenMetadata?.symbol}`}</Typography>

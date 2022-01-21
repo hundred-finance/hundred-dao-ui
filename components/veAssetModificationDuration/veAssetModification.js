@@ -177,14 +177,14 @@ export default function VeAssetGeneration({ project }) {
 function isLockIncreasePossible(project, selectedDate) {
   return project &&
     project.veTokenMetadata &&
-    BigNumber(project.veTokenMetadata.userLocked).gt(0) &&
+    project.veTokenMetadata.userLocked > 0 &&
     moment(selectedDate).unix() >= project.veTokenMetadata.userLockEnd
 }
 
 function isUnLockPossible(project) {
   return project &&
     project.veTokenMetadata &&
-    BigNumber(project.veTokenMetadata.userLocked).gt(0) &&
+    project.veTokenMetadata.userLocked > 0 &&
     moment().unix() >= project.veTokenMetadata.userLockEnd
 }
 

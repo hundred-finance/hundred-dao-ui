@@ -43,7 +43,7 @@ export default function GaugeVoting({ project }) {
       return;
     }
 
-    setAmount(BigNumber(project.tokenMetadata.balance).times(percent).div(100).toFixed(project.tokenMetadata.decimals));
+    setAmount((project.tokenMetadata.balance * percent/100).toFixed(project.tokenMetadata.decimals));
   };
 
   const onGaugeSelectChanged = (event, theOption) => {
@@ -59,7 +59,7 @@ export default function GaugeVoting({ project }) {
       setGaugeError(true);
       error = true;
     }
-    if (!amount || amount === '' || isNaN(amount) || BigNumber(amount).gt(100) || BigNumber(amount).lt(0)) {
+    if (!amount || amount === '' || isNaN(amount) || amount > 100 || amount < 0) {
       setAmountError(true);
       error = true;
     }
@@ -163,10 +163,10 @@ export default function GaugeVoting({ project }) {
             </Typography>
           </div>
         </div>
-        {BigNumber(project?.userVotesPercent).gt(0) && (
+        {project?.userVotesPercent > 0 && (
           <div className={classes.gaugeVotesTable}>
             {project?.gauges?.map((gauge, idx) => {
-              if (!gauge.userVotesPercent || (gauge.userVotesPercent && BigNumber(gauge.userVotesPercent).eq(0))) {
+              if (!gauge.userVotesPercent || (gauge.userVotesPercent && gauge.userVotesPercent === 0)) {
                 return null;
               }
 
@@ -195,7 +195,7 @@ export default function GaugeVoting({ project }) {
             })}
           </div>
         )}
-        {BigNumber(project?.userVotesPercent).eq(0) && (
+        {project?.userVotesPercent === 0 && (
           <div className={classes.gaugeVotesTable}>
             <Typography>
               Voting for a gauge increases the emissions that the farm receives. The more votes that your farm receives, the more profitable it will be.
