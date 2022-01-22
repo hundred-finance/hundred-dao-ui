@@ -45,6 +45,10 @@ export default function VeAssetGeneration({ project }) {
     setAmount((project.tokenMetadata.balance * percent/100).toFixed(project.tokenMetadata.decimals));
   };
 
+  const handleChangeAmount = (e) => {
+    console.log(e)
+  }
+
   const handleDateChange = (event) => {
     setSelectedDate(normalizeDate(event.target.value));
     setSelectedValue(null);
@@ -144,9 +148,7 @@ export default function VeAssetGeneration({ project }) {
           placeholder="0.00"
           value={amount}
           error={amountError}
-          onChange={(e) => {
-            setAmount(e.target.value);
-          }}
+          onChange={(e) => setAmount(e.target.value)}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -184,7 +186,7 @@ export default function VeAssetGeneration({ project }) {
         <div className={classes.inputTitleContainer}>
           <div className={classes.inputTitle}>
             <Typography variant="h5" noWrap>
-              Lock for
+              Lock for 
             </Typography>
           </div>
         </div>
@@ -208,7 +210,7 @@ export default function VeAssetGeneration({ project }) {
           color="primary"
           size="large"
           onClick={onApprove}
-          disabled={ approveLoading || !amount || amount === '' || isNaN(amount) || amount === 0 || project?.tokenMetadata?.allowance <= amount}
+          disabled={ approveLoading || !amount || amount === '' || isNaN(amount) || BigNumber(amount).eq(BigNumber(0)) || BigNumber(project?.tokenMetadata?.allowance).gte(BigNumber(amount))}
           className={classes.button}
         >
           <Typography variant="h5">{approveLoading ? <CircularProgress size={15} /> : `Approve ${project?.tokenMetadata?.symbol}`}</Typography>
@@ -220,7 +222,7 @@ export default function VeAssetGeneration({ project }) {
           color="primary"
           size="large"
           onClick={onLock}
-          disabled={ lockLoading || !amount || amount === '' || isNaN(amount) || amount === 0  || project?.tokenMetadata?.allowance > amount}
+          disabled={ lockLoading || !amount || amount === '' || isNaN(amount) || BigNumber(amount).eq(BigNumber(0))  || BigNumber(project?.tokenMetadata?.allowance).lt(BigNumber(amount))}
           className={classes.button}
         >
           <Typography variant="h5">{lockLoading ? <CircularProgress size={15} /> : `Lock ${project?.tokenMetadata?.symbol}`}</Typography>
