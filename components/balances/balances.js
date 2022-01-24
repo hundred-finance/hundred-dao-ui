@@ -58,7 +58,7 @@ function Balances({ project }) {
       <div className={classes.overviewCard}>
         <div>
           <Typography variant="h5">{project?.tokenMetadata?.symbol} price</Typography>
-          <Typography variant="h2">
+          <Typography variant="h3">
             {!project?.hndPrice ? <Skeleton style={{ minWidth: '200px ' }} /> : `$${formatCurrency(project?.hndPrice, 2)}`}
           </Typography>
         </div>
@@ -67,7 +67,7 @@ function Balances({ project }) {
       <div className={classes.overviewCard}>
         <div>
           <Typography variant="h5">{project?.tokenMetadata?.symbol} balance</Typography>
-          <Typography variant="h2">
+          <Typography variant="h3">
             {!project?.tokenMetadata?.balance ? <Skeleton style={{ minWidth: '200px ' }} /> : `${formatCurrency(project?.tokenMetadata?.balance, 4)}`}
           </Typography>
         </div>
@@ -76,28 +76,28 @@ function Balances({ project }) {
       <div className={classes.overviewCard}>
         <div>
           <Typography variant="h5">{project?.veTokenMetadata?.symbol} balance</Typography>
-          <Typography variant="h2">{!project?.veTokenMetadata?.balance ? <Skeleton style={{ minWidth: '200px ' }} /> : `${formatCurrency(project?.veTokenMetadata?.balance, 4)}`}</Typography>
+          <Typography variant="h3">{!project?.veTokenMetadata?.balance ? <Skeleton style={{ minWidth: '200px ' }} /> : `${formatCurrency(project?.veTokenMetadata?.balance, 4)}`}</Typography>
         </div>
       </div>
       <div className={classes.separator}></div>
       <div className={classes.overviewCard}>
         <div>
           <Typography variant="h5">Total {project?.veTokenMetadata?.symbol}</Typography>
-          <Typography variant="h2">{!project ? <Skeleton style={{ minWidth: '200px ' }} /> : `${formatCurrency(project?.veTokenMetadata?.totalSupply, 0)}`}</Typography>
+          <Typography variant="h3">{!project ? <Skeleton style={{ minWidth: '200px ' }} /> : `${formatCurrency(project?.veTokenMetadata?.totalSupply, 0)}`}</Typography>
         </div>
       </div>
       <div className={classes.separator}></div>
       <div className={classes.overviewCard}>
         <div>
           <Typography variant="h5">Total {project?.tokenMetadata?.symbol} staked</Typography>
-          <Typography variant="h2">{!project ? <Skeleton style={{ minWidth: '200px ' }} /> : `${formatCurrency(project?.veTokenMetadata?.supply, 0)}`}</Typography>
+          <Typography variant="h3">{!project ? <Skeleton style={{ minWidth: '200px ' }} /> : `${formatCurrency(project?.veTokenMetadata?.supply, 0)}`}</Typography>
         </div>
       </div>
       <div className={classes.separator}></div>
       <div className={classes.overviewCard}>
         <div>
           <Typography variant="h5">Epoch ends in</Typography>
-          <Typography variant="h2">{ timeToNextEpoch }</Typography>
+          <Typography variant="h3">{ timeToNextEpoch }</Typography>
         </div>
       </div>
     </Paper>
