@@ -42,7 +42,7 @@ export default function VeAssetGeneration({ project }) {
       return;
     }
 
-    setAmount((project.tokenMetadata.balance * percent/100).toFixed(project.tokenMetadata.decimals));
+    setAmount(project.tokenMetadata.balance.times(BigNumber(percent).div(BigNumber(100))).toFixed(project.tokenMetadata.decimals));
   };
 
   const handleChangeAmount = (e) => {

@@ -504,7 +504,7 @@ class Store {
     })
 
 
-    project.tokenMetadata.balance = (tokenBalance/10**project.tokenMetadata.decimals).toFixed(project.tokenMetadata.decimals);
+    project.tokenMetadata.balance = BigNumber(ethers.utils.formatUnits(tokenBalance, project.tokenMetadata.decimals));
     project.tokenMetadata.allowance = (allowance / 10 ** project.tokenMetadata.decimals).toFixed(project.tokenMetadata.decimals);
     project.tokenMetadata.totalLocked = (totalLocked/10 ** project.tokenMetadata.decimals).toFixed(project.tokenMetadata.decimals);
 

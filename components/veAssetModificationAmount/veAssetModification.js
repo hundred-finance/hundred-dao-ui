@@ -4,7 +4,7 @@ import Skeleton from '@material-ui/lab/Skeleton';
 import BigNumber from 'bignumber.js';
 import { formatCurrency } from '../../utils';
 import moment from 'moment';
-
+import { ethers } from "ethers"
 import stores from '../../stores/index.js';
 import { ERROR, INCREASE_LOCK_AMOUNT, INCREASE_LOCK_AMOUNT_RETURNED, APPROVE_LOCK, APPROVE_LOCK_RETURNED } from '../../stores/constants';
 
@@ -39,8 +39,9 @@ export default function VeAssetGeneration({ project }) {
     if (!project || !project.tokenMetadata) {
       return;
     }
-
-    setAmount((project.tokenMetadata.balance * percent / 100).toFixed(project.tokenMetadata.decimals));
+    
+    //29524135316538781012501
+    setAmount(project.tokenMetadata.balance.times(BigNumber(percent).div(BigNumber(100))).toFixed(project.tokenMetadata.decimals));
   };
 
   const onLock = () => {
