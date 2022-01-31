@@ -64,7 +64,7 @@ const headCells = [
     numeric: true,
     disablePadding: false,
     label: 'Average APR',
-    tooltip: "Current Epoch APR -> Next Epoch APR, value is average APR at max boost"
+    tooltip: 'Current Epoch APR -> Next Epoch APR, value is average APR at max boost',
   },
   {
     id: 'balance',
@@ -83,7 +83,7 @@ const headCells = [
     numeric: true,
     disablePadding: false,
     label: 'My APR',
-    tooltip: "Current Epoch APR -> Next Epoch APR"
+    tooltip: 'Current Epoch APR -> Next Epoch APR',
   },
 ];
 
@@ -102,13 +102,13 @@ function EnhancedTableHead(props) {
               <Typography variant="h5">{headCell.label}</Typography>
               {orderBy === headCell.id ? <span className={classes.visuallyHidden}>{order === 'desc' ? 'sorted descending' : 'sorted ascending'}</span> : null}
             </TableSortLabel>
-            { headCell.tooltip ?
+            {headCell.tooltip ? (
               <Tooltip title={headCell.tooltip}>
                 <InfoIcon />
               </Tooltip>
-              :
+            ) : (
               ''
-            }
+            )}
           </TableCell>
         ))}
       </TableRow>
@@ -176,7 +176,7 @@ const useStyles = makeStyles((theme) => ({
   textSpacedClickable: {
     lineHeight: '1.5',
     cursor: 'pointer',
-    textDecoration: 'underline'
+    textDecoration: 'underline',
   },
   cell: {},
   cellSuccess: {
@@ -255,7 +255,7 @@ const useStyles = makeStyles((theme) => ({
   },
   statusSafe: {
     color: 'green',
-  }
+  },
 }));
 
 export default function EnhancedTable({ project }) {
@@ -306,46 +306,52 @@ export default function EnhancedTable({ project }) {
   }
 
   function displayBoost(gauge) {
-
     if (gauge.appliedBoost === 2.5 || isNaN(gauge.appliedBoost)) {
-      return <Typography variant="h5" className={classes.textSpaced}>
+      return (
+        <Typography variant="h5" className={classes.textSpaced}>
           {formatCurrency(gauge.appliedBoost)}x
         </Typography>
+      );
     }
 
-    return <Tooltip title={`You need ${formatCurrency(gauge.needVeHndForMaxBoost)} more veHND to get max boost`} followCursor>
-      <Typography variant="h5" className={classes.textSpacedClickable}>
-        {formatCurrency(gauge.appliedBoost)}x
-      </Typography>
-    </Tooltip>
-
+    return (
+      <Tooltip title={`You need ${formatCurrency(gauge.needVeHndForMaxBoost)} more veHND to get max boost`} followCursor>
+        <Typography variant="h5" className={classes.textSpacedClickable}>
+          {formatCurrency(gauge.appliedBoost)}x
+        </Typography>
+      </Tooltip>
+    );
   }
 
   function displayApplyBoost(gauge) {
-    if ((gauge.boost - gauge.appliedBoost) > 0.01) {
-      return  <Tooltip title={`Your effective boost is ${formatCurrency(gauge.boost)} click on apply if you wish to update it`} followCursor>
-        <Button
-          disableElevation
-          variant="contained"
-          color="primary"
-          size="small"
-          onClick={() => {
-            onApplyBoost(gauge);
-          }}
-          disabled={resetLoading}
-        >
-          <Typography variant="h5">{resetLoading ? <CircularProgress size={15} /> : 'Apply'}</Typography>
-        </Button>
-      </Tooltip>
+    if (gauge.boost - gauge.appliedBoost > 0.01) {
+      return (
+        <Tooltip title={`Your effective boost is ${formatCurrency(gauge.boost)} click on apply if you wish to update it`} followCursor>
+          <Button
+            disableElevation
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={() => {
+              onApplyBoost(gauge);
+            }}
+            disabled={resetLoading}
+          >
+            <Typography variant="h5">{resetLoading ? <CircularProgress size={15} /> : 'Apply'}</Typography>
+          </Button>
+        </Tooltip>
+      );
     }
   }
 
   function displayStakeAtMaxBoost(gauge) {
-    return <Tooltip title={`You can stake ${formatCurrency(gauge.remainingBalance)} ${gauge.lpToken.underlyingSymbol} more at max boost`} followCursor>
-      <Typography variant="h5" className={classes.textSpacedClickable}>
-        {formatCurrency(gauge.balance)}
-      </Typography>
-    </Tooltip>
+    return (
+      <Tooltip title={`You can stake ${formatCurrency(gauge.remainingBalance)} ${gauge.lpToken.underlyingSymbol} more at max boost`} followCursor>
+        <Typography variant="h5" className={classes.textSpacedClickable}>
+          {formatCurrency(gauge.balance)}
+        </Typography>
+      </Tooltip>
+    );
   }
 
   return (
@@ -377,27 +383,32 @@ export default function EnhancedTable({ project }) {
                       {formatCurrency(row.weight)}
                     </Typography>
                   </TableCell>
+
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
-                        {formatCurrency(row.gaugeApr)}% -> {formatCurrency(row.nextEpochGaugeApr)}%
+                      {formatCurrency(row.nextEpochGaugeApr) == 0.0
+                        ? formatCurrency(row.gaugeApr) + '% -> Pending'
+                        : formatCurrency(row.gaugeApr) + '% ->' + formatCurrency(row.nextEpochGaugeApr) + '%'}
                     </Typography>
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
-                    {row.remainingBalance > 0 ?
+                    {row.remainingBalance > 0 ? (
                       displayStakeAtMaxBoost(row)
-                      :
+                    ) : (
                       <Typography variant="h5" className={classes.textSpaced}>
                         {formatCurrency(row.balance)}
                       </Typography>
-                    }
+                    )}
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
-                    { displayBoost(row) }
-                    { displayApplyBoost(row) }
+                    {displayBoost(row)}
+                    {displayApplyBoost(row)}
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
-                      {formatCurrency(row.apr)}% -> {formatCurrency(row.nextEpochApr)}%
+                      {formatCurrency(row.nextEpochApr) == 0.0
+                        ? formatCurrency(row.apr) + '% -> Pending'
+                        : formatCurrency(row.apr) + '% ->' + formatCurrency(row.nextEpochApr) + '%'}
                     </Typography>
                   </TableCell>
                 </TableRow>
