@@ -63,7 +63,6 @@ class Store {
           votingEscrow: "0xBa57440fA35Fdb671E58F6F56c1A4447aB1f6C2B",
           lpPriceOracle: "0x10010069DE6bD5408A6dEd075Cf6ae2498073c73",
           rewardPolicyMaker: "0x3A4148DDDd121fbceD8717CB7B82370Be27F76bf",
-          ignoredGauges: [],
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -84,7 +83,6 @@ class Store {
           votingEscrow: "0x376020c5B0ba3Fd603d7722381fAA06DA8078d8a",
           lpPriceOracle: "0x10010069DE6bD5408A6dEd075Cf6ae2498073c73",
           rewardPolicyMaker: "0x772918d032cFd4Ff09Ea7Af623e56E2D8D96bB65",
-          ignoredGauges: [],
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -105,7 +103,6 @@ class Store {
           votingEscrow: "0xE4e43864ea18d5E5211352a4B810383460aB7fcC",
           lpPriceOracle: "0x10010069de6bd5408a6ded075cf6ae2498073c73",
           rewardPolicyMaker: "0xEdBA32185BAF7fEf9A26ca567bC4A6cbe426e499",
-          ignoredGauges: [],
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -147,9 +144,6 @@ class Store {
           votingEscrow: "0xbeD8EFa1973F6E1fB3515bf94aa760174431b3F8",
           lpPriceOracle: "0x10010069DE6bD5408A6dEd075Cf6ae2498073c73",
           rewardPolicyMaker: '0x6aDd45C2759fba789031370a8544A33C33E2335d',
-          ignoredGauges: [
-            "0xaEFF8f05b8DeFD2ddbFF4Fb654147d5d7B32731A"
-          ],
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -289,8 +283,6 @@ class Store {
     const metadata = gauges.splice(0, 4)
     const tokenMetadata = {address: tokenAddress, symbol: metadata[0], decimals: metadata[1]}
     const veTokenMetadata = {address: mirroredVeTokenAddress, symbol: metadata[2], decimals: metadata[3]}
-
-    gauges = gauges.filter(g => project.ignoredGauges.find(ig => ig.toLowerCase() === g.toLowerCase()) === undefined)
 
     // get the gauge relative weights
 
