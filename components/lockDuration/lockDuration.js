@@ -32,7 +32,7 @@ function LockDurationChart ({ project }) {
   // };
   // useEffect(updateProject, [props]);
 
-  let totalSupply = project?.veTokenMetadata.totalSupply;
+  let totalSupply = project?.veTokenMetadata.totalLocalSupply;
   let totalLocked = project?.veTokenMetadata.supply;
 
     // const { totalSupply: dillSupply, totalLocked: pickleLocked } = dillStats;

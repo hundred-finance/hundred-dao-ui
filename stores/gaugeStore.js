@@ -493,6 +493,7 @@ class Store {
                     tokenContract.balanceOf(mirroredVeTokenAddress),
                     mirroredVeTokenContract.balanceOf(account.address),
                     mirroredVeTokenContract.totalSupply(),
+                    veTokenContract.totalSupply(),
                     veTokenContract.locked(account.address),
                     veTokenContract.supply(),
                     rewardPolicyMakerContract.rate_at(currentEpochTime()),
@@ -520,12 +521,13 @@ class Store {
     const totalLocked = data[2]
     const veTokenBalance = data[3]
     const totalVeTokenSupply = data[4]
-    const userLocked = data[5]
-    const supply = data[6]
-    const currentRewardRate = data[7];
-    const nextEpochRewardRate = data[8];
+    const totalLocalVeTokenSupply = data[5]
+    const userLocked = data[6]
+    const supply = data[7]
+    const currentRewardRate = data[8];
+    const nextEpochRewardRate = data[9];
 
-    data.splice(0, 9);
+    data.splice(0, 10);
 
     const gaugesData = project.gauges.map(() => {
       const d = data.splice(0, 5)
@@ -543,6 +545,7 @@ class Store {
 
     project.veTokenMetadata.balance = (veTokenBalance/10 ** project.veTokenMetadata.decimals).toFixed(project.veTokenMetadata.decimals);
     project.veTokenMetadata.totalSupply = (totalVeTokenSupply/10 ** project.veTokenMetadata.decimals).toFixed(project.veTokenMetadata.decimals);
+    project.veTokenMetadata.totalLocalSupply = (totalLocalVeTokenSupply/10 ** project.veTokenMetadata.decimals).toFixed(project.veTokenMetadata.decimals);
     project.veTokenMetadata.userLocked = (userLocked.amount/10 ** project.veTokenMetadata.decimals).toFixed(project.veTokenMetadata.decimals);
 
     project.veTokenMetadata.supply = (supply/10 ** project.tokenMetadata.decimals).toFixed(project.tokenMetadata.decimals);
