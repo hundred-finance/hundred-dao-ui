@@ -22,7 +22,9 @@ export default function ProjectCard({ project }) {
       const provider = await stores.accountStore.getWeb3Provider();
       const targetNetwork  = NETWORKS_CONFIG.find(n => parseInt(n.chainId) === project.chainId)
       if (project.chainId === 1) {
-        await provider.currentProvider.request({method: 'wallet_switchEthereumChain', params:[{chainId: '0x1'}]})
+        await provider.currentProvider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x1' }] })
+      } else if (project.chainId === 42) {
+          await provider.currentProvider.request({method: 'wallet_switchEthereumChain', params:[{chainId: '0x2A'}]})
       } else {
         await provider.currentProvider.request({method: 'wallet_addEthereumChain', params:[targetNetwork]})
       }

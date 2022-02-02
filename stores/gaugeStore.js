@@ -24,7 +24,7 @@ import {
   INCREASE_LOCK_DURATION_RETURNED, WITHDRAW, WITHDRAW_RETURNED, APPLY_BOOST, APPLY_BOOST_RETURNED,
 } from './constants';
 
-import { ERC20_ABI, GAUGE_CONTROLLER_ABI, GAUGE_ABI, VOTING_ESCROW_ABI } from './abis';
+import { ERC20_ABI, GAUGE_CONTROLLER_ABI, GAUGE_ABI, VOTING_ESCROW_ABI, GAUGE_CONTROLLER_V2_ABI } from './abis';
 
 import stores from './';
 import BigNumber from 'bignumber.js';
@@ -60,8 +60,10 @@ class Store {
           url: '',
           chainId: 42161,
           gaugeProxyAddress: "0xb4BAfc3d60662De362c0cB0f5e2DE76603Ea77D7",
+          votingEscrow: "0xBa57440fA35Fdb671E58F6F56c1A4447aB1f6C2B",
           lpPriceOracle: "0x10010069DE6bD5408A6dEd075Cf6ae2498073c73",
           rewardPolicyMaker: "0x3A4148DDDd121fbceD8717CB7B82370Be27F76bf",
+          ignoredGauges: [],
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -79,8 +81,10 @@ class Store {
           url: '',
           chainId: 250,
           gaugeProxyAddress: "0xb1c4426C86082D91a6c097fC588E5D5d8dD1f5a8",
+          votingEscrow: "0x376020c5B0ba3Fd603d7722381fAA06DA8078d8a",
           lpPriceOracle: "0x10010069DE6bD5408A6dEd075Cf6ae2498073c73",
           rewardPolicyMaker: "0x772918d032cFd4Ff09Ea7Af623e56E2D8D96bB65",
+          ignoredGauges: [],
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -98,8 +102,10 @@ class Store {
           url: '',
           chainId: 1666600000,
           gaugeProxyAddress: "0xa8cD5D59827514BCF343EC19F531ce1788Ea48f8",
+          votingEscrow: "0xE4e43864ea18d5E5211352a4B810383460aB7fcC",
           lpPriceOracle: "0x10010069de6bd5408a6ded075cf6ae2498073c73",
           rewardPolicyMaker: "0xEdBA32185BAF7fEf9A26ca567bC4A6cbe426e499",
+          ignoredGauges: [],
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -117,6 +123,7 @@ class Store {
           url: '',
           chainId: 1285,
           gaugeProxyAddress: '0xb4300e088a3AE4e624EE5C71Bc1822F68BB5f2bc',
+          votingEscrow: "0x243E33aa7f6787154a8E59d3C27a66db3F8818ee",
           lpPriceOracle: '0x10010069de6bd5408a6ded075cf6ae2498073c73',
           rewardPolicyMaker: '0xa8cD5D59827514BCF343EC19F531ce1788Ea48f8',
           gauges: [],
@@ -128,6 +135,29 @@ class Store {
           maxDurationYears: 4,
           onload: null,
           multicallAddress:"0x9fdd7e3e2df5998c7866cd2471d7d30e04496dfa"
+        },
+        {
+          type: 'hundredfinance',
+          id: 'hundred-finance-kovan',
+          name: 'Ethereum Kovan testnet',
+          url: '',
+          chainId: 42,
+          gaugeProxyAddress: '0xd6Cafd6d475A790634a548d7f43a6e420247BA61',
+          mirroredVotingEscrow: "0x44F288e2405D9D62Eb43F5E3f1eD8147bF502A9a",
+          votingEscrow: "0xbeD8EFa1973F6E1fB3515bf94aa760174431b3F8",
+          lpPriceOracle: "0x10010069DE6bD5408A6dEd075Cf6ae2498073c73",
+          rewardPolicyMaker: '0x6aDd45C2759fba789031370a8544A33C33E2335d',
+          ignoredGauges: [
+            "0xaEFF8f05b8DeFD2ddbFF4Fb654147d5d7B32731A"
+          ],
+          gauges: [],
+          vaults: [],
+          tokenMetadata: {},
+          veTokenMetadata: {},
+          otherTokenMetadata: {},
+          useDays: false,
+          maxDurationYears: 4,
+          onload: null
         }
       ],
     };
@@ -231,13 +261,13 @@ class Store {
 
     const hndPrice = await this._getHndPrice();
 
-    const gaugeControllerContract = new web3.eth.Contract(GAUGE_CONTROLLER_ABI, project.gaugeProxyAddress);
     const gaugeControllerMulticall = new Contract(project.gaugeProxyAddress, GAUGE_CONTROLLER_ABI);
+    const veTokenAddress = project.votingEscrow
+    const mirroredVeTokenAddress = project.mirroredVotingEscrow ? project.mirroredVotingEscrow : veTokenAddress
 
-    const priceOracleContract = new web3.eth.Contract(PRICE_ORACLE_ABI, project.lpPriceOracle);
     const priceOracleMulticall = new Contract(project.lpPriceOracle, PRICE_ORACLE_ABI)
 
-    const [totalWeight, tokenAddress, veTokenAddress, n_gauges] = await ethcallProvider.all([gaugeControllerMulticall.get_total_weight(), gaugeControllerMulticall.token(), gaugeControllerMulticall.voting_escrow(), gaugeControllerMulticall.n_gauges()])
+    const [totalWeight, tokenAddress, n_gauges] = await ethcallProvider.all([gaugeControllerMulticall.get_total_weight(), gaugeControllerMulticall.token(), gaugeControllerMulticall.n_gauges()])
 
     // get how many gauges there are
     // const n_gauges = await gaugeControllerContract.methods.n_gauges().call();
@@ -245,23 +275,25 @@ class Store {
 
 
     const tokenContract = new Contract(tokenAddress, ERC20_ABI)
-    const veTokenContract = new Contract(veTokenAddress, ERC20_ABI)
+    const mirroredVeTokenContract = new Contract(mirroredVeTokenAddress, ERC20_ABI)
 
     // get all the gauges
-    const gaugesCall = [tokenContract.symbol(), tokenContract.decimals(), veTokenContract.symbol(), veTokenContract.decimals()]
+    const gaugesCall = [tokenContract.symbol(), tokenContract.decimals(), mirroredVeTokenContract.symbol(), mirroredVeTokenContract.decimals()]
 
     tmpArr.forEach((gauge, idx) => {
       gaugesCall.push(gaugeControllerMulticall.gauges(idx));
     });
 
-    const gauges = await ethcallProvider.all(gaugesCall)
+    let gauges = await ethcallProvider.all(gaugesCall)
 
     const metadata = gauges.splice(0, 4)
     const tokenMetadata = {address: tokenAddress, symbol: metadata[0], decimals: metadata[1]}
-    const veTokenMetadata = {address: veTokenAddress, symbol: metadata[2], decimals: metadata[3]}
+    const veTokenMetadata = {address: mirroredVeTokenAddress, symbol: metadata[2], decimals: metadata[3]}
+
+    gauges = gauges.filter(g => project.ignoredGauges.find(ig => ig.toLowerCase() === g.toLowerCase()) === undefined)
 
     // get the gauge relative weights
-    
+
     const gaugesCalls = []
 
     gauges.forEach((gauge) => {
@@ -273,7 +305,7 @@ class Store {
       });
 
       const gaugesData = await ethcallProvider.all(gaugesCalls)
-      
+
       const gaugesWeights = []
       const gaugesCurrentEpochRelativeWeights = []
       const gaugesNextEpochRelativeWeights = []
@@ -326,7 +358,7 @@ class Store {
     for (let i = 0; i < gauges.length; i++) {
       let lpPrice = lpTokenUnderlyingInfo[i].price / 10 ** (36-lpTokens[i].underlyingDecimals);
       let convRate = lpTokenUnderlyingInfo[i].exchangeRate / 1e18;
-      
+
       const gauge = {
         address: gauges[i],
         weight: gaugesWeights[i]/1e18,
@@ -349,14 +381,6 @@ class Store {
 
       projectGauges.push(gauge);
     }
-
-    // const totalWeight = await gaugeControllerContract.methods.get_total_weight().call();
-
-    // const tokenAddress = await gaugeControllerContract.methods.token().call();
-    // const tokenContract = new web3.eth.Contract(ERC20_ABI, tokenAddress);
-
-    // const veTokenAddress = await gaugeControllerContract.methods.voting_escrow().call();
-    // const veTokenContract = new web3.eth.Contract(ERC20_ABI, veTokenAddress);
 
     const projectTokenMetadata = {
       address: web3.utils.toChecksumAddress(tokenMetadata.address),
@@ -455,29 +479,38 @@ class Store {
       ethcallProvider.multicall = {address: project.multicallAddress, block: 0};
     }
 
+    const mirroredVeTokenAddress = project.mirroredVotingEscrow ? project.mirroredVotingEscrow : project.votingEscrow
+
     const tokenContract = new Contract(project.tokenMetadata.address, ERC20_ABI)
-    const veTokenContract = new Contract(project.veTokenMetadata.address, VOTING_ESCROW_ABI);
+    const veTokenContract = new Contract(project.votingEscrow, VOTING_ESCROW_ABI);
+    const mirroredVeTokenContract = new Contract(mirroredVeTokenAddress, VOTING_ESCROW_ABI);
     const rewardPolicyMakerContract = new Contract(project.rewardPolicyMaker, REWARD_POLICY_MAKER_ABI);
     const gaugeControllerContract = new Contract(project.gaugeProxyAddress, GAUGE_CONTROLLER_ABI)
+    const gaugeControllerV2Contract = new Contract(project.gaugeProxyAddress, GAUGE_CONTROLLER_V2_ABI)
 
     const calls = [tokenContract.balanceOf(account.address), 
-                    tokenContract.allowance(account.address, project.veTokenMetadata.address),
-                    tokenContract.balanceOf(project.veTokenMetadata.address),
-                    veTokenContract.balanceOf(account.address),
-                    veTokenContract.totalSupply(),
+                    tokenContract.allowance(account.address, project.votingEscrow),
+                    tokenContract.balanceOf(mirroredVeTokenAddress),
+                    mirroredVeTokenContract.balanceOf(account.address),
+                    mirroredVeTokenContract.totalSupply(),
                     veTokenContract.locked(account.address),
                     veTokenContract.supply(),
                     rewardPolicyMakerContract.rate_at(currentEpochTime()),
-                    rewardPolicyMakerContract.rate_at(nextEpochTime())]
-    
+                    rewardPolicyMakerContract.rate_at(nextEpochTime())
+    ]
+
     project.gauges.forEach((gauge) =>{
       const erc20Contract = new Contract(gauge.address, ERC20_ABI);
       const gaugeContract = new Contract(gauge.address, GAUGE_ABI);
-      calls.push(gaugeControllerContract.vote_user_slopes(account.address, gauge.address),
-                 erc20Contract.balanceOf(account.address),
-                 gaugeContract.working_balances(account.address),
-                 gaugeContract.working_supply(),
-                 gaugeControllerContract.last_user_vote(account.address, gauge.address))
+      calls.push(
+         project.mirroredVotingEscrow ?
+           gaugeControllerV2Contract.vote_user_power_for_gauge(account.address, gauge.address) :
+           gaugeControllerContract.vote_user_slopes(account.address, gauge.address),
+         erc20Contract.balanceOf(account.address),
+         gaugeContract.working_balances(account.address),
+         gaugeContract.working_supply(),
+         gaugeControllerContract.last_user_vote(account.address, gauge.address)
+      )
     })
 
     const data = await ethcallProvider.all(calls)
@@ -496,7 +529,7 @@ class Store {
 
     const gaugesData = project.gauges.map(() => {
       const d = data.splice(0, 5)
-      return({ voteWeight: d[0].power, 
+      return({ voteWeight: project.mirroredVotingEscrow ? d[0] : d[0].power,
                balanceOf: d[1],
                workingBalanceOf: d[2],
                workingSupply: d[3],
@@ -524,7 +557,7 @@ class Store {
       project.gauges[i].workingBalance = gaugesData[i].workingBalanceOf
       project.gauges[i].workingSupply = gaugesData[i].workingSupply
       project.gauges[i].rawBalance = gaugesData[i].balanceOf
-     
+
       project.gauges[i].remainingBalance = userRemainingStake(
         project.gauges[i].balance, project.gauges[i].totalStakeBalance, veTokenBalance, totalVeTokenSupply
       )
@@ -619,7 +652,7 @@ class Store {
         .toFixed(0);
     }
 
-    await this._asyncCallContractWait(web3, tokenContract, 'approve', [project.veTokenMetadata.address, amountToSend], account, null, GET_TOKEN_BALANCES, { id: project.id }, callback);
+    await this._asyncCallContractWait(web3, tokenContract, 'approve', [project.votingEscrow, amountToSend], account, null, GET_TOKEN_BALANCES, { id: project.id }, callback);
   }
 
   async lock(payload) {
@@ -673,7 +706,7 @@ class Store {
   }
 
   async _callLock(web3, project, account, amount, selectedDate, callback) {
-    const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.veTokenMetadata.address);
+    const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.votingEscrow);
 
     const amountToSend = BigNumber(amount)
       .times(10 ** project.tokenMetadata.decimals)
@@ -686,7 +719,7 @@ class Store {
   }
 
   async _callUnlock(web3, project, account, callback) {
-    const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.veTokenMetadata.address);
+    const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.votingEscrow);
 
     await this._asyncCallContractWait(web3, escrowContract, 'withdraw', [], account, null, GET_TOKEN_BALANCES, { id: project.id }, callback);
   }
@@ -753,7 +786,7 @@ class Store {
   }
 
   async _callIncreaseAmount(web3, project, account, amount, callback) {
-    const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.veTokenMetadata.address);
+    const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.votingEscrow);
 
     const amountToSend = BigNumber(amount)
       .times(10 ** project.tokenMetadata.decimals)
@@ -820,7 +853,7 @@ class Store {
   }
 
   async _callIncreaseUnlockTime(web3, project, account, selectedDate, callback) {
-    const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.veTokenMetadata.address);
+    const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.votingEscrow);
 
     await this._asyncCallContractWait(web3, escrowContract, 'increase_unlock_time', [selectedDate], account, null, WITHDRAW_RETURNED, { id: project.id }, callback);
   }
