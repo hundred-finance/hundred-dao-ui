@@ -62,7 +62,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm precommit"
+      "pre-commit": "next precommit"
     }
   }
 }
