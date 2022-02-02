@@ -8,7 +8,7 @@
     "export": "next export",
     "build2": "next build && next export",
     "start": "next start",
-    "precommit": "lint-staged"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@danah/react-hook-scrollto": "^1.0.10",
@@ -60,9 +60,11 @@
     "husky": "^7.0.4",
     "lint-staged": "^12.3.3"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "next precommit"
-    }
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "eslint --fix",
+      "git add"
+    ]
   }
 }
