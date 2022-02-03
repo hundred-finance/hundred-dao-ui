@@ -11,11 +11,13 @@ import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Typography from '@material-ui/core/Typography';
 
-import { formatCurrency, formatAddress } from '../../utils';
 import { Button, CircularProgress, Tooltip } from '@material-ui/core';
 import InfoIcon from '@material-ui/icons/InfoOutlined';
+import { formatCurrency, formatAddress } from '../../utils';
 import stores from '../../stores';
-import { APPLY_BOOST, APPLY_BOOST_RETURNED, ERROR, VOTE_RETURNED } from '../../stores/constants';
+import {
+  APPLY_BOOST, APPLY_BOOST_RETURNED, ERROR, VOTE_RETURNED,
+} from '../../stores/constants';
 
 function descendingComparator(a, b, orderBy) {
   if (!a || !b) {
@@ -46,7 +48,12 @@ function stableSort(array, comparator) {
 }
 
 const headCells = [
-  { id: 'vault', numeric: false, disablePadding: false, label: 'Vault' },
+  {
+    id: 'vault',
+    numeric: false,
+    disablePadding: false,
+    label: 'Vault',
+  },
   {
     id: 'totalBalance',
     numeric: true,
@@ -88,7 +95,9 @@ const headCells = [
 ];
 
 function EnhancedTableHead(props) {
-  const { classes, order, orderBy, rowCount, onRequestSort } = props;
+  const {
+    classes, order, orderBy, rowCount, onRequestSort,
+  } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -97,7 +106,7 @@ function EnhancedTableHead(props) {
     <TableHead>
       <TableRow>
         {headCells.map((headCell) => (
-          <TableCell key={headCell.id} align={headCell.numeric ? 'right' : 'left'} padding={'normal'} sortDirection={orderBy === headCell.id ? order : false}>
+          <TableCell key={headCell.id} align={headCell.numeric ? 'right' : 'left'} padding="normal" sortDirection={orderBy === headCell.id ? order : false}>
             <TableSortLabel active={orderBy === headCell.id} direction={orderBy === headCell.id ? order : 'asc'} onClick={createSortHandler(headCell.id)}>
               <Typography variant="h5">{headCell.label}</Typography>
               {orderBy === headCell.id ? <span className={classes.visuallyHidden}>{order === 'desc' ? 'sorted descending' : 'sorted ascending'}</span> : null}
@@ -132,13 +141,13 @@ const useToolbarStyles = makeStyles((theme) => ({
   highlight:
     theme.palette.type === 'light'
       ? {
-          color: theme.palette.secondary.main,
-          backgroundColor: lighten(theme.palette.secondary.light, 0.85),
-        }
+        color: theme.palette.secondary.main,
+        backgroundColor: lighten(theme.palette.secondary.light, 0.85),
+      }
       : {
-          color: theme.palette.text.primary,
-          backgroundColor: theme.palette.secondary.dark,
-        },
+        color: theme.palette.text.primary,
+        backgroundColor: theme.palette.secondary.dark,
+      },
   title: {
     flex: '1 1 100%',
   },
@@ -266,7 +275,7 @@ export default function EnhancedTable({ project }) {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [resetLoading, setResetLoading] = useState(false);
 
-  useEffect(function () {
+  useEffect(() => {
     const applyBoostReturned = () => {
       setResetLoading(false);
     };
@@ -289,18 +298,18 @@ export default function EnhancedTable({ project }) {
   const onApplyBoost = (gauge) => {
     setResetLoading(true);
 
-    stores.dispatcher.dispatch({ type: APPLY_BOOST, content: { project: project, gaugeAddress: gauge.address } });
+    stores.dispatcher.dispatch({ type: APPLY_BOOST, content: { project, gaugeAddress: gauge.address } });
   };
 
   if (!project || !project.gauges) {
     return (
       <div className={classes.root}>
-        <Skeleton variant="rect" width={'100%'} height={40} className={classes.skelly1} />
-        <Skeleton variant="rect" width={'100%'} height={70} className={classes.skelly} />
-        <Skeleton variant="rect" width={'100%'} height={70} className={classes.skelly} />
-        <Skeleton variant="rect" width={'100%'} height={70} className={classes.skelly} />
-        <Skeleton variant="rect" width={'100%'} height={70} className={classes.skelly} />
-        <Skeleton variant="rect" width={'100%'} height={70} className={classes.skelly} />
+        <Skeleton variant="rect" width="100%" height={40} className={classes.skelly1} />
+        <Skeleton variant="rect" width="100%" height={70} className={classes.skelly} />
+        <Skeleton variant="rect" width="100%" height={70} className={classes.skelly} />
+        <Skeleton variant="rect" width="100%" height={70} className={classes.skelly} />
+        <Skeleton variant="rect" width="100%" height={70} className={classes.skelly} />
+        <Skeleton variant="rect" width="100%" height={70} className={classes.skelly} />
       </div>
     );
   }
@@ -309,7 +318,8 @@ export default function EnhancedTable({ project }) {
     if (gauge.appliedBoost === 2.5 || isNaN(gauge.appliedBoost)) {
       return (
         <Typography variant="h5" className={classes.textSpaced}>
-          {formatCurrency(gauge.appliedBoost)}x
+          {formatCurrency(gauge.appliedBoost)}
+          x
         </Typography>
       );
     }
@@ -317,7 +327,8 @@ export default function EnhancedTable({ project }) {
     return (
       <Tooltip title={`You need ${formatCurrency(gauge.needVeHndForMaxBoost)} more veHND to get max boost`} followCursor>
         <Typography variant="h5" className={classes.textSpacedClickable}>
-          {formatCurrency(gauge.appliedBoost)}x
+          {formatCurrency(gauge.appliedBoost)}
+          x
         </Typography>
       </Tooltip>
     );
@@ -357,7 +368,7 @@ export default function EnhancedTable({ project }) {
   return (
     <div className={classes.root}>
       <TableContainer>
-        <Table className={classes.table} aria-labelledby="tableTitle" size={'medium'} aria-label="enhanced table">
+        <Table className={classes.table} aria-labelledby="tableTitle" size="medium" aria-label="enhanced table">
           <EnhancedTableHead classes={classes} order={order} orderBy={orderBy} onRequestSort={handleRequestSort} rowCount={project?.gauges.length} />
           <TableBody>
             {stableSort(project?.gauges, getComparator(order, orderBy)).map((row, index) => {
@@ -387,8 +398,8 @@ export default function EnhancedTable({ project }) {
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
                       {formatCurrency(row.nextEpochGaugeApr) == 0.0
-                        ? formatCurrency(row.gaugeApr) + '% -> Pending'
-                        : formatCurrency(row.gaugeApr) + '% ->' + formatCurrency(row.nextEpochGaugeApr) + '%'}
+                        ? `${formatCurrency(row.gaugeApr)}% -> Pending`
+                        : `${formatCurrency(row.gaugeApr)}% ->${formatCurrency(row.nextEpochGaugeApr)}%`}
                     </Typography>
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
@@ -407,8 +418,8 @@ export default function EnhancedTable({ project }) {
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
                       {formatCurrency(row.nextEpochApr) == 0.0
-                        ? formatCurrency(row.apr) + '% -> Pending'
-                        : formatCurrency(row.apr) + '% ->' + formatCurrency(row.nextEpochApr) + '%'}
+                        ? `${formatCurrency(row.apr)}% -> Pending`
+                        : `${formatCurrency(row.apr)}% ->${formatCurrency(row.nextEpochApr)}%`}
                     </Typography>
                   </TableCell>
                 </TableRow>

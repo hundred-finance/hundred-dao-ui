@@ -5,7 +5,7 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { useRouter } from 'next/router';
 
-import '../styles/global.css'
+import '../styles/global.css';
 
 import lightTheme from '../theme/light';
 import darkTheme from '../theme/dark';
@@ -38,12 +38,12 @@ export default function MyApp({ Component, pageProps }) {
     setConfigured(true);
   };
 
-  useEffect(function () {
+  useEffect(() => {
     const localStorageDarkMode = window.localStorage.getItem('yearn.finance-dark-mode');
     changeTheme(localStorageDarkMode ? localStorageDarkMode === 'dark' : false);
   }, []);
 
-  useEffect(function () {
+  useEffect(() => {
     stores.emitter.on(CONFIGURE_RETURNED, configureReturned);
     stores.dispatcher.dispatch({ type: CONFIGURE });
 
@@ -53,12 +53,12 @@ export default function MyApp({ Component, pageProps }) {
   }, []);
 
   const validateConfigured = () => {
-    return true
-    return configured
+    return true;
+    return configured;
   };
 
   return (
-    <React.Fragment>
+    <>
       <Head>
         <title>Hundred Finance DAO</title>
         <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
@@ -69,7 +69,7 @@ export default function MyApp({ Component, pageProps }) {
         {validateConfigured() && <Component {...pageProps} changeTheme={changeTheme} />}
         {!validateConfigured() && <Configure {...pageProps} />}
       </ThemeProvider>
-    </React.Fragment>
+    </>
   );
 }
 

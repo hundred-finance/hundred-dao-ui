@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import {
-  Typography,
-  Paper,
-  TextField,
-  RadioGroup, FormControlLabel, Radio,
+  Typography, Paper, TextField, RadioGroup, FormControlLabel, Radio,
 } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
-import classes from './boostCalculator.module.css';
 import moment from 'moment';
+import classes from './boostCalculator.module.css';
 import { formatCurrency, normalizeDate } from '../../utils';
 
 export default function BoostCalculator({ project }) {
@@ -46,57 +43,54 @@ export default function BoostCalculator({ project }) {
         newDate = moment().add(2, 'years').format('YYYY-MM-DD');
         break;
       default:
-        newDate = moment().add(4, 'years').subtract(1, "days").format('YYYY-MM-DD');
+        newDate = moment().add(4, 'years').subtract(1, 'days').format('YYYY-MM-DD');
     }
 
-    setSelectedDate(normalizeDate(newDate))
+    setSelectedDate(normalizeDate(newDate));
   };
 
   const calculatedBoost = (project, gauge, stake, lock, endLockDate) => {
-    const veHndForLock = veTokenForLock(lock, endLockDate)
+    const veHndForLock = veTokenForLock(lock, endLockDate);
     const totalVeTokenSupply = project?.veTokenMetadata.totalSupply;
 
-    return userBoost(gauge, stake, veHndForLock, +totalVeTokenSupply)
-  }
+    return userBoost(gauge, stake, veHndForLock, +totalVeTokenSupply);
+  };
 
-   const veTokenForLock = (lock, endLockDate) => {
-     const lockDuration = moment.duration(moment(endLockDate).diff(moment())).asDays()
-     const maxLockDuration = moment.duration(moment().add(4, 'years').diff(moment())).asDays()
+  const veTokenForLock = (lock, endLockDate) => {
+    const lockDuration = moment.duration(moment(endLockDate).diff(moment())).asDays();
+    const maxLockDuration = moment.duration(moment().add(4, 'years').diff(moment())).asDays();
 
-     let amount = lock * lockDuration / maxLockDuration
+    const amount = (lock * lockDuration) / maxLockDuration;
 
-     return amount ? amount : 0
-   }
+    return amount || 0;
+  };
 
   const userBoost = (gauge, stake, veTokenBalance, totalVeTokenSupply) => {
     if (!gauge) {
-      return 0
+      return 0;
     }
 
-    return Math.min(userLiquidityShare(gauge, stake, veTokenBalance, totalVeTokenSupply) /
-      userLiquidityShare(gauge, stake, 0, totalVeTokenSupply), 2.5)
-  }
+    return Math.min(userLiquidityShare(gauge, stake, veTokenBalance, totalVeTokenSupply) / userLiquidityShare(gauge, stake, 0, totalVeTokenSupply), 2.5);
+  };
 
   const userLiquidityShare = (gauge, balance, veTokenBalance, totalVeTokenSupply) => {
+    const workingBalance = Math.min(
+      balance * 0.4 + ((gauge.totalStakeBalance + balance) * 0.6 * veTokenBalance) / (totalVeTokenSupply + veTokenBalance),
+      balance,
+    );
 
-    let workingBalance = Math.min(
-      balance * 0.4 + (gauge.totalStakeBalance + balance) * 0.6 * veTokenBalance / (totalVeTokenSupply + veTokenBalance),
-      balance
-    )
+    const totalWorkingSupply = (gauge.workingSupply / 10 ** gauge.lpToken.underlyingDecimals) * gauge.lpToken.conversionRate;
 
-    let totalWorkingSupply =
-      gauge.workingSupply/10 ** gauge.lpToken.underlyingDecimals * gauge.lpToken.conversionRate
-
-    return workingBalance * 100 / (totalWorkingSupply + workingBalance);
-  }
+    return (workingBalance * 100) / (totalWorkingSupply + workingBalance);
+  };
 
   const userAPR = (gauge, balance, lock, endLockDate) => {
-    const veHndForLock = veTokenForLock(lock, endLockDate)
+    const veHndForLock = veTokenForLock(lock, endLockDate);
     const totalVeTokenSupply = project?.veTokenMetadata.totalSupply;
-    const liquidityShare = userLiquidityShare(gauge, +balance, +veHndForLock, +totalVeTokenSupply)
+    const liquidityShare = userLiquidityShare(gauge, +balance, +veHndForLock, +totalVeTokenSupply);
 
-    return gauge.gaugeRewards * liquidityShare / (+balance * gauge.lpToken.price)
-  }
+    return (gauge.gaugeRewards * liquidityShare) / (+balance * gauge.lpToken.price);
+  };
 
   return (
     <Paper elevation={1} className={classes.projectCardContainer}>
@@ -104,7 +98,6 @@ export default function BoostCalculator({ project }) {
         Boost Calculator
       </Typography>
       <div>
-
         <div className={classes.textField}>
           <div className={classes.inputTitleContainer}>
             <div className={classes.inputTitle}>
@@ -114,17 +107,13 @@ export default function BoostCalculator({ project }) {
             </div>
           </div>
           <Autocomplete
-            disableClearable={true}
+            disableClearable
             options={project?.gauges}
             value={gauge}
             onChange={onGaugeSelectChanged}
             getOptionLabel={(option) => option.lpToken.underlyingSymbol}
-            fullWidth={true}
-            renderOption={(option, { selected }) => (
-              <React.Fragment>
-                <div className={classes.text}>{option.lpToken.underlyingSymbol}</div>
-              </React.Fragment>
-            )}
+            fullWidth
+            renderOption={(option, { selected }) => <div className={classes.text}>{option.lpToken.underlyingSymbol}</div>}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -144,7 +133,9 @@ export default function BoostCalculator({ project }) {
           <div className={classes.inputTitleContainer}>
             <div className={classes.inputTitle}>
               <Typography variant="h5" noWrap>
-                Staked amount { gauge ? `($${formatCurrency(stakeAmount * gauge.lpToken.price)})` : '' }
+                Staked amount
+                {' '}
+                {gauge ? `($${formatCurrency(stakeAmount * gauge.lpToken.price)})` : ''}
               </Typography>
             </div>
           </div>
@@ -164,7 +155,9 @@ export default function BoostCalculator({ project }) {
           <div className={classes.inputTitleContainer}>
             <div className={classes.inputTitle}>
               <Typography variant="h5" noWrap>
-                Locked HND amount { lockAmount ? `($${formatCurrency(lockAmount * project.hndPrice)})` : '' }
+                Locked HND amount
+                {' '}
+                {lockAmount ? `($${formatCurrency(lockAmount * project.hndPrice)})` : ''}
               </Typography>
             </div>
           </div>
@@ -215,42 +208,54 @@ export default function BoostCalculator({ project }) {
             <FormControlLabel value="month" control={<Radio color="primary" />} label="1 month" labelPlacement="bottom" />
             <FormControlLabel value="year" control={<Radio color="primary" />} label="1 year" labelPlacement="bottom" />
             <FormControlLabel value="2year" control={<Radio color="primary" />} label="2 years" labelPlacement="bottom" />
-            {project?.maxDurationYears == 3 ?
+            {project?.maxDurationYears == 3 ? (
               <FormControlLabel value="3year" control={<Radio color="primary" />} label="3 years" labelPlacement="bottom" />
-              :
+            ) : (
               <FormControlLabel value="years" control={<Radio color="primary" />} label="4 years" labelPlacement="bottom" />
-            }
+            )}
           </RadioGroup>
         </div>
 
         <div className={classes.boost}>
           <div>
-            <Typography >
-              Estimated veHND: { formatCurrency(veTokenForLock(lockAmount, selectedDate)) }
+            <Typography>
+              Estimated veHND:
+              {formatCurrency(veTokenForLock(lockAmount, selectedDate))}
             </Typography>
-            <Typography >
-              Total veHND: { formatCurrency(+project?.veTokenMetadata.totalSupply) }
+            <Typography>
+              Total veHND:
+              {formatCurrency(+project?.veTokenMetadata.totalSupply)}
             </Typography>
-            { gauge ?
+            {gauge ? (
               <Typography>
-                Total { gauge.lpToken.underlyingSymbol } staked in gauge: { formatCurrency(gauge.totalStakeBalance) }
+                Total
+                {' '}
+                {gauge.lpToken.underlyingSymbol}
+                {' '}
+                staked in gauge:
+                {' '}
+                {formatCurrency(gauge.totalStakeBalance)}
               </Typography>
-              : ''
-            }
+            ) : (
+              ''
+            )}
           </div>
           <div>
             <Typography variant="h3">
-              Estimated boost: { formatCurrency(calculatedBoost(project, gauge, stakeAmount, lockAmount, selectedDate)) }
+              Estimated boost:
+              {formatCurrency(calculatedBoost(project, gauge, stakeAmount, lockAmount, selectedDate))}
             </Typography>
-            { gauge ?
+            {gauge ? (
               <Typography>
-                Estimated APR: { formatCurrency(userAPR(gauge, stakeAmount, lockAmount, selectedDate)) }%
+                Estimated APR:
+                {formatCurrency(userAPR(gauge, stakeAmount, lockAmount, selectedDate))}
+                %
               </Typography>
-              : ''
-            }
+            ) : (
+              ''
+            )}
           </div>
         </div>
-
       </div>
     </Paper>
   );

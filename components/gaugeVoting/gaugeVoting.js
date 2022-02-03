@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Paper, TextField, InputAdornment, Button, Tooltip, CircularProgress } from '@material-ui/core';
+import {
+  Typography, Paper, TextField, InputAdornment, Button, Tooltip, CircularProgress,
+} from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import BigNumber from 'bignumber.js';
+import moment from 'moment';
 import { formatCurrency } from '../../utils';
 
 import PieChart from './pieChart';
@@ -12,7 +15,6 @@ import stores from '../../stores/index.js';
 import { ERROR, VOTE, VOTE_RETURNED } from '../../stores/constants';
 
 import classes from './gaugeVoting.module.css';
-import moment from 'moment';
 
 export default function GaugeVoting({ project }) {
   const [amount, setAmount] = useState(0);
@@ -23,7 +25,7 @@ export default function GaugeVoting({ project }) {
   const [voteLoading, setVoteLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
 
-  useEffect(function () {
+  useEffect(() => {
     const voteReturned = () => {
       setVoteLoading(false);
       setResetLoading(false);
@@ -77,9 +79,7 @@ export default function GaugeVoting({ project }) {
     stores.dispatcher.dispatch({ type: VOTE, content: { gaugeAddress: gauge.address, amount: '0', project } });
   };
 
-  const canVoteFor = (gauge) => {
-      return !gauge || gauge.nextVoteTimestamp === 0 || gauge.nextVoteTimestamp <= moment().unix()
-  };
+  const canVoteFor = (gauge) => !gauge || gauge.nextVoteTimestamp === 0 || gauge.nextVoteTimestamp <= moment().unix();
 
   return (
     <Paper elevation={1} className={classes.projectCardContainer}>
@@ -87,7 +87,9 @@ export default function GaugeVoting({ project }) {
         Gauge Voting
       </Typography>
       <div>
-        <Typography variant="h5" className={classes.sectionHeader}>Vote for your gauge</Typography>
+        <Typography variant="h5" className={classes.sectionHeader}>
+          Vote for your gauge
+        </Typography>
         <div className={classes.textField}>
           <div className={classes.inputTitleContainer}>
             <div className={classes.inputTitle}>
@@ -97,17 +99,13 @@ export default function GaugeVoting({ project }) {
             </div>
           </div>
           <Autocomplete
-            disableClearable={true}
+            disableClearable
             options={project?.gauges}
             value={gauge}
             onChange={onGaugeSelectChanged}
             getOptionLabel={(option) => option.lpToken.symbol}
-            fullWidth={true}
-            renderOption={(option, { selected }) => (
-              <React.Fragment>
-                <div className={classes.text}>{option.lpToken.symbol}</div>
-              </React.Fragment>
-            )}
+            fullWidth
+            renderOption={(option, { selected }) => <div className={classes.text}>{option.lpToken.symbol}</div>}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -143,23 +141,23 @@ export default function GaugeVoting({ project }) {
           />
         </div>
         <div className={classes.actionButton}>
-          <Button fullWidth disableElevation variant="contained"
-                  color="primary" size="large" onClick={onVote}
-                  disabled={voteLoading || !canVoteFor(gauge)}
-          >
-            {
-              canVoteFor(gauge) ?
-                <Typography variant="h5">{voteLoading ? <CircularProgress size={15} /> : 'Vote'}</Typography>
-              :
-                <Typography variant="h5">Vote disabled until { moment.unix(gauge?.nextVoteTimestamp).format('YYYY-MM-DD HH:mm') }</Typography>
-            }
+          <Button fullWidth disableElevation variant="contained" color="primary" size="large" onClick={onVote} disabled={voteLoading || !canVoteFor(gauge)}>
+            {canVoteFor(gauge) ? (
+              <Typography variant="h5">{voteLoading ? <CircularProgress size={15} /> : 'Vote'}</Typography>
+            ) : (
+              <Typography variant="h5">
+                Vote disabled until
+                {moment.unix(gauge?.nextVoteTimestamp).format('YYYY-MM-DD HH:mm')}
+              </Typography>
+            )}
           </Button>
         </div>
         <div className={classes.calculationResults}>
           <div className={classes.calculationResult}>
             <Typography variant="h3">Current voting power used: </Typography>
             <Typography variant="h3" className={classes.bold}>
-              {formatCurrency(project?.userVotesPercent)}%
+              {formatCurrency(project?.userVotesPercent)}
+              %
             </Typography>
           </div>
         </div>
@@ -171,11 +169,12 @@ export default function GaugeVoting({ project }) {
               }
 
               return (
-                <div className={classes.vote_line} key={'gauge' + idx}>
+                <div className={classes.vote_line} key={`gauge${idx}`}>
                   <div className={classes.calculationResult}>
                     <Typography variant="h5">{gauge.lpToken.name}</Typography>
                     <Typography variant="h5" className={classes.bold}>
-                      {formatCurrency(gauge.userVotesPercent)}%
+                      {formatCurrency(gauge.userVotesPercent)}
+                      %
                     </Typography>
                   </div>
                   <Button

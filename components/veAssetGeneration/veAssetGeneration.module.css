@@ -6,7 +6,7 @@
 }
 
 .textField {
-  padding: 12px 0px
+  padding: 12px 0px;
 }
 
 .inputTitleContainer {
@@ -65,11 +65,9 @@
 }
 
 @media screen and (max-width: 1440px) {
-
 }
 
 @media screen and (max-width: 1000px) {
-
 }
 
 @media screen and (max-width: 600px) {

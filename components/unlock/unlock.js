@@ -6,7 +6,9 @@ import CloseIcon from '@material-ui/icons/Close';
 import { Web3ReactProvider, useWeb3React } from '@web3-react/core';
 import { Web3Provider } from '@ethersproject/providers';
 
-import { ERROR, CONNECTION_DISCONNECTED, CONNECTION_CONNECTED, CONFIGURE } from '../../stores/constants';
+import {
+  ERROR, CONNECTION_DISCONNECTED, CONNECTION_CONNECTED, CONFIGURE,
+} from '../../stores/constants';
 
 import stores from '../../stores';
 
@@ -152,12 +154,14 @@ function onDeactivateClicked(deactivate, connector) {
 function MyComponent(props) {
   const context = useWeb3React();
   const localContext = stores.accountStore.getStore('web3context');
-  var localConnector = null;
+  let localConnector = null;
   if (localContext) {
     localConnector = localContext.connector;
   }
-  const { connector, library, account, activate, deactivate, active, error } = context;
-  var connectorsByName = stores.accountStore.getStore('connectorsByName');
+  const {
+    connector, library, account, activate, deactivate, active, error,
+  } = context;
+  const connectorsByName = stores.accountStore.getStore('connectorsByName');
 
   const { closeModal } = props;
 
@@ -276,8 +280,8 @@ function MyComponent(props) {
                   src={url}
                   alt=""
                 />
-                <Typography variant={'h5'}>{display}</Typography>
-                <Typography variant={'body2'}>{descriptor}</Typography>
+                <Typography variant="h5">{display}</Typography>
+                <Typography variant="body2">{descriptor}</Typography>
                 {activating && <CircularProgress size={15} style={{ marginRight: '10px' }} />}
                 {!activating && connected && (
                   <div
@@ -288,7 +292,7 @@ function MyComponent(props) {
                       height: '10px',
                       marginRight: '10px',
                     }}
-                  ></div>
+                  />
                 )}
               </div>
             </Button>

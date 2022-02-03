@@ -1,4 +1,3 @@
-
 .configureContainer {
   width: 100%;
   height: 100%;
@@ -20,10 +19,11 @@
   color: #fff;
   box-shadow: 9999px 0 0 -5px #fff;
   animation: dotPulseDark 1.5s infinite linear;
-  animation-delay: .25s;
+  animation-delay: 0.25s;
 }
 
-.dot-pulse-dark::before, .dot-pulse-dark::after {
+.dot-pulse-dark::before,
+.dot-pulse-dark::after {
   content: '';
   display: inline-block;
   position: absolute;
@@ -44,15 +44,13 @@
 .dot-pulse-dark::after {
   box-shadow: 10014px 0 0 -5px #fff;
   animation: dotPulseDarkAfter 1.5s infinite linear;
-  animation-delay: .5s;
+  animation-delay: 0.5s;
 }
 
 .yearnLogo {
   width: 123px !important;
   height: 42.3px !important;
 }
-
-
 
 @keyframes dotPulseDarkBefore {
   0% {
@@ -104,10 +102,11 @@
   color: #212529;
   box-shadow: 9999px 0 0 -5px #212529;
   animation: dotPulse 1.5s infinite linear;
-  animation-delay: .25s;
+  animation-delay: 0.25s;
 }
 
-.dot-pulse::before, .dot-pulse::after {
+.dot-pulse::before,
+.dot-pulse::after {
   content: '';
   display: inline-block;
   position: absolute;
@@ -128,7 +127,7 @@
 .dot-pulse::after {
   box-shadow: 10014px 0 0 -5px #212529;
   animation: dotPulseAfter 1.5s infinite linear;
-  animation-delay: .5s;
+  animation-delay: 0.5s;
 }
 
 @keyframes dotPulseBefore {

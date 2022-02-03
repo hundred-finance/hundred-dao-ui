@@ -1,5 +1,3 @@
 module.exports = {
-  webpack: (config, { isServer }) => {
-    return config
-  }
-}
+  webpack: (config, { isServer }) => config,
+};

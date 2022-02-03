@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { Typography, Switch, Button } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
-import { withTheme } from '@material-ui/core/styles';
+import { withStyles, withTheme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
 import IconButton from '@material-ui/core/IconButton';
@@ -40,7 +39,7 @@ const StyledSwitch = withStyles((theme) => ({
     '&$focusVisible $thumb': {
       color: '#ffffff',
       border: '6px solid #fff',
-    }
+    },
   },
   thumb: {
     width: 24,
@@ -48,35 +47,33 @@ const StyledSwitch = withStyles((theme) => ({
   },
   track: {
     borderRadius: 32 / 2,
-    border: `1px solid #212529`,
+    border: '1px solid #212529',
     backgroundColor: '#212529',
     opacity: 1,
     transition: theme.transitions.create(['background-color', 'border']),
   },
   checked: {},
   focusVisible: {},
-}))(({ classes, ...props }) => {
-  return (
-    <Switch
-      focusVisibleClassName={classes.focusVisible}
-      disableRipple
-      classes={{
-        root: classes.root,
-        switchBase: classes.switchBase,
-        thumb: classes.thumb,
-        track: classes.track,
-        checked: classes.checked,
-      }}
-      {...props}
-    />
-  );
-});
+}))(({ classes, ...props }) => (
+  <Switch
+    focusVisibleClassName={classes.focusVisible}
+    disableRipple
+    classes={{
+      root: classes.root,
+      switchBase: classes.switchBase,
+      thumb: classes.thumb,
+      track: classes.track,
+      checked: classes.checked,
+    }}
+    {...props}
+  />
+));
 
 function Header(props) {
   const accountStore = stores.accountStore.getStore('account');
 
   const [account, setAccount] = useState(null);
-  const [darkMode, setDarkMode] = useState(props.theme.palette.type === 'dark' ? true : false);
+  const [darkMode, setDarkMode] = useState(props.theme.palette.type === 'dark');
   const [unlockOpen, setUnlockOpen] = useState(false);
 
   useEffect(() => {
@@ -113,7 +110,7 @@ function Header(props) {
     setUnlockOpen(false);
   };
 
-  useEffect(function () {
+  useEffect(() => {
     const localStorageDarkMode = window.localStorage.getItem('yearn.finance-dark-mode');
     setDarkMode(localStorageDarkMode ? localStorageDarkMode === 'dark' : false);
   }, []);
@@ -126,7 +123,8 @@ function Header(props) {
             <ArrowBackIcon />
           </Button>
         </div>
-      )}{' '}
+      )}
+      {' '}
       <div className={classes.themeSelectContainer}>
         <StyledSwitch
           icon={<Brightness2Icon className={classes.switchIcon} />}
@@ -136,7 +134,7 @@ function Header(props) {
         />
       </div>
       <Button disableElevation className={classes.accountButton} variant="contained" color="secondary" onClick={onAddressClicked}>
-        {account && account.address && <div className={`${classes.accountIcon} ${classes.metamask}`}></div>}
+        {account && account.address && <div className={`${classes.accountIcon} ${classes.metamask}`} />}
         <Typography variant="h5">{account && account.address ? formatAddress(account.address) : 'Connect Wallet'}</Typography>
       </Button>
       {unlockOpen && <Unlock modalOpen={unlockOpen} closeModal={closeUnlock} />}

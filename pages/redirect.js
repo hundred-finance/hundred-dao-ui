@@ -6,11 +6,11 @@ function Redirect(props) {
   const router = useRouter();
   const { address, section } = router.query;
   if (section === 'invest') {
-    router.replace('/invest/' + address);
+    router.replace(`/invest/${address}`);
   } else if (section === 'lend') {
-    router.push('/lend?address=' + address);
+    router.push(`/lend?address=${address}`);
   }
-  return <span></span>;
+  return <span />;
 }
 
 export default Redirect;

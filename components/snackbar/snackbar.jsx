@@ -155,7 +155,7 @@ class MySnackbar extends Component {
                 display: 'inline-block',
                 verticalAlign: 'middle',
                 maxWidth: '400px',
-                overflowX: 'hidden'
+                overflowX: 'hidden',
               }}
             >
               <Typography variant="body1" style={{ fontSize: '12px', color: color }}>

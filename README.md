@@ -36,4 +36,4 @@ A new project card should show up when loading the app
 
 ## Thanks
 
-This project is forked from [chimera-defi/vetoken-voting](https://github.com/chimera-defi/veToken-voting) 
+This project is forked from [chimera-defi/vetoken-voting](https://github.com/chimera-defi/veToken-voting)

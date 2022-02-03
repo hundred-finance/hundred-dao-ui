@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Typography, Paper, TextField, InputAdornment, Button, Tooltip } from '@material-ui/core';
+import {
+  Typography, Paper, TextField, InputAdornment, Button, Tooltip,
+} from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import BigNumber from 'bignumber.js';
@@ -19,7 +21,7 @@ export default function GaugeCalculator({ project }) {
       return;
     }
 
-    setAmount((project.tokenMetadata.balance * percent/100).toFixed(project.tokenMetadata.decimals));
+    setAmount(((project.tokenMetadata.balance * percent) / 100).toFixed(project.tokenMetadata.decimals));
   };
 
   const onGaugeSelectChanged = (event, theOption) => {
@@ -28,8 +30,7 @@ export default function GaugeCalculator({ project }) {
 
   const onCalculate = () => {};
 
-
-  console.log(project)
+  console.log(project);
 
   return (
     <Paper elevation={1} className={classes.projectCardContainer}>
@@ -44,17 +45,17 @@ export default function GaugeCalculator({ project }) {
           </div>
         </div>
         <Autocomplete
-          disableClearable={true}
+          disableClearable
           options={project?.gauges}
           value={gauge}
           onChange={onGaugeSelectChanged}
           getOptionLabel={(option) => option.lpToken.symbol}
-          fullWidth={true}
+          fullWidth
           renderOption={(option, { selected }) => (
-            <React.Fragment>
+            <>
               <img src={option.logo} alt="" width={30} height={30} style={{ marginRight: '10px' }} />
               <div className={classes.text}>{option.lpToken.symbol}</div>
-            </React.Fragment>
+            </>
           )}
           renderInput={(params) => (
             <TextField
@@ -80,7 +81,11 @@ export default function GaugeCalculator({ project }) {
         <div className={classes.inputTitleContainer}>
           <div className={classes.inputTitle}>
             <Typography variant="h5" noWrap>
-              Your {project?.tokenMetadata?.symbol} Balance
+              Your
+              {' '}
+              {project?.tokenMetadata?.symbol}
+              {' '}
+              Balance
             </Typography>
           </div>
           <div className={classes.balances}>
@@ -92,7 +97,9 @@ export default function GaugeCalculator({ project }) {
               className={classes.value}
               noWrap
             >
-              Balance: {!project?.tokenMetadata?.balance ? <Skeleton /> : formatCurrency(project.tokenMetadata.balance)}
+              Balance:
+              {' '}
+              {!project?.tokenMetadata?.balance ? <Skeleton /> : formatCurrency(project.tokenMetadata.balance)}
             </Typography>
           </div>
         </div>
@@ -119,7 +126,11 @@ export default function GaugeCalculator({ project }) {
         <div className={classes.inputTitleContainer}>
           <div className={classes.inputTitle}>
             <Typography variant="h5" noWrap>
-              Your {project?.veTokenMetadata?.symbol} Balance
+              Your
+              {' '}
+              {project?.veTokenMetadata?.symbol}
+              {' '}
+              Balance
             </Typography>
           </div>
           <div className={classes.balances}>
@@ -131,7 +142,9 @@ export default function GaugeCalculator({ project }) {
               className={classes.value}
               noWrap
             >
-              Balance: {!project?.tokenMetadata?.balance ? <Skeleton /> : formatCurrency(project.tokenMetadata.balance)}
+              Balance:
+              {' '}
+              {!project?.tokenMetadata?.balance ? <Skeleton /> : formatCurrency(project.tokenMetadata.balance)}
             </Typography>
           </div>
         </div>
@@ -153,23 +166,27 @@ export default function GaugeCalculator({ project }) {
           }}
         />
       </div>
-      <div className={ classes.actionButton }>
-        <Button fullWidth disableElevation variant="contained" color="primary" size="large" onClick={onCalculate} >
+      <div className={classes.actionButton}>
+        <Button fullWidth disableElevation variant="contained" color="primary" size="large" onClick={onCalculate}>
           <Typography variant="h5">Calculate</Typography>
         </Button>
       </div>
-      <div className={ classes.calculationResults }>
-        <div className={ classes.calculationResult}>
-          <Typography variant='h2'>Gauge boost amount: </Typography>
-          <Typography variant='h2' className={ classes.bold }></Typography>
+      <div className={classes.calculationResults}>
+        <div className={classes.calculationResult}>
+          <Typography variant="h2">Gauge boost amount: </Typography>
+          <Typography variant="h2" className={classes.bold} />
         </div>
-        <div className={ classes.calculationResult}>
-          <Typography variant='h2'>{project?.veTokenMetadata?.symbol} required for max boost:</Typography>
-          <Typography variant='h2' className={ classes.bold }></Typography>
+        <div className={classes.calculationResult}>
+          <Typography variant="h2">
+            {project?.veTokenMetadata?.symbol}
+            {' '}
+            required for max boost:
+          </Typography>
+          <Typography variant="h2" className={classes.bold} />
         </div>
-        <div className={ classes.calculationResult}>
-          <Typography variant='h2'>Gauge APY: </Typography>
-          <Typography variant='h2' className={ classes.bold }></Typography>
+        <div className={classes.calculationResult}>
+          <Typography variant="h2">Gauge APY: </Typography>
+          <Typography variant="h2" className={classes.bold} />
         </div>
       </div>
     </Paper>

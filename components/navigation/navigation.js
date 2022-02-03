@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Paper, Switch, Button, SvgIcon } from '@material-ui/core';
-import { withTheme } from '@material-ui/core/styles';
-import { withStyles } from '@material-ui/core/styles';
+import {
+  Typography, Paper, Switch, Button, SvgIcon,
+} from '@material-ui/core';
+import { withTheme, withStyles } from '@material-ui/core/styles';
 
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import BarChartIcon from '@material-ui/icons/BarChart';
@@ -15,15 +16,18 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 
+import LocalParkingIcon from '@material-ui/icons/LocalParking';
 import Unlock from '../unlock';
 
 import stores from '../../stores';
 import { formatAddress } from '../../utils';
 
 import classes from './navigation.module.css';
-import LocalParkingIcon from '@material-ui/icons/LocalParking';
+
 function YearnIcon(props) {
-  const { color, altColor, className, width, height } = props;
+  const {
+    color, altColor, className, width, height,
+  } = props;
   return (
     <SvgIcon viewBox="0 0 105 37" fill="none" width={width} height={height} className={className}>
       <path d="M8.14 14.88H13.82V9.32L21.78 0H15.56L11.14 5.14L6.8 0H0L8.14 9.28V14.88Z" fill={color} />
@@ -70,7 +74,7 @@ function CDPIcon(props) {
   const { color, altColor, className } = props;
   return (
     <SvgIcon viewBox="0, 0, 24, 24" className={className}>
-      <path fill={color} d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"></path>
+      <path fill={color} d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
     </SvgIcon>
   );
 }
@@ -89,7 +93,7 @@ function CDPIconSelected(props) {
       }}
     >
       <SvgIcon viewBox="0, 0, 24, 24" className={className}>
-        <path fill={altColor} d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"></path>
+        <path fill={altColor} d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
       </SvgIcon>
     </div>
   );
@@ -123,29 +127,27 @@ const StyledSwitch = withStyles((theme) => ({
   },
   track: {
     borderRadius: 32 / 2,
-    border: `1px solid #212529`,
+    border: '1px solid #212529',
     backgroundColor: '#212529',
     opacity: 1,
     transition: theme.transitions.create(['background-color', 'border']),
   },
   checked: {},
   focusVisible: {},
-}))(({ classes, ...props }) => {
-  return (
-    <Switch
-      focusVisibleClassName={classes.focusVisible}
-      disableRipple
-      classes={{
-        root: classes.root,
-        switchBase: classes.switchBase,
-        thumb: classes.thumb,
-        track: classes.track,
-        checked: classes.checked,
-      }}
-      {...props}
-    />
-  );
-});
+}))(({ classes, ...props }) => (
+  <Switch
+    focusVisibleClassName={classes.focusVisible}
+    disableRipple
+    classes={{
+      root: classes.root,
+      switchBase: classes.switchBase,
+      thumb: classes.thumb,
+      track: classes.track,
+      checked: classes.checked,
+    }}
+    {...props}
+  />
+));
 
 function Navigation(props) {
   const router = useRouter();
@@ -177,68 +179,61 @@ function Navigation(props) {
     setUnlockOpen(false);
   };
 
-  useEffect(function () {
+  useEffect(() => {
     const localStorageDarkMode = window.localStorage.getItem('yearn.finance-dark-mode');
     setDarkMode(localStorageDarkMode ? localStorageDarkMode === 'dark' : false);
   }, []);
 
-  useEffect(
-    function () {
-      setDarkMode(props.theme.palette.type === 'dark' ? true : false);
-    },
-    [props.theme],
-  );
+  useEffect(() => {
+    setDarkMode(props.theme.palette.type === 'dark');
+  }, [props.theme]);
 
   const activePath = router.asPath;
-  const renderNavs = () => {
-    return (
-      <React.Fragment>
-        {account &&
-          account.address &&
-          renderNav(
-            'Vesting',
-            'vesting',
-            <CDPIcon className={classes.icon} color={darkMode ? 'white' : 'rgb(33, 37, 41)'} altColor={darkMode ? 'rgb(33, 37, 41)' : 'white'} />,
-            <CDPIconSelected className={classes.iconHack} color={darkMode ? 'white' : 'rgb(33, 37, 41)'} altColor={darkMode ? 'rgb(33, 37, 41)' : 'white'} />,
-          )}
-        {account &&
-          account.address &&
-          renderNav(
-            'Voting',
-            'voting',
-            <CDPIcon className={classes.icon} color={darkMode ? 'white' : 'rgb(33, 37, 41)'} altColor={darkMode ? 'rgb(33, 37, 41)' : 'white'} />,
-            <CDPIconSelected className={classes.iconHack} color={darkMode ? 'white' : 'rgb(33, 37, 41)'} altColor={darkMode ? 'rgb(33, 37, 41)' : 'white'} />,
-          )}
-        {account &&
-          account.address &&
-          renderNav(
-            'Gauges',
-            'gauges',
-            <CDPIcon className={classes.icon} color={darkMode ? 'white' : 'rgb(33, 37, 41)'} altColor={darkMode ? 'rgb(33, 37, 41)' : 'white'} />,
-            <CDPIconSelected className={classes.iconHack} color={darkMode ? 'white' : 'rgb(33, 37, 41)'} altColor={darkMode ? 'rgb(33, 37, 41)' : 'white'} />,
-          )}
-      </React.Fragment>
-    );
-  };
-
-  const renderNav = (title, link, icon, iconSelected) => {
-    return (
-      <div
-        className={classes.navigationOptionContainer}
-        onClick={() => {
-          handleNavigate('/' + link);
-        }}
-      >
-        {activePath.includes('/' + link) || (activePath === '/' && link === 'invest') ? (
-          <div className={darkMode ? classes.navigationOptionSelectedWhite : classes.navigationOptionSelected}></div>
-        ) : (
-          <div className={classes.navigationOptionNotSelected}></div>
+  const renderNavs = () => (
+    <>
+      {account
+        && account.address
+        && renderNav(
+          'Vesting',
+          'vesting',
+          <CDPIcon className={classes.icon} color={darkMode ? 'white' : 'rgb(33, 37, 41)'} altColor={darkMode ? 'rgb(33, 37, 41)' : 'white'} />,
+          <CDPIconSelected className={classes.iconHack} color={darkMode ? 'white' : 'rgb(33, 37, 41)'} altColor={darkMode ? 'rgb(33, 37, 41)' : 'white'} />,
         )}
-        {activePath.includes('/' + link) || (activePath === '/' && link === 'invest') ? iconSelected : icon}
-        <Typography variant="h2">{title}</Typography>
-      </div>
-    );
-  };
+      {account
+        && account.address
+        && renderNav(
+          'Voting',
+          'voting',
+          <CDPIcon className={classes.icon} color={darkMode ? 'white' : 'rgb(33, 37, 41)'} altColor={darkMode ? 'rgb(33, 37, 41)' : 'white'} />,
+          <CDPIconSelected className={classes.iconHack} color={darkMode ? 'white' : 'rgb(33, 37, 41)'} altColor={darkMode ? 'rgb(33, 37, 41)' : 'white'} />,
+        )}
+      {account
+        && account.address
+        && renderNav(
+          'Gauges',
+          'gauges',
+          <CDPIcon className={classes.icon} color={darkMode ? 'white' : 'rgb(33, 37, 41)'} altColor={darkMode ? 'rgb(33, 37, 41)' : 'white'} />,
+          <CDPIconSelected className={classes.iconHack} color={darkMode ? 'white' : 'rgb(33, 37, 41)'} altColor={darkMode ? 'rgb(33, 37, 41)' : 'white'} />,
+        )}
+    </>
+  );
+
+  const renderNav = (title, link, icon, iconSelected) => (
+    <div
+      className={classes.navigationOptionContainer}
+      onClick={() => {
+        handleNavigate(`/${link}`);
+      }}
+    >
+      {activePath.includes(`/${link}`) || (activePath === '/' && link === 'invest') ? (
+        <div className={darkMode ? classes.navigationOptionSelectedWhite : classes.navigationOptionSelected} />
+      ) : (
+        <div className={classes.navigationOptionNotSelected} />
+      )}
+      {activePath.includes(`/${link}`) || (activePath === '/' && link === 'invest') ? iconSelected : icon}
+      <Typography variant="h2">{title}</Typography>
+    </div>
+  );
 
   return (
     <Paper elevation={0} className={classes.navigationContainer}>
@@ -258,7 +253,7 @@ function Navigation(props) {
         <Paper elevation={0} className={classes.navigationContentMobile}>
           <div className={classes.menuIcon}>
             <Button color={props.theme.palette.type === 'light' ? 'primary' : 'secondary'} onClick={onMenuClicked} disableElevation>
-              <CloseIcon fontSize={'large'} />
+              <CloseIcon fontSize="large" />
             </Button>
           </div>
           <div className={classes.navigationHeading}>
@@ -275,7 +270,7 @@ function Navigation(props) {
               />
             </div>
             <Button disableElevation className={classes.accountButton} variant="contained" color="secondary" onClick={onAddressClicked}>
-              <div className={`${classes.accountIcon} ${classes.metamask}`}></div>
+              <div className={`${classes.accountIcon} ${classes.metamask}`} />
               <Typography variant="h5">{account ? formatAddress(account.address) : 'Connect Wallet'}</Typography>
             </Button>
 
@@ -286,7 +281,7 @@ function Navigation(props) {
 
       <div className={classes.menuIcon}>
         <Button color={props.theme.palette.type === 'light' ? 'primary' : 'secondary'} onClick={onMenuClicked} disableElevation>
-          <MenuIcon fontSize={'large'} />
+          <MenuIcon fontSize="large" />
         </Button>
       </div>
 
@@ -294,7 +289,7 @@ function Navigation(props) {
         <div className={classes.backButtonContainer}>
           <div className={classes.backButton}>
             <Button color={props.theme.palette.type === 'light' ? 'primary' : 'secondary'} onClick={props.backClicked} disableElevation>
-              <ArrowBackIcon fontSize={'large'} />
+              <ArrowBackIcon fontSize="large" />
             </Button>
           </div>
         </div>
@@ -312,11 +307,11 @@ function Navigation(props) {
         <a className={`${classes.socialButton}`} href="https://medium.com/iearn" target="_blank" rel="noopener noreferrer">
           <svg width="100%" viewBox="0 0 256 256" version="1.1">
             <g>
-              <rect fill={props.theme.palette.type === 'light' ? '#212529' : '#FFF'} x="0" y="0" width="256" height="256"></rect>
+              <rect fill={props.theme.palette.type === 'light' ? '#212529' : '#FFF'} x="0" y="0" width="256" height="256" />
               <path
                 d="M61.0908952,85.6165814 C61.3045665,83.5054371 60.4994954,81.4188058 58.9230865,79.9979257 L42.8652446,60.6536969 L42.8652446,57.7641026 L92.7248438,57.7641026 L131.263664,142.284737 L165.145712,57.7641026 L212.676923,57.7641026 L212.676923,60.6536969 L198.947468,73.8174045 C197.763839,74.719636 197.176698,76.2025173 197.421974,77.670197 L197.421974,174.391342 C197.176698,175.859021 197.763839,177.341902 198.947468,178.244134 L212.355766,191.407842 L212.355766,194.297436 L144.91283,194.297436 L144.91283,191.407842 L158.802864,177.923068 C160.16778,176.558537 160.16778,176.157205 160.16778,174.070276 L160.16778,95.8906948 L121.54867,193.97637 L116.329871,193.97637 L71.3679139,95.8906948 L71.3679139,161.628966 C70.9930375,164.392788 71.9109513,167.175352 73.8568795,169.174019 L91.9219516,191.086776 L91.9219516,193.97637 L40.6974359,193.97637 L40.6974359,191.086776 L58.7625081,169.174019 C60.6942682,167.172038 61.5586577,164.371016 61.0908952,161.628966 L61.0908952,85.6165814 Z"
                 fill={props.theme.palette.type === 'light' ? '#FFF' : '#212529'}
-              ></path>
+              />
             </g>
           </svg>
         </a>

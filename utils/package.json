@@ -1,3 +1,7 @@
 {
-  "main": "utils.js"
+  "main": "utils.js",
+  "dependencies": {
+    "bignumber.js": "^9.0.2",
+    "moment": "^2.29.1"
+  }
 }
