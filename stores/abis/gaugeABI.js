@@ -156,4 +156,16 @@ export const gaugeABI = [
     gas: 2055,
   },
   { name: 'inflation_rate', outputs: [{ type: 'uint256', name: '' }], inputs: [], stateMutability: 'view', type: 'function', gas: 1931 },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    name: 'is_killed',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+  },
 ];

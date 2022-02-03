@@ -299,6 +299,7 @@ class Store {
         gaugeControllerMulticall.gauge_relative_weight(gauge, currentEpochTime()),
         gaugeControllerMulticall.gauge_relative_weight(gauge, nextEpochTime()),
         gaugeContractMulticall.lp_token(),
+        gaugeContractMulticall.is_killed(),
       );
     });
 
@@ -308,13 +309,18 @@ class Store {
     const gaugesCurrentEpochRelativeWeights = [];
     const gaugesNextEpochRelativeWeights = [];
     const gaugesLPTokens = [];
+    const activeGauges = [];
 
     for (let i = 0; i < gauges.length; i++) {
-      const data = gaugesData.splice(0, 4);
-      gaugesWeights.push(data[0]);
-      gaugesCurrentEpochRelativeWeights.push(data[1]);
-      gaugesNextEpochRelativeWeights.push(data[2]);
-      gaugesLPTokens.push(data[3]);
+      const data = gaugesData.splice(0, 5);
+      const isGaugeKilled = data[4];
+      if (!isGaugeKilled) {
+        gaugesWeights.push(data[0]);
+        gaugesCurrentEpochRelativeWeights.push(data[1]);
+        gaugesNextEpochRelativeWeights.push(data[2]);
+        gaugesLPTokens.push(data[3]);
+        activeGauges.push(gauges[i]);
+      }
     }
 
     const lpCalls = [];
@@ -338,7 +344,7 @@ class Store {
         lpTokenContract.name(),
         lpTokenContract.symbol(),
         lpTokenContract.decimals(),
-        lpTokenContract.balanceOf(gauges[index]),
+        lpTokenContract.balanceOf(activeGauges[index]),
         lpUnderlyingTokenContract.decimals(),
         lpUnderlyingTokenContract.symbol(),
       );
