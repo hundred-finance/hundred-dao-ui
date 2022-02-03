@@ -97,7 +97,7 @@ function Balances({ project }) {
       <div className={classes.overviewCard}>
         <div>
           <Typography variant="h5">
-            Total
+            Total{' '}
             {project?.veTokenMetadata?.symbol}
           </Typography>
           <Typography variant="h3">
@@ -109,7 +109,7 @@ function Balances({ project }) {
       <div className={classes.overviewCard}>
         <div>
           <Typography variant="h5">
-            Total
+            Total{' '}
             {project?.tokenMetadata?.symbol}
             {' '}
             staked
