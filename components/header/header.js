@@ -40,7 +40,7 @@ const StyledSwitch = withStyles((theme) => ({
     '&$focusVisible $thumb': {
       color: '#ffffff',
       border: '6px solid #fff',
-    }
+    },
   },
   thumb: {
     width: 24,

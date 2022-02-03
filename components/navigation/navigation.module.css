@@ -37,7 +37,7 @@
   width: 100%;
   border-radius: 10px;
   cursor: pointer;
-  background: radial-gradient(circle, rgba(63,94,251,0.7) 0%, rgba(47,128,237,0.7) 48%) rgba(63,94,251,0.7) 100%;
+  background: radial-gradient(circle, rgba(63, 94, 251, 0.7) 0%, rgba(47, 128, 237, 0.7) 48%) rgba(63, 94, 251, 0.7) 100%;
 }
 
 .socials {
@@ -82,8 +82,6 @@
   max-width: 400px;
 }
 
-
-
 .headerThings {
   display: none;
 }
@@ -126,7 +124,6 @@
   background-image: url('/connectors/trustWallet.png');
 }
 
-
 .menuIcon {
   display: none;
 }
@@ -140,7 +137,6 @@
   letter-spacing: 1px;
   padding-top: 12px;
 }
-
 
 .navigationOptionContainer {
   display: flex;
@@ -179,7 +175,6 @@
   align-items: center;
   justify-content: center;
 }
-
 
 .navigationOptionContainer:hover .navigationOptionIcon {
   background: #000;

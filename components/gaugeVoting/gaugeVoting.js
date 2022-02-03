@@ -78,7 +78,7 @@ export default function GaugeVoting({ project }) {
   };
 
   const canVoteFor = (gauge) => {
-      return !gauge || gauge.nextVoteTimestamp === 0 || gauge.nextVoteTimestamp <= moment().unix()
+    return !gauge || gauge.nextVoteTimestamp === 0 || gauge.nextVoteTimestamp <= moment().unix();
   };
 
   return (
@@ -87,7 +87,9 @@ export default function GaugeVoting({ project }) {
         Gauge Voting
       </Typography>
       <div>
-        <Typography variant="h5" className={classes.sectionHeader}>Vote for your gauge</Typography>
+        <Typography variant="h5" className={classes.sectionHeader}>
+          Vote for your gauge
+        </Typography>
         <div className={classes.textField}>
           <div className={classes.inputTitleContainer}>
             <div className={classes.inputTitle}>
@@ -143,16 +145,12 @@ export default function GaugeVoting({ project }) {
           />
         </div>
         <div className={classes.actionButton}>
-          <Button fullWidth disableElevation variant="contained"
-                  color="primary" size="large" onClick={onVote}
-                  disabled={voteLoading || !canVoteFor(gauge)}
-          >
-            {
-              canVoteFor(gauge) ?
-                <Typography variant="h5">{voteLoading ? <CircularProgress size={15} /> : 'Vote'}</Typography>
-              :
-                <Typography variant="h5">Vote disabled until { moment.unix(gauge?.nextVoteTimestamp).format('YYYY-MM-DD HH:mm') }</Typography>
-            }
+          <Button fullWidth disableElevation variant="contained" color="primary" size="large" onClick={onVote} disabled={voteLoading || !canVoteFor(gauge)}>
+            {canVoteFor(gauge) ? (
+              <Typography variant="h5">{voteLoading ? <CircularProgress size={15} /> : 'Vote'}</Typography>
+            ) : (
+              <Typography variant="h5">Vote disabled until {moment.unix(gauge?.nextVoteTimestamp).format('YYYY-MM-DD HH:mm')}</Typography>
+            )}
           </Button>
         </div>
         <div className={classes.calculationResults}>

@@ -5,7 +5,7 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { useRouter } from 'next/router';
 
-import '../styles/global.css'
+import '../styles/global.css';
 
 import lightTheme from '../theme/light';
 import darkTheme from '../theme/dark';
@@ -53,8 +53,8 @@ export default function MyApp({ Component, pageProps }) {
   }, []);
 
   const validateConfigured = () => {
-    return true
-    return configured
+    return true;
+    return configured;
   };
 
   return (

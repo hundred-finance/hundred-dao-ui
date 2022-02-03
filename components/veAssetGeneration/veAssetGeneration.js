@@ -46,8 +46,8 @@ export default function VeAssetGeneration({ project }) {
   };
 
   const handleChangeAmount = (e) => {
-    console.log(e)
-  }
+    console.log(e);
+  };
 
   const handleDateChange = (event) => {
     setSelectedDate(normalizeDate(event.target.value));
@@ -55,7 +55,6 @@ export default function VeAssetGeneration({ project }) {
   };
 
   const handleChange = (event) => {
-
     setSelectedValue(event.target.value);
     let newDate;
 
@@ -70,10 +69,10 @@ export default function VeAssetGeneration({ project }) {
         newDate = moment().add(2, 'years').format('YYYY-MM-DD');
         break;
       default:
-        newDate = moment().add(4, 'years').subtract(1, "days").format('YYYY-MM-DD');
+        newDate = moment().add(4, 'years').subtract(1, 'days').format('YYYY-MM-DD');
     }
 
-    setSelectedDate(normalizeDate(newDate))
+    setSelectedDate(normalizeDate(newDate));
   };
 
   const onLock = () => {
@@ -93,7 +92,7 @@ export default function VeAssetGeneration({ project }) {
     if (!error) {
       setLockLoading(true);
 
-      let selectedDateUnix = moment(selectedDate).unix()
+      let selectedDateUnix = moment(selectedDate).unix();
       if (project.useDays) {
         selectedDateUnix = moment.duration(moment.unix(selectedDateUnix).diff(moment().startOf('day'))).asDays();
       }
@@ -120,7 +119,9 @@ export default function VeAssetGeneration({ project }) {
 
   return (
     <Paper elevation={1} className={classes.projectCardContainer}>
-      <Typography variant="h2" className={ classes.sectionHeader }>Generate {project && project.veTokenMetadata ? project.veTokenMetadata.symbol : 'veAsset'}</Typography>
+      <Typography variant="h2" className={classes.sectionHeader}>
+        Generate {project && project.veTokenMetadata ? project.veTokenMetadata.symbol : 'veAsset'}
+      </Typography>
 
       <div className={classes.textField}>
         <div className={classes.inputTitleContainer}>
@@ -186,7 +187,7 @@ export default function VeAssetGeneration({ project }) {
         <div className={classes.inputTitleContainer}>
           <div className={classes.inputTitle}>
             <Typography variant="h5" noWrap>
-              Lock for 
+              Lock for
             </Typography>
           </div>
         </div>
@@ -194,11 +195,11 @@ export default function VeAssetGeneration({ project }) {
           <FormControlLabel value="month" control={<Radio color="primary" />} label="1 month" labelPlacement="bottom" />
           <FormControlLabel value="year" control={<Radio color="primary" />} label="1 year" labelPlacement="bottom" />
           <FormControlLabel value="2year" control={<Radio color="primary" />} label="2 years" labelPlacement="bottom" />
-          {project?.maxDurationYears == 3 ? 
+          {project?.maxDurationYears == 3 ? (
             <FormControlLabel value="3year" control={<Radio color="primary" />} label="3 years" labelPlacement="bottom" />
-            :
+          ) : (
             <FormControlLabel value="years" control={<Radio color="primary" />} label="4 years" labelPlacement="bottom" />
-          }
+          )}
         </RadioGroup>
       </div>
 
@@ -210,7 +211,14 @@ export default function VeAssetGeneration({ project }) {
           color="primary"
           size="large"
           onClick={onApprove}
-          disabled={ approveLoading || !amount || amount === '' || isNaN(amount) || BigNumber(amount).eq(BigNumber(0)) || BigNumber(project?.tokenMetadata?.allowance).gte(BigNumber(amount))}
+          disabled={
+            approveLoading ||
+            !amount ||
+            amount === '' ||
+            isNaN(amount) ||
+            BigNumber(amount).eq(BigNumber(0)) ||
+            BigNumber(project?.tokenMetadata?.allowance).gte(BigNumber(amount))
+          }
           className={classes.button}
         >
           <Typography variant="h5">{approveLoading ? <CircularProgress size={15} /> : `Approve ${project?.tokenMetadata?.symbol}`}</Typography>
@@ -222,7 +230,14 @@ export default function VeAssetGeneration({ project }) {
           color="primary"
           size="large"
           onClick={onLock}
-          disabled={ lockLoading || !amount || amount === '' || isNaN(amount) || BigNumber(amount).eq(BigNumber(0))  || BigNumber(project?.tokenMetadata?.allowance).lt(BigNumber(amount))}
+          disabled={
+            lockLoading ||
+            !amount ||
+            amount === '' ||
+            isNaN(amount) ||
+            BigNumber(amount).eq(BigNumber(0)) ||
+            BigNumber(project?.tokenMetadata?.allowance).lt(BigNumber(amount))
+          }
           className={classes.button}
         >
           <Typography variant="h5">{lockLoading ? <CircularProgress size={15} /> : `Lock ${project?.tokenMetadata?.symbol}`}</Typography>

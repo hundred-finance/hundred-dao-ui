@@ -126,13 +126,13 @@ export const gaugeControllerABI = [
     outputs: [],
     gas: 18349612985,
   },
-//   {
-//     stateMutability: 'view',
-//     type: 'function',
-//     name: 'gauge_relative_weight',
-//     inputs: [{ name: 'addr', type: 'address' }],
-//     outputs: [{ name: '', type: 'uint256' }],
-//   },
+  //   {
+  //     stateMutability: 'view',
+  //     type: 'function',
+  //     name: 'gauge_relative_weight',
+  //     inputs: [{ name: 'addr', type: 'address' }],
+  //     outputs: [{ name: '', type: 'uint256' }],
+  //   },
   {
     stateMutability: 'view',
     type: 'function',
@@ -423,838 +423,838 @@ export const gaugeControllerABI = [
 
 export const gaugeControllerV2ABI = [
   {
-    "name": "CommitOwnership",
-    "inputs": [
+    name: 'CommitOwnership',
+    inputs: [
       {
-        "name": "admin",
-        "type": "address",
-        "indexed": false
-      }
+        name: 'admin',
+        type: 'address',
+        indexed: false,
+      },
     ],
-    "anonymous": false,
-    "type": "event"
+    anonymous: false,
+    type: 'event',
   },
   {
-    "name": "ApplyOwnership",
-    "inputs": [
+    name: 'ApplyOwnership',
+    inputs: [
       {
-        "name": "admin",
-        "type": "address",
-        "indexed": false
-      }
+        name: 'admin',
+        type: 'address',
+        indexed: false,
+      },
     ],
-    "anonymous": false,
-    "type": "event"
+    anonymous: false,
+    type: 'event',
   },
   {
-    "name": "AddType",
-    "inputs": [
+    name: 'AddType',
+    inputs: [
       {
-        "name": "name",
-        "type": "string",
-        "indexed": false
+        name: 'name',
+        type: 'string',
+        indexed: false,
       },
       {
-        "name": "type_id",
-        "type": "int128",
-        "indexed": false
-      }
+        name: 'type_id',
+        type: 'int128',
+        indexed: false,
+      },
     ],
-    "anonymous": false,
-    "type": "event"
+    anonymous: false,
+    type: 'event',
   },
   {
-    "name": "NewTypeWeight",
-    "inputs": [
+    name: 'NewTypeWeight',
+    inputs: [
       {
-        "name": "type_id",
-        "type": "int128",
-        "indexed": false
+        name: 'type_id',
+        type: 'int128',
+        indexed: false,
       },
       {
-        "name": "time",
-        "type": "uint256",
-        "indexed": false
+        name: 'time',
+        type: 'uint256',
+        indexed: false,
       },
       {
-        "name": "weight",
-        "type": "uint256",
-        "indexed": false
+        name: 'weight',
+        type: 'uint256',
+        indexed: false,
       },
       {
-        "name": "total_weight",
-        "type": "uint256",
-        "indexed": false
-      }
+        name: 'total_weight',
+        type: 'uint256',
+        indexed: false,
+      },
     ],
-    "anonymous": false,
-    "type": "event"
+    anonymous: false,
+    type: 'event',
   },
   {
-    "name": "NewGaugeWeight",
-    "inputs": [
+    name: 'NewGaugeWeight',
+    inputs: [
       {
-        "name": "gauge_address",
-        "type": "address",
-        "indexed": false
+        name: 'gauge_address',
+        type: 'address',
+        indexed: false,
       },
       {
-        "name": "time",
-        "type": "uint256",
-        "indexed": false
+        name: 'time',
+        type: 'uint256',
+        indexed: false,
       },
       {
-        "name": "weight",
-        "type": "uint256",
-        "indexed": false
+        name: 'weight',
+        type: 'uint256',
+        indexed: false,
       },
       {
-        "name": "total_weight",
-        "type": "uint256",
-        "indexed": false
-      }
+        name: 'total_weight',
+        type: 'uint256',
+        indexed: false,
+      },
     ],
-    "anonymous": false,
-    "type": "event"
+    anonymous: false,
+    type: 'event',
   },
   {
-    "name": "VoteForGauge",
-    "inputs": [
+    name: 'VoteForGauge',
+    inputs: [
       {
-        "name": "time",
-        "type": "uint256",
-        "indexed": false
+        name: 'time',
+        type: 'uint256',
+        indexed: false,
       },
       {
-        "name": "user",
-        "type": "address",
-        "indexed": false
+        name: 'user',
+        type: 'address',
+        indexed: false,
       },
       {
-        "name": "gauge_addr",
-        "type": "address",
-        "indexed": false
+        name: 'gauge_addr',
+        type: 'address',
+        indexed: false,
       },
       {
-        "name": "weight",
-        "type": "uint256",
-        "indexed": false
-      }
+        name: 'weight',
+        type: 'uint256',
+        indexed: false,
+      },
     ],
-    "anonymous": false,
-    "type": "event"
+    anonymous: false,
+    type: 'event',
   },
   {
-    "name": "NewGauge",
-    "inputs": [
+    name: 'NewGauge',
+    inputs: [
       {
-        "name": "addr",
-        "type": "address",
-        "indexed": false
+        name: 'addr',
+        type: 'address',
+        indexed: false,
       },
       {
-        "name": "gauge_type",
-        "type": "int128",
-        "indexed": false
+        name: 'gauge_type',
+        type: 'int128',
+        indexed: false,
       },
       {
-        "name": "weight",
-        "type": "uint256",
-        "indexed": false
-      }
+        name: 'weight',
+        type: 'uint256',
+        indexed: false,
+      },
     ],
-    "anonymous": false,
-    "type": "event"
+    anonymous: false,
+    type: 'event',
   },
   {
-    "stateMutability": "nonpayable",
-    "type": "constructor",
-    "inputs": [
+    stateMutability: 'nonpayable',
+    type: 'constructor',
+    inputs: [
       {
-        "name": "_token",
-        "type": "address"
+        name: '_token',
+        type: 'address',
       },
       {
-        "name": "_voting_escrow",
-        "type": "address"
-      }
+        name: '_voting_escrow',
+        type: 'address',
+      },
     ],
-    "outputs": []
+    outputs: [],
   },
   {
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "name": "commit_transfer_ownership",
-    "inputs": [
+    stateMutability: 'nonpayable',
+    type: 'function',
+    name: 'commit_transfer_ownership',
+    inputs: [
       {
-        "name": "addr",
-        "type": "address"
-      }
+        name: 'addr',
+        type: 'address',
+      },
     ],
-    "outputs": [],
+    outputs: [],
   },
   {
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "name": "apply_transfer_ownership",
-    "inputs": [],
-    "outputs": [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+    name: 'apply_transfer_ownership',
+    inputs: [],
+    outputs: [],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "gauge_types",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'gauge_types',
+    inputs: [
       {
-        "name": "_addr",
-        "type": "address"
-      }
+        name: '_addr',
+        type: 'address',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "int128"
-      }
+        name: '',
+        type: 'int128',
+      },
     ],
   },
   {
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "name": "add_gauge",
-    "inputs": [
+    stateMutability: 'nonpayable',
+    type: 'function',
+    name: 'add_gauge',
+    inputs: [
       {
-        "name": "addr",
-        "type": "address"
+        name: 'addr',
+        type: 'address',
       },
       {
-        "name": "gauge_type",
-        "type": "int128"
-      }
+        name: 'gauge_type',
+        type: 'int128',
+      },
     ],
-    "outputs": []
+    outputs: [],
   },
   {
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "name": "add_gauge",
-    "inputs": [
+    stateMutability: 'nonpayable',
+    type: 'function',
+    name: 'add_gauge',
+    inputs: [
       {
-        "name": "addr",
-        "type": "address"
+        name: 'addr',
+        type: 'address',
       },
       {
-        "name": "gauge_type",
-        "type": "int128"
+        name: 'gauge_type',
+        type: 'int128',
       },
       {
-        "name": "weight",
-        "type": "uint256"
-      }
+        name: 'weight',
+        type: 'uint256',
+      },
     ],
-    "outputs": []
+    outputs: [],
   },
   {
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "name": "checkpoint",
-    "inputs": [],
-    "outputs": [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+    name: 'checkpoint',
+    inputs: [],
+    outputs: [],
   },
   {
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "name": "checkpoint_gauge",
-    "inputs": [
+    stateMutability: 'nonpayable',
+    type: 'function',
+    name: 'checkpoint_gauge',
+    inputs: [
       {
-        "name": "addr",
-        "type": "address"
-      }
+        name: 'addr',
+        type: 'address',
+      },
     ],
-    "outputs": [],
+    outputs: [],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "gauge_relative_weight",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'gauge_relative_weight',
+    inputs: [
       {
-        "name": "addr",
-        "type": "address"
-      }
+        name: 'addr',
+        type: 'address',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "uint256"
-      }
-    ]
+        name: '',
+        type: 'uint256',
+      },
+    ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "gauge_relative_weight",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'gauge_relative_weight',
+    inputs: [
       {
-        "name": "addr",
-        "type": "address"
+        name: 'addr',
+        type: 'address',
       },
       {
-        "name": "time",
-        "type": "uint256"
-      }
+        name: 'time',
+        type: 'uint256',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "uint256"
-      }
-    ]
+        name: '',
+        type: 'uint256',
+      },
+    ],
   },
   {
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "name": "gauge_relative_weight_write",
-    "inputs": [
+    stateMutability: 'nonpayable',
+    type: 'function',
+    name: 'gauge_relative_weight_write',
+    inputs: [
       {
-        "name": "addr",
-        "type": "address"
-      }
+        name: 'addr',
+        type: 'address',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "uint256"
-      }
-    ]
+        name: '',
+        type: 'uint256',
+      },
+    ],
   },
   {
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "name": "gauge_relative_weight_write",
-    "inputs": [
+    stateMutability: 'nonpayable',
+    type: 'function',
+    name: 'gauge_relative_weight_write',
+    inputs: [
       {
-        "name": "addr",
-        "type": "address"
+        name: 'addr',
+        type: 'address',
       },
       {
-        "name": "time",
-        "type": "uint256"
-      }
+        name: 'time',
+        type: 'uint256',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "uint256"
-      }
-    ]
+        name: '',
+        type: 'uint256',
+      },
+    ],
   },
   {
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "name": "add_type",
-    "inputs": [
+    stateMutability: 'nonpayable',
+    type: 'function',
+    name: 'add_type',
+    inputs: [
       {
-        "name": "_name",
-        "type": "string"
-      }
+        name: '_name',
+        type: 'string',
+      },
     ],
-    "outputs": []
+    outputs: [],
   },
   {
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "name": "add_type",
-    "inputs": [
+    stateMutability: 'nonpayable',
+    type: 'function',
+    name: 'add_type',
+    inputs: [
       {
-        "name": "_name",
-        "type": "string"
+        name: '_name',
+        type: 'string',
       },
       {
-        "name": "weight",
-        "type": "uint256"
-      }
+        name: 'weight',
+        type: 'uint256',
+      },
     ],
-    "outputs": []
+    outputs: [],
   },
   {
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "name": "change_type_weight",
-    "inputs": [
+    stateMutability: 'nonpayable',
+    type: 'function',
+    name: 'change_type_weight',
+    inputs: [
       {
-        "name": "type_id",
-        "type": "int128"
+        name: 'type_id',
+        type: 'int128',
       },
       {
-        "name": "weight",
-        "type": "uint256"
-      }
+        name: 'weight',
+        type: 'uint256',
+      },
     ],
-    "outputs": [],
+    outputs: [],
   },
   {
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "name": "change_gauge_weight",
-    "inputs": [
+    stateMutability: 'nonpayable',
+    type: 'function',
+    name: 'change_gauge_weight',
+    inputs: [
       {
-        "name": "addr",
-        "type": "address"
+        name: 'addr',
+        type: 'address',
       },
       {
-        "name": "weight",
-        "type": "uint256"
-      }
+        name: 'weight',
+        type: 'uint256',
+      },
     ],
-    "outputs": [],
+    outputs: [],
   },
   {
-    "stateMutability": "nonpayable",
-    "type": "function",
-    "name": "vote_for_gauge_weights",
-    "inputs": [
+    stateMutability: 'nonpayable',
+    type: 'function',
+    name: 'vote_for_gauge_weights',
+    inputs: [
       {
-        "name": "_gauge_addr",
-        "type": "address"
+        name: '_gauge_addr',
+        type: 'address',
       },
       {
-        "name": "_user_weight",
-        "type": "uint256"
-      }
+        name: '_user_weight',
+        type: 'uint256',
+      },
     ],
-    "outputs": [],
+    outputs: [],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "user_vote_power",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'user_vote_power',
+    inputs: [
       {
-        "name": "addr",
-        "type": "address"
-      }
+        name: 'addr',
+        type: 'address',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "uint256"
-      }
+        name: '',
+        type: 'uint256',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "vote_user_power_for_gauge",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'vote_user_power_for_gauge',
+    inputs: [
       {
-        "name": "addr",
-        "type": "address"
+        name: 'addr',
+        type: 'address',
       },
       {
-        "name": "gauge",
-        "type": "address"
-      }
+        name: 'gauge',
+        type: 'address',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-  },
-  {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "get_gauge_weight",
-    "inputs": [
-      {
-        "name": "addr",
-        "type": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
+        name: '',
+        type: 'uint256',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "get_type_weight",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'get_gauge_weight',
+    inputs: [
       {
-        "name": "type_id",
-        "type": "int128"
-      }
+        name: 'addr',
+        type: 'address',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-  },
-  {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "get_total_weight",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
+        name: '',
+        type: 'uint256',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "get_weights_sum_per_type",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'get_type_weight',
+    inputs: [
       {
-        "name": "type_id",
-        "type": "int128"
-      }
+        name: 'type_id',
+        type: 'int128',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-  },
-  {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "admin",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address"
-      }
+        name: '',
+        type: 'uint256',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "future_admin",
-    "inputs": [],
-    "outputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'get_total_weight',
+    inputs: [],
+    outputs: [
       {
-        "name": "",
-        "type": "address"
-      }
+        name: '',
+        type: 'uint256',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "token",
-    "inputs": [],
-    "outputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'get_weights_sum_per_type',
+    inputs: [
       {
-        "name": "",
-        "type": "address"
-      }
+        name: 'type_id',
+        type: 'int128',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "voting_escrow",
-    "inputs": [],
-    "outputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'admin',
+    inputs: [],
+    outputs: [
       {
-        "name": "",
-        "type": "address"
-      }
+        name: '',
+        type: 'address',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "n_gauge_types",
-    "inputs": [],
-    "outputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'future_admin',
+    inputs: [],
+    outputs: [
       {
-        "name": "",
-        "type": "int128"
-      }
+        name: '',
+        type: 'address',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "n_gauges",
-    "inputs": [],
-    "outputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'token',
+    inputs: [],
+    outputs: [
       {
-        "name": "",
-        "type": "int128"
-      }
+        name: '',
+        type: 'address',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "gauge_type_names",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'voting_escrow',
+    inputs: [],
+    outputs: [
       {
-        "name": "arg0",
-        "type": "int128"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "string"
-      }
+        name: '',
+        type: 'address',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "gauges",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'n_gauge_types',
+    inputs: [],
+    outputs: [
       {
-        "name": "arg0",
-        "type": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address"
-      }
+        name: '',
+        type: 'int128',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "vote_user_slopes",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'n_gauges',
+    inputs: [],
+    outputs: [
       {
-        "name": "arg0",
-        "type": "address"
+        name: '',
+        type: 'int128',
+      },
+    ],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    name: 'gauge_type_names',
+    inputs: [
+      {
+        name: 'arg0',
+        type: 'int128',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'string',
+      },
+    ],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    name: 'gauges',
+    inputs: [
+      {
+        name: 'arg0',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    name: 'vote_user_slopes',
+    inputs: [
+      {
+        name: 'arg0',
+        type: 'address',
       },
       {
-        "name": "arg1",
-        "type": "address"
+        name: 'arg1',
+        type: 'address',
       },
       {
-        "name": "arg2",
-        "type": "uint256"
-      }
+        name: 'arg2',
+        type: 'uint256',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "slope",
-        "type": "uint256"
+        name: 'slope',
+        type: 'uint256',
       },
       {
-        "name": "power",
-        "type": "uint256"
+        name: 'power',
+        type: 'uint256',
       },
       {
-        "name": "end",
-        "type": "uint256"
-      }
+        name: 'end',
+        type: 'uint256',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "vote_user_power",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'vote_user_power',
+    inputs: [
       {
-        "name": "arg0",
-        "type": "address"
+        name: 'arg0',
+        type: 'address',
       },
       {
-        "name": "arg1",
-        "type": "uint256"
-      }
+        name: 'arg1',
+        type: 'uint256',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "uint256"
-      }
+        name: '',
+        type: 'uint256',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "last_user_vote",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'last_user_vote',
+    inputs: [
       {
-        "name": "arg0",
-        "type": "address"
+        name: 'arg0',
+        type: 'address',
       },
       {
-        "name": "arg1",
-        "type": "address"
-      }
+        name: 'arg1',
+        type: 'address',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "uint256"
-      }
+        name: '',
+        type: 'uint256',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "points_weight",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'points_weight',
+    inputs: [
       {
-        "name": "arg0",
-        "type": "address"
+        name: 'arg0',
+        type: 'address',
       },
       {
-        "name": "arg1",
-        "type": "uint256"
-      }
+        name: 'arg1',
+        type: 'uint256',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "bias",
-        "type": "uint256"
+        name: 'bias',
+        type: 'uint256',
       },
       {
-        "name": "slope",
-        "type": "uint256"
-      }
+        name: 'slope',
+        type: 'uint256',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "time_weight",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'time_weight',
+    inputs: [
       {
-        "name": "arg0",
-        "type": "address"
-      }
+        name: 'arg0',
+        type: 'address',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "uint256"
-      }
+        name: '',
+        type: 'uint256',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "points_sum",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'points_sum',
+    inputs: [
       {
-        "name": "arg0",
-        "type": "int128"
+        name: 'arg0',
+        type: 'int128',
       },
       {
-        "name": "arg1",
-        "type": "uint256"
-      }
+        name: 'arg1',
+        type: 'uint256',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "bias",
-        "type": "uint256"
+        name: 'bias',
+        type: 'uint256',
       },
       {
-        "name": "slope",
-        "type": "uint256"
-      }
+        name: 'slope',
+        type: 'uint256',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "time_sum",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'time_sum',
+    inputs: [
       {
-        "name": "arg0",
-        "type": "uint256"
-      }
+        name: 'arg0',
+        type: 'uint256',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-  },
-  {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "points_total",
-    "inputs": [
-      {
-        "name": "arg0",
-        "type": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
+        name: '',
+        type: 'uint256',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "time_total",
-    "inputs": [],
-    "outputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'points_total',
+    inputs: [
       {
-        "name": "",
-        "type": "uint256"
-      }
+        name: 'arg0',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "points_type_weight",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'time_total',
+    inputs: [],
+    outputs: [
       {
-        "name": "arg0",
-        "type": "int128"
+        name: '',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    name: 'points_type_weight',
+    inputs: [
+      {
+        name: 'arg0',
+        type: 'int128',
       },
       {
-        "name": "arg1",
-        "type": "uint256"
-      }
+        name: 'arg1',
+        type: 'uint256',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "uint256"
-      }
+        name: '',
+        type: 'uint256',
+      },
     ],
   },
   {
-    "stateMutability": "view",
-    "type": "function",
-    "name": "time_type_weight",
-    "inputs": [
+    stateMutability: 'view',
+    type: 'function',
+    name: 'time_type_weight',
+    inputs: [
       {
-        "name": "arg0",
-        "type": "uint256"
-      }
+        name: 'arg0',
+        type: 'uint256',
+      },
     ],
-    "outputs": [
+    outputs: [
       {
-        "name": "",
-        "type": "uint256"
-      }
+        name: '',
+        type: 'uint256',
+      },
     ],
-  }
+  },
 ];

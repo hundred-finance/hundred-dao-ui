@@ -3,7 +3,7 @@
   grid-template-columns: 700px 1fr;
   position: relative;
   box-sizing: border-box;
-  background: #FFF;
+  background: #fff;
 }
 
 .containerDark {
@@ -115,7 +115,6 @@
 .projectsLoadingSpace {
   margin-right: 24px;
 }
-
 
 @media screen and (max-width: 1700px) {
   .cardsContainer {

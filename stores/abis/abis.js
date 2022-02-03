@@ -1,7 +1,7 @@
-import { erc20ABI } from "./erc20ABI";
+import { erc20ABI } from './erc20ABI';
 import { gaugeControllerABI, gaugeControllerV2ABI } from './gaugeControllerABI';
-import { votingEscrowABI } from "./votingEscrowABI";
-import { gaugeABI } from "./gaugeABI";
+import { votingEscrowABI } from './votingEscrowABI';
+import { gaugeABI } from './gaugeABI';
 import { pickleGaugeControllerABI } from './pickleGaugeControllerABI';
 import { sushiswapLPTokenABI } from './sushiswapLPTokenABI';
 import { uniswapLPTokenABI } from './uniswapLPTokenABI';

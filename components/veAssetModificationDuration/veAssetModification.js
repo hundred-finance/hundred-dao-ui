@@ -6,13 +6,7 @@ import { formatCurrency, normalizeDate } from '../../utils';
 import moment from 'moment';
 
 import stores from '../../stores/index.js';
-import {
-  ERROR,
-  INCREASE_LOCK_DURATION,
-  INCREASE_LOCK_DURATION_RETURNED,
-  WITHDRAW,
-  WITHDRAW_RETURNED,
-} from '../../stores/constants';
+import { ERROR, INCREASE_LOCK_DURATION, INCREASE_LOCK_DURATION_RETURNED, WITHDRAW, WITHDRAW_RETURNED } from '../../stores/constants';
 
 import classes from './veAssetModification.module.css';
 
@@ -127,7 +121,8 @@ export default function VeAssetGeneration({ project }) {
         <div className={classes.inputTitleContainer}>
           <div className={classes.inputTitle}>
             <Typography variant="h5" noWrap>
-              Relock for { isLockIncreasePossible(project, selectedDate) ? `(new veHND balance: ${projectedVeHndBalance(project, selectedDate).toFixed(2)})` : ''  }
+              Relock for{' '}
+              {isLockIncreasePossible(project, selectedDate) ? `(new veHND balance: ${projectedVeHndBalance(project, selectedDate).toFixed(2)})` : ''}
             </Typography>
           </div>
         </div>
@@ -135,11 +130,11 @@ export default function VeAssetGeneration({ project }) {
           <FormControlLabel value="month" control={<Radio color="primary" />} label="1 month" labelPlacement="bottom" />
           <FormControlLabel value="year" control={<Radio color="primary" />} label="1 year" labelPlacement="bottom" />
           <FormControlLabel value="2year" control={<Radio color="primary" />} label="2 years" labelPlacement="bottom" />
-          {project?.maxDurationYears === 3 ?
+          {project?.maxDurationYears === 3 ? (
             <FormControlLabel value="3year" control={<Radio color="primary" />} label="3 years" labelPlacement="bottom" />
-            :
+          ) : (
             <FormControlLabel value="years" control={<Radio color="primary" />} label="4 years" labelPlacement="bottom" />
-          }
+          )}
         </RadioGroup>
       </div>
       <div className={classes.textField}>
@@ -147,8 +142,11 @@ export default function VeAssetGeneration({ project }) {
       </div>
       <div className={classes.actionButton}>
         <Button
-          fullWidth disableElevation
-          variant="contained" color="primary" size="large"
+          fullWidth
+          disableElevation
+          variant="contained"
+          color="primary"
+          size="large"
           onClick={onLock}
           disabled={lockLoading || !isLockIncreasePossible(project, selectedDate)}
           className={classes.button}
@@ -161,8 +159,11 @@ export default function VeAssetGeneration({ project }) {
       </div>
       <div className={classes.actionButton}>
         <Button
-          fullWidth disableElevation
-          variant="contained" color="primary" size="large"
+          fullWidth
+          disableElevation
+          variant="contained"
+          color="primary"
+          size="large"
           onClick={onUnlock}
           disabled={lockLoading || !isUnLockPossible(project)}
           className={classes.button}
@@ -175,26 +176,20 @@ export default function VeAssetGeneration({ project }) {
 }
 
 function isLockIncreasePossible(project, selectedDate) {
-  return project &&
-    project.veTokenMetadata &&
-    project.veTokenMetadata.userLocked > 0 &&
-    moment(selectedDate).unix() >= project.veTokenMetadata.userLockEnd
+  return project && project.veTokenMetadata && project.veTokenMetadata.userLocked > 0 && moment(selectedDate).unix() >= project.veTokenMetadata.userLockEnd;
 }
 
 function isUnLockPossible(project) {
-  return project &&
-    project.veTokenMetadata &&
-    project.veTokenMetadata.userLocked > 0 &&
-    moment().unix() >= project.veTokenMetadata.userLockEnd
+  return project && project.veTokenMetadata && project.veTokenMetadata.userLocked > 0 && moment().unix() >= project.veTokenMetadata.userLockEnd;
 }
 
 function projectedVeHndBalance(project, selectedDate) {
-  let oldLockEnd = project.veTokenMetadata.userLockEnd
-  let newLockEnd = moment(selectedDate).unix()
+  let oldLockEnd = project.veTokenMetadata.userLockEnd;
+  let newLockEnd = moment(selectedDate).unix();
   if (newLockEnd > oldLockEnd) {
-    let now = moment().unix()
-    let maxLockEnd = moment().add(4, 'years').unix()
-    return +project.veTokenMetadata.userLocked * (newLockEnd - now) / (maxLockEnd - now)
+    let now = moment().unix();
+    let maxLockEnd = moment().add(4, 'years').unix();
+    return (+project.veTokenMetadata.userLocked * (newLockEnd - now)) / (maxLockEnd - now);
   }
-  return +project.veTokenMetadata.userLocked
+  return +project.veTokenMetadata.userLocked;
 }
