@@ -261,15 +261,13 @@ class Store {
 
     const priceOracleMulticall = new Contract(project.lpPriceOracle, PRICE_ORACLE_ABI);
 
-    const [totalWeight, tokenAddress, nGuages] = await ethcallProvider.all([
+    const [totalWeight, tokenAddress, nGauges] = await ethcallProvider.all([
       gaugeControllerMulticall.get_total_weight(),
       gaugeControllerMulticall.token(),
-      gaugeControllerMulticall.nGuages(),
+      gaugeControllerMulticall.n_gauges(),
     ]);
 
-    // get how many gauges there are
-    // const nGuages = await gaugeControllerContract.methods.nGuages().call();
-    const tmpArr = [...Array(Number(nGuages)).keys()];
+    const tmpArr = [...Array(Number(nGauges)).keys()];
 
     const tokenContract = new Contract(tokenAddress, ERC20_ABI);
     const mirroredVeTokenContract = new Contract(mirroredVeTokenAddress, ERC20_ABI);
@@ -409,19 +407,9 @@ class Store {
   }
 
   async getProjects(payload) {
-    const projects = await this.getProjects();
+    const projects = this.getStore('projects');
 
     this.emitter.emit(PROJECTS_RETURNED, projects);
-  }
-
-  async getProjects() {
-    // ...
-    // get contract where we store projects
-    // get project info
-    // store them into the storage
-
-    // for now just return stored projects
-    return this.getStore('projects');
   }
 
   async getProject(payload) {
@@ -435,7 +423,7 @@ class Store {
       return null;
     }
 
-    const projects = await this.getProjects();
+    const projects = this.getStore('projects');
 
     let project = projects.filter((project) => project.id === payload.content.id);
 
@@ -463,7 +451,7 @@ class Store {
       return null;
     }
 
-    const projects = await this.getProjects();
+    const projects = this.getStore('projects');
 
     let project = projects.filter((project) => project.id === payload.content.id);
 
