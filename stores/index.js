@@ -1,8 +1,8 @@
 import AccountStore from './accountStore';
 import GaugeStore from './gaugeStore';
 
-import {Dispatcher} from 'flux';
-import {EventEmitter} from 'events';
+import { Dispatcher } from 'flux';
+import { EventEmitter } from 'events';
 
 const dispatcher = new Dispatcher();
 const emitter = new EventEmitter();

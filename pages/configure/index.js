@@ -1,26 +1,14 @@
-import { useRouter } from "next/router";
-import { Typography, SvgIcon } from "@material-ui/core";
-import { withTheme } from "@material-ui/core/styles";
-import classes from "./configure.module.css";
+import { useRouter } from 'next/router';
+import { Typography, SvgIcon } from '@material-ui/core';
+import { withTheme } from '@material-ui/core/styles';
+import classes from './configure.module.css';
 
 function YearnIcon(props) {
   const { color, altColor, className, width, height } = props;
   return (
-    <SvgIcon
-      viewBox="0 0 105 37"
-      fill="none"
-      width={width}
-      height={height}
-      className={className}
-    >
-      <path
-        d="M8.14 14.88H13.82V9.32L21.78 0H15.56L11.14 5.14L6.8 0H0L8.14 9.28V14.88Z"
-        fill={color}
-      />
-      <path
-        d="M22.3366 0V14.88H38.9566V11.16H27.9366V9.12H38.5766V5.5H27.9366V3.64H38.7966V0H22.3366Z"
-        fill={color}
-      />
+    <SvgIcon viewBox="0 0 105 37" fill="none" width={width} height={height} className={className}>
+      <path d="M8.14 14.88H13.82V9.32L21.78 0H15.56L11.14 5.14L6.8 0H0L8.14 9.28V14.88Z" fill={color} />
+      <path d="M22.3366 0V14.88H38.9566V11.16H27.9366V9.12H38.5766V5.5H27.9366V3.64H38.7966V0H22.3366Z" fill={color} />
       <path
         d="M52.9373 8.76H47.9973L50.4373 3.64L52.9373 8.76ZM55.9173 14.88H62.1373L54.3573 0H46.7173L39.3573 14.88H45.1173L46.2573 12.48H54.7573L55.9173 14.88Z"
         fill={color}
@@ -29,18 +17,12 @@ function YearnIcon(props) {
         d="M68.4658 3.62H74.9858C76.2658 3.62 76.7058 4.18 76.7058 4.88V4.9C76.7058 5.62 76.2458 6.18 74.9858 6.18H68.4658V3.62ZM68.4658 9.78H73.9058C76.1458 9.78 76.9258 10.66 76.9258 12.36V14.1C76.9258 14.52 76.9658 14.72 77.1058 14.88H82.9058V14.78C82.7658 14.52 82.6258 14.14 82.6258 13.1V10.9C82.6258 8.98 81.4058 7.78 79.5658 7.36C80.6858 7.1 82.5658 6.2 82.5658 4.04V3.82C82.5658 1.4 80.6458 0 76.3058 0H62.7858V14.88H68.4658V9.78Z"
         fill={color}
       />
-      <path
-        d="M84.192 0V14.88H89.832V5.86L99.152 14.88H104.832V0H99.192V8.46L90.552 0H84.192Z"
-        fill={color}
-      />
+      <path d="M84.192 0V14.88H89.832V5.86L99.152 14.88H104.832V0H99.192V8.46L90.552 0H84.192Z" fill={color} />
       <path
         d="M6.9 35.8807V30.1207H5.625V28.9807H6.9V28.0657C6.9 27.3157 7.115 26.7607 7.545 26.4007C7.985 26.0307 8.58 25.8457 9.33 25.8457H10.395V26.9857H9.45C9 26.9857 8.675 27.1007 8.475 27.3307C8.285 27.5507 8.19 27.8857 8.19 28.3357V28.9807H10.395V30.1207H8.19V35.8807H6.9Z"
         fill={color}
       />
-      <path
-        d="M20.7081 28.9807V35.8807H19.4181V28.9807H20.7081ZM19.3131 25.8457H20.8131V27.4057H19.3131V25.8457Z"
-        fill={color}
-      />
+      <path d="M20.7081 28.9807V35.8807H19.4181V28.9807H20.7081ZM19.3131 25.8457H20.8131V27.4057H19.3131V25.8457Z" fill={color} />
       <path
         d="M34.2531 28.7857C34.7231 28.7857 35.1431 28.8607 35.5131 29.0107C35.8931 29.1607 36.2081 29.3707 36.4581 29.6407C36.7181 29.9107 36.9131 30.2307 37.0431 30.6007C37.1831 30.9707 37.2531 31.3757 37.2531 31.8157V35.8807H35.9631V31.9207C35.9631 31.3507 35.8131 30.8857 35.5131 30.5257C35.2131 30.1657 34.7481 29.9857 34.1181 29.9857C33.8381 29.9857 33.5631 30.0407 33.2931 30.1507C33.0331 30.2507 32.8031 30.4007 32.6031 30.6007C32.4031 30.7907 32.2381 31.0307 32.1081 31.3207C31.9881 31.6107 31.9281 31.9357 31.9281 32.2957V35.8807H30.6381V28.9807H31.9281V29.7307C32.1581 29.4507 32.4681 29.2257 32.8581 29.0557C33.2481 28.8757 33.7131 28.7857 34.2531 28.7857Z"
         fill={color}
@@ -71,31 +53,13 @@ function Configure({ theme }) {
   return (
     <div className={classes.configureContainer}>
       <YearnIcon
-        color={
-          (theme.palette.type === "dark"
-          ? true
-          : false)
-            ? "white"
-            : "rgb(33, 37, 41)"
-        }
-        altColor={
-          (theme.palette.type === "dark"
-          ? true
-          : false)
-            ? "rgb(33, 37, 41)"
-            : "white"
-        }
+        color={(theme.palette.type === 'dark' ? true : false) ? 'white' : 'rgb(33, 37, 41)'}
+        altColor={(theme.palette.type === 'dark' ? true : false) ? 'rgb(33, 37, 41)' : 'white'}
         width="123px"
         height="42.3px"
         className={classes.yearnLogo}
       />
-      <div
-        className={
-          theme.palette.type === "light"
-            ? classes["dot-pulse"]
-            : classes["dot-pulse-dark"]
-        }
-      ></div>
+      <div className={theme.palette.type === 'light' ? classes['dot-pulse'] : classes['dot-pulse-dark']}></div>
     </div>
   );
 }

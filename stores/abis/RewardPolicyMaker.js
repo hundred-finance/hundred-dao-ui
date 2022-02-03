@@ -1,1 +1,41 @@
-export const REWARD_POLICY_MAKER_ABI = [{"name":"SetAdmin","inputs":[{"name":"admin","type":"address","indexed":false}],"anonymous":false,"type":"event"},{"stateMutability":"nonpayable","type":"constructor","inputs":[{"name":"_epoch_length","type":"uint256"}],"outputs":[]},{"stateMutability":"view","type":"function","name":"epoch_at","inputs":[{"name":"_timestamp","type":"uint256"}],"outputs":[{"name":"","type":"uint256"}]},{"stateMutability":"view","type":"function","name":"epoch_start_time","inputs":[{"name":"_epoch","type":"uint256"}],"outputs":[{"name":"","type":"uint256"}]},{"stateMutability":"view","type":"function","name":"rate_at","inputs":[{"name":"_timestamp","type":"uint256"}],"outputs":[{"name":"","type":"uint256"}]},{"stateMutability":"view","type":"function","name":"current_epoch","inputs":[],"outputs":[{"name":"","type":"uint256"}]},{"stateMutability":"view","type":"function","name":"future_epoch_time","inputs":[],"outputs":[{"name":"","type":"uint256"}]},{"stateMutability":"view","type":"function","name":"future_epoch_rate","inputs":[],"outputs":[{"name":"","type":"uint256"}]},{"stateMutability":"nonpayable","type":"function","name":"set_admin","inputs":[{"name":"_admin","type":"address"}],"outputs":[]},{"stateMutability":"nonpayable","type":"function","name":"set_rewards_at","inputs":[{"name":"_epoch","type":"uint256"},{"name":"_reward","type":"uint256"}],"outputs":[]},{"stateMutability":"nonpayable","type":"function","name":"set_rewards_starting_at","inputs":[{"name":"_epoch","type":"uint256"},{"name":"_rewards","type":"uint256[10]"}],"outputs":[]},{"stateMutability":"view","type":"function","name":"admin","inputs":[],"outputs":[{"name":"","type":"address"}]},{"stateMutability":"view","type":"function","name":"first_epoch_time","inputs":[],"outputs":[{"name":"","type":"uint256"}]},{"stateMutability":"view","type":"function","name":"epoch_length","inputs":[],"outputs":[{"name":"","type":"uint256"}]},{"stateMutability":"view","type":"function","name":"rewards","inputs":[{"name":"arg0","type":"uint256"}],"outputs":[{"name":"","type":"uint256"}]}]
+export const REWARD_POLICY_MAKER_ABI = [
+  { name: 'SetAdmin', inputs: [{ name: 'admin', type: 'address', indexed: false }], anonymous: false, type: 'event' },
+  { stateMutability: 'nonpayable', type: 'constructor', inputs: [{ name: '_epoch_length', type: 'uint256' }], outputs: [] },
+  { stateMutability: 'view', type: 'function', name: 'epoch_at', inputs: [{ name: '_timestamp', type: 'uint256' }], outputs: [{ name: '', type: 'uint256' }] },
+  {
+    stateMutability: 'view',
+    type: 'function',
+    name: 'epoch_start_time',
+    inputs: [{ name: '_epoch', type: 'uint256' }],
+    outputs: [{ name: '', type: 'uint256' }],
+  },
+  { stateMutability: 'view', type: 'function', name: 'rate_at', inputs: [{ name: '_timestamp', type: 'uint256' }], outputs: [{ name: '', type: 'uint256' }] },
+  { stateMutability: 'view', type: 'function', name: 'current_epoch', inputs: [], outputs: [{ name: '', type: 'uint256' }] },
+  { stateMutability: 'view', type: 'function', name: 'future_epoch_time', inputs: [], outputs: [{ name: '', type: 'uint256' }] },
+  { stateMutability: 'view', type: 'function', name: 'future_epoch_rate', inputs: [], outputs: [{ name: '', type: 'uint256' }] },
+  { stateMutability: 'nonpayable', type: 'function', name: 'set_admin', inputs: [{ name: '_admin', type: 'address' }], outputs: [] },
+  {
+    stateMutability: 'nonpayable',
+    type: 'function',
+    name: 'set_rewards_at',
+    inputs: [
+      { name: '_epoch', type: 'uint256' },
+      { name: '_reward', type: 'uint256' },
+    ],
+    outputs: [],
+  },
+  {
+    stateMutability: 'nonpayable',
+    type: 'function',
+    name: 'set_rewards_starting_at',
+    inputs: [
+      { name: '_epoch', type: 'uint256' },
+      { name: '_rewards', type: 'uint256[10]' },
+    ],
+    outputs: [],
+  },
+  { stateMutability: 'view', type: 'function', name: 'admin', inputs: [], outputs: [{ name: '', type: 'address' }] },
+  { stateMutability: 'view', type: 'function', name: 'first_epoch_time', inputs: [], outputs: [{ name: '', type: 'uint256' }] },
+  { stateMutability: 'view', type: 'function', name: 'epoch_length', inputs: [], outputs: [{ name: '', type: 'uint256' }] },
+  { stateMutability: 'view', type: 'function', name: 'rewards', inputs: [{ name: 'arg0', type: 'uint256' }], outputs: [{ name: '', type: 'uint256' }] },
+];

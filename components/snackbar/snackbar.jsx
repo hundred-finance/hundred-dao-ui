@@ -117,7 +117,8 @@ class MySnackbar extends Component {
         let snackbarMessage = `${message.baseUrl}/tx/${message.hash}`;
 
         actions = [
-          <Button variant="text" size="small" onClick={() => window.open(snackbarMessage, '_blank')}>
+          // the button was missing a key, but not sure if i'm adding the correct key
+          <Button key="close" variant="text" size="small" onClick={() => window.open(snackbarMessage, '_blank')}>
             View
           </Button>,
           <IconButton key="close" aria-label="Close" onClick={this.handleClose}>
@@ -155,7 +156,7 @@ class MySnackbar extends Component {
                 display: 'inline-block',
                 verticalAlign: 'middle',
                 maxWidth: '400px',
-                overflowX: 'hidden'
+                overflowX: 'hidden',
               }}
             >
               <Typography variant="body1" style={{ fontSize: '12px', color: color }}>
