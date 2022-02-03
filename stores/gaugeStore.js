@@ -358,12 +358,12 @@ class Store {
     });
 
     let projectGauges = [];
-    for (let i = 0; i < gauges.length; i++) {
+    for (let i = 0; i < activeGauges.length; i++) {
       let lpPrice = lpTokenUnderlyingInfo[i].price / 10 ** (36 - lpTokens[i].underlyingDecimals);
       let convRate = lpTokenUnderlyingInfo[i].exchangeRate / 1e18;
 
       const gauge = {
-        address: gauges[i],
+        address: activeGauges[i],
         weight: gaugesWeights[i] / 1e18,
         currentEpochRelativeWeight: (gaugesCurrentEpochRelativeWeights[i] * 100) / 1e18,
         nextEpochRelativeWeight: (gaugesNextEpochRelativeWeights[i] * 100) / 1e18,
