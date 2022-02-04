@@ -216,8 +216,12 @@ export default function BoostCalculator({ project }) {
 
         <div className={classes.boost}>
           <div>
-            <Typography>Estimated veHND: {formatCurrency(veTokenForLock(lockAmount, selectedDate))}</Typography>
-            <Typography>Total veHND: {formatCurrency(+project?.veTokenMetadata.totalSupply)}</Typography>
+            <Typography>
+              Estimated {project?.veTokenMetadata.symbol}: {formatCurrency(veTokenForLock(lockAmount, selectedDate))}
+            </Typography>
+            <Typography>
+              Total {project?.veTokenMetadata.symbol}: {formatCurrency(+project?.veTokenMetadata.totalSupply)}
+            </Typography>
             {gauge ? (
               <Typography>
                 Total {gauge.lpToken.underlyingSymbol} staked in gauge: {formatCurrency(gauge.totalStakeBalance)}
