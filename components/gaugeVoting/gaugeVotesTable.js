@@ -386,7 +386,7 @@ export default function EnhancedTable({ project }) {
 
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
-                      {formatCurrency(row.nextEpochGaugeApr) == 0.0
+                      {!project.nextEpochRewardsAreSet
                         ? formatCurrency(row.gaugeApr) + '% -> Pending'
                         : formatCurrency(row.gaugeApr) + '% ->' + formatCurrency(row.nextEpochGaugeApr) + '%'}
                     </Typography>
@@ -406,7 +406,7 @@ export default function EnhancedTable({ project }) {
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
                     <Typography variant="h5" className={classes.textSpaced}>
-                      {formatCurrency(row.nextEpochApr) == 0.0
+                      {!project.nextEpochRewardsAreSet
                         ? formatCurrency(row.apr) + '% -> Pending'
                         : formatCurrency(row.apr) + '% ->' + formatCurrency(row.nextEpochApr) + '%'}
                     </Typography>

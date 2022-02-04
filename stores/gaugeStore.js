@@ -583,7 +583,6 @@ class Store {
         project.veTokenMetadata.balance;
 
       let providedLiquidity = project.gauges[i].balance * project.gauges[i].lpToken.price;
-      let totalProvidedLiquidity = project.gauges[i].totalStakeBalance * project.gauges[i].lpToken.price;
 
       let totalRewards = (currentRewardRate * 365 * 24 * 3600 * project.hndPrice) / 1e18;
       let gaugeRewards = (totalRewards * project.gauges[i].currentEpochRelativeWeight) / 100;
@@ -611,6 +610,8 @@ class Store {
     }
 
     project.userVotesPercent = totalPercentUsed.toFixed(2);
+
+    project.nextEpochRewardsAreSet = +nextEpochRewardRate !== 0;
 
     let newProjects = projects.map((proj) => {
       if (proj.id === project.id) {
