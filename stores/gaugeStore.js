@@ -142,11 +142,11 @@ class Store {
           name: 'Ethereum Kovan testnet',
           url: '',
           chainId: 42,
-          gaugeProxyAddress: '0xd6Cafd6d475A790634a548d7f43a6e420247BA61',
-          mirroredVotingEscrow: '0x44F288e2405D9D62Eb43F5E3f1eD8147bF502A9a',
-          votingEscrow: '0xbeD8EFa1973F6E1fB3515bf94aa760174431b3F8',
+          gaugeProxyAddress: '0x2E08596F46f51d1E88207790270aF2BD94602762',
+          mirroredVotingEscrow: '0xe8b56c41be2b39Db027Fb2e5f826E068A5F73FBe',
+          votingEscrow: '0x08fd5fe792E9d14850Aa3Ca066Dbafbe15c6562C',
           lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
-          rewardPolicyMaker: '0x6aDd45C2759fba789031370a8544A33C33E2335d',
+          rewardPolicyMaker: '0x6D5DD9C36Ac842eEd7Cb85a01FFD8d75C112407e',
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -256,15 +256,16 @@ class Store {
 
     const hndPrice = await this._getHndPrice();
 
-    const gaugeControllerMulticall = new Contract(project.gaugeProxyAddress, GAUGE_CONTROLLER_ABI);
     const veTokenAddress = project.votingEscrow;
+    const gaugeControllerMulticall = new Contract(project.gaugeProxyAddress, GAUGE_CONTROLLER_ABI);
+    const escrowContract = new Contract(project.votingEscrow, VOTING_ESCROW_ABI);
     const mirroredVeTokenAddress = project.mirroredVotingEscrow ? project.mirroredVotingEscrow : veTokenAddress;
 
     const priceOracleMulticall = new Contract(project.lpPriceOracle, PRICE_ORACLE_ABI);
 
     const [totalWeight, tokenAddress, n_gauges] = await ethcallProvider.all([
       gaugeControllerMulticall.get_total_weight(),
-      gaugeControllerMulticall.token(),
+      escrowContract.token(),
       gaugeControllerMulticall.n_gauges(),
     ]);
 
