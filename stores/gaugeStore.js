@@ -351,7 +351,7 @@ class Store {
 
     const lpCalls = [];
     gaugesLPTokens.forEach((lp, index) => {
-      if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge.toLowerCase()) {
+      if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
         const lpContract = new Contract(lp, CTOKEN_ABI);
         lpCalls.push(priceOracleMulticall.getUnderlyingPrice(lp), lpContract.exchangeRateStored(), lpContract.underlying());
       } else {
@@ -362,7 +362,7 @@ class Store {
 
     const lpData = await ethcallProvider.all(lpCalls);
     const lpTokenUnderlyingInfo = gaugesLPTokens.map((lp, index) => {
-      if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge.toLowerCase()) {
+      if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
         const lptokenInfo = lpData.splice(0, 3);
         return { price: lptokenInfo[0], exchangeRate: lptokenInfo[1], underlying: lptokenInfo[2] };
       } else {
@@ -374,7 +374,7 @@ class Store {
     const lpTokensCalls = [];
     gaugesLPTokens.forEach((lp, index) => {
       const lpTokenContract = new Contract(lp, ERC20_ABI);
-      if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge.toLowerCase()) {
+      if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
         const lpUnderlyingTokenContract = new Contract(lpTokenUnderlyingInfo[index].underlying, ERC20_ABI);
         lpTokensCalls.push(
           lpTokenContract.name(),
@@ -392,7 +392,7 @@ class Store {
     const lpTokensData = await ethcallProvider.all(lpTokensCalls);
 
     const lpTokens = gaugesLPTokens.map((gauge, index) => {
-      if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge.toLowerCase()) {
+      if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
         const data = lpTokensData.splice(0, 6);
         return { name: data[0], symbol: data[1], decimals: data[2], balance: data[3], underlyingDecimals: data[4], underlyingSymbol: data[5] };
       } else {
