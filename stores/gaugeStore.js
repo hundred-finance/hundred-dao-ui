@@ -35,9 +35,10 @@ import BigNumber from 'bignumber.js';
 import { PRICE_ORACLE_ABI } from './abis/HundredFinancePriceOracleABI';
 import { CTOKEN_ABI } from './abis/CtokenABI';
 import { REWARD_POLICY_MAKER_ABI } from './abis/RewardPolicyMaker';
-import { NETWORKS_CONFIG } from './connectors';
+import { network, NETWORKS_CONFIG } from './connectors';
 import { Contract, Provider } from 'ethcall';
 import { ethers } from 'ethers';
+import { CETHER_ABI } from './abis/CetherABI';
 
 const fetch = require('node-fetch');
 
@@ -136,6 +137,29 @@ class Store {
           maxDurationYears: 4,
           onload: null,
           multicallAddress: '0x9fdd7e3e2df5998c7866cd2471d7d30e04496dfa',
+        },
+        {
+          type: 'hundredfinance',
+          id: 'hundred-finance-gnosis',
+          name: 'Gnosis',
+          logo: '/gnosis.png',
+          url: '',
+          chainId: 100,
+          gaugeProxyAddress: '0xc3CC9369fcB8491DaD4FA64cE1Fbd3DD2d70034f',
+          mirroredVotingEscrow: '0xFf39252Ce6A8fC5657235EeFEB45702B86c42E8F',
+          votingEscrow: '0x1747D329CB37e0A0f387f24065aDdbc60eAB69DD',
+          rewardPolicyMaker: '0xb4BAfc3d60662De362c0cB0f5e2DE76603Ea77D7',
+          lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
+          nativeTokenGauge: '0xd7f3Bf2085AD32ff95E1bCC408d37F10f6949270',
+          nativeTokenSymbol: 'xDAI',
+          gauges: [],
+          vaults: [],
+          tokenMetadata: {},
+          veTokenMetadata: {},
+          otherTokenMetadata: {},
+          useDays: false,
+          maxDurationYears: 4,
+          onload: null,
         },
         {
           type: 'hundredfinance',
@@ -326,37 +350,55 @@ class Store {
     }
 
     const lpCalls = [];
-    gaugesLPTokens.forEach((lp) => {
-      const lpContract = new Contract(lp, CTOKEN_ABI);
-      lpCalls.push(priceOracleMulticall.getUnderlyingPrice(lp), lpContract.exchangeRateStored(), lpContract.underlying());
+    gaugesLPTokens.forEach((lp, index) => {
+      if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge.toLowerCase()) {
+        const lpContract = new Contract(lp, CTOKEN_ABI);
+        lpCalls.push(priceOracleMulticall.getUnderlyingPrice(lp), lpContract.exchangeRateStored(), lpContract.underlying());
+      } else {
+        const lpContract = new Contract(lp, CETHER_ABI);
+        lpCalls.push(priceOracleMulticall.getUnderlyingPrice(lp), lpContract.exchangeRateStored());
+      }
     });
 
     const lpData = await ethcallProvider.all(lpCalls);
     const lpTokenUnderlyingInfo = gaugesLPTokens.map((lp, index) => {
-      const lptokenInfo = lpData.splice(0, 3);
-      return { price: lptokenInfo[0], exchangeRate: lptokenInfo[1], underlying: lptokenInfo[2] };
+      if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge.toLowerCase()) {
+        const lptokenInfo = lpData.splice(0, 3);
+        return { price: lptokenInfo[0], exchangeRate: lptokenInfo[1], underlying: lptokenInfo[2] };
+      } else {
+        const lptokenInfo = lpData.splice(0, 2);
+        return { price: lptokenInfo[0], exchangeRate: lptokenInfo[1] };
+      }
     });
 
     const lpTokensCalls = [];
     gaugesLPTokens.forEach((lp, index) => {
       const lpTokenContract = new Contract(lp, ERC20_ABI);
-      const lpUnderlyingTokenContract = new Contract(lpTokenUnderlyingInfo[index].underlying, ERC20_ABI);
-
-      lpTokensCalls.push(
-        lpTokenContract.name(),
-        lpTokenContract.symbol(),
-        lpTokenContract.decimals(),
-        lpTokenContract.balanceOf(activeGauges[index]),
-        lpUnderlyingTokenContract.decimals(),
-        lpUnderlyingTokenContract.symbol(),
-      );
+      if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge.toLowerCase()) {
+        const lpUnderlyingTokenContract = new Contract(lpTokenUnderlyingInfo[index].underlying, ERC20_ABI);
+        lpTokensCalls.push(
+          lpTokenContract.name(),
+          lpTokenContract.symbol(),
+          lpTokenContract.decimals(),
+          lpTokenContract.balanceOf(activeGauges[index]),
+          lpUnderlyingTokenContract.decimals(),
+          lpUnderlyingTokenContract.symbol(),
+        );
+      } else {
+        lpTokensCalls.push(lpTokenContract.name(), lpTokenContract.symbol(), lpTokenContract.decimals(), lpTokenContract.balanceOf(activeGauges[index]));
+      }
     });
 
     const lpTokensData = await ethcallProvider.all(lpTokensCalls);
 
     const lpTokens = gaugesLPTokens.map((gauge, index) => {
-      const data = lpTokensData.splice(0, 6);
-      return { name: data[0], symbol: data[1], decimals: data[2], balance: data[3], underlyingDecimals: data[4], underlyingSymbol: data[5] };
+      if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge.toLowerCase()) {
+        const data = lpTokensData.splice(0, 6);
+        return { name: data[0], symbol: data[1], decimals: data[2], balance: data[3], underlyingDecimals: data[4], underlyingSymbol: data[5] };
+      } else {
+        const data = lpTokensData.splice(0, 4);
+        return { name: data[0], symbol: data[1], decimals: data[2], balance: data[3], underlyingDecimals: 18, underlyingSymbol: project.nativeTokenSymbol };
+      }
     });
 
     let projectGauges = [];

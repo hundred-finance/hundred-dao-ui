@@ -8,6 +8,7 @@ const POLLING_INTERVAL = 12000;
 const RPC_URLS = {
   1: 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
   42: 'https://kovan.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+  100: 'https://rpc.xdaichain.com',
   250: 'https://rpc.ftm.tools',
   1285: 'https://rpc.moonriver.moonbeam.network',
   42161: 'https://arb1.arbitrum.io/rpc',
@@ -70,12 +71,23 @@ export const NETWORKS_CONFIG = [
     rpcUrls: ['https://kovan.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
     blockExplorerUrls: ['https://kovan.etherscan.io'],
   },
+  {
+    chainId: '0x64',
+    chainName: 'Gnosis Chain',
+    nativeCurrency: {
+      name: 'xDAI',
+      symbol: 'xDAI',
+      decimals: 18,
+    },
+    rpcUrls: ['https://rpc.xdaichain.com/'],
+    blockExplorerUrls: ['https://blockscout.com/xdai/mainnet/'],
+  },
 ];
 
 export const network = new NetworkConnector({ urls: { 1: RPC_URLS[1] } });
 
 export const injected = new InjectedConnector({
-  supportedChainIds: [1, 42, 250, 42161, 1666600000],
+  supportedChainIds: [1, 42, 100, 250, 42161, 1666600000],
 });
 
 export const walletconnect = new WalletConnectConnector({
