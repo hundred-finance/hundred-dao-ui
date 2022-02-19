@@ -626,8 +626,8 @@ class Store {
       project.gauges[i].rawBalance = gaugesData[i].balanceOf;
 
       project.gauges[i].remainingBalance = userRemainingStake(
-        project.gauges[i].balance,
-        // workingBalanceNormalized,
+        // project.gauges[i].balance,
+        workingBalanceNormalized,
         project.gauges[i].totalStakeBalance,
         veTokenBalance,
         totalVeTokenSupply,
