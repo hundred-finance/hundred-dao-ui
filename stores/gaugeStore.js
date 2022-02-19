@@ -293,26 +293,36 @@ class Store {
       escrowContract.token(),
       gaugeControllerMulticall.n_gauges(),
     ]);
+    console.log('totalWeight ', totalWeight.toString());
+    console.log('tokenAddress ', tokenAddress);
+    console.log('n_gauges ', n_gauges.toString());
 
     // get how many gauges there are
     // const n_gauges = await gaugeControllerContract.methods.n_gauges().call();
     const tmpArr = [...Array(parseInt(n_gauges)).keys()];
+    console.log('tmpArr ', tmpArr);
 
     const tokenContract = new Contract(tokenAddress, ERC20_ABI);
     const mirroredVeTokenContract = new Contract(mirroredVeTokenAddress, ERC20_ABI);
 
     // get all the gauges
     const gaugesCall = [tokenContract.symbol(), tokenContract.decimals(), mirroredVeTokenContract.symbol(), mirroredVeTokenContract.decimals()];
-
+    console.log(gaugesCall);
+    // console.log(tokenContract.symbol());
+    // console.log('decimals', BigNumber.from(tokenContract.decimals()).toString());
     tmpArr.forEach((gauge, idx) => {
       gaugesCall.push(gaugeControllerMulticall.gauges(idx));
     });
 
     let gauges = await ethcallProvider.all(gaugesCall);
+    console.log('gauges', gauges);
+    console.log(typeof gauges);
 
     const metadata = gauges.splice(0, 4);
-    const tokenMetadata = { address: tokenAddress, symbol: metadata[0], decimals: metadata[1] };
-    const veTokenMetadata = { address: mirroredVeTokenAddress, symbol: metadata[2], decimals: metadata[3] };
+    console.log('metadata', metadata);
+
+    const tokenMetadata = { address: tokenAddress, symbol: metadata[0], decimals: metadata[1] }; //HND METADAD
+    const veTokenMetadata = { address: mirroredVeTokenAddress, symbol: metadata[2], decimals: metadata[3] }; //VEHND METADATA
 
     // get the gauge relative weights
 
@@ -578,6 +588,7 @@ class Store {
 
     const gaugesData = project.gauges.map(() => {
       const d = data.splice(0, 5);
+
       return {
         voteWeight: project.mirroredVotingEscrow ? d[0] : d[0].power,
         balanceOf: d[1],
@@ -604,12 +615,19 @@ class Store {
 
     for (let i = 0; i < project.gauges.length; i++) {
       project.gauges[i].balance = (gaugesData[i].balanceOf / 10 ** project.gauges[i].lpToken.underlyingDecimals) * project.gauges[i].lpToken.conversionRate;
-      project.gauges[i].workingBalance = gaugesData[i].workingBalanceOf;
+      project.gauges[i].workingBalance = gaugesData[i].workingBalanceOf; //effective balance after boost applied
+      const boostAppliedAmount = project.gauges[i].workingBalance;
+      const workingBalanceNormalized = (boostAppliedAmount / 10 ** project.gauges[i].lpToken.underlyingDecimals) * project.gauges[i].lpToken.conversionRate;
+      console.log('original balance', project.gauges[i].balance);
+      console.log('boostAppliedAmount', boostAppliedAmount.toString());
+      console.log('workingBalanceNormalized', workingBalanceNormalized);
+
       project.gauges[i].workingSupply = gaugesData[i].workingSupply;
       project.gauges[i].rawBalance = gaugesData[i].balanceOf;
 
       project.gauges[i].remainingBalance = userRemainingStake(
         project.gauges[i].balance,
+        // workingBalanceNormalized,
         project.gauges[i].totalStakeBalance,
         veTokenBalance,
         totalVeTokenSupply,
