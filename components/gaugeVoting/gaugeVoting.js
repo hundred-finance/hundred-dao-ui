@@ -69,6 +69,51 @@ export default function GaugeVoting({ project }) {
     return !gauge || gauge.nextVoteTimestamp === 0 || gauge.nextVoteTimestamp <= moment().unix();
   };
 
+  //10 days cooldown
+  function Countdown() {
+    const timeDiff = () => {
+      let diff = moment.duration(moment.unix(gauge?.nextVoteTimestamp).diff(moment()));
+      let days = Math.trunc(diff.asDays());
+      let hours = Math.trunc(diff.asHours() % 24);
+
+      let minutes = Math.trunc(diff.asMinutes() % 60);
+      let seconds = Math.trunc(diff.asSeconds() % 60);
+
+      let diffString = '';
+
+      if (days) {
+        diffString += `${days}d`;
+      }
+
+      if (hours) {
+        diffString += ` ${hours}h`;
+      }
+
+      if (minutes) {
+        diffString += ` ${minutes}m`;
+      }
+
+      if (seconds) {
+        diffString += ` ${seconds}s`;
+      }
+
+      return diffString;
+    };
+
+    const [timeToNextEpoch, setTimeToNextEpoch] = useState(timeDiff());
+
+    useEffect(() => {
+      const timer = setTimeout(() => setTimeToNextEpoch(timeDiff()), 1000);
+      return () => clearTimeout(timer);
+    });
+
+    return (
+      <div>
+        <Typography variant="h5">Vote begins in {timeToNextEpoch}</Typography>
+      </div>
+    );
+  }
+
   return (
     <Paper elevation={1} className={classes.projectCardContainer}>
       <Typography variant="h3" className={classes.sectionHeader}>
@@ -134,11 +179,7 @@ export default function GaugeVoting({ project }) {
         </div>
         <div className={classes.actionButton}>
           <Button fullWidth disableElevation variant="contained" color="primary" size="large" onClick={onVote} disabled={voteLoading || !canVoteFor(gauge)}>
-            {canVoteFor(gauge) ? (
-              <Typography variant="h5">{voteLoading ? <CircularProgress size={15} /> : 'Vote'}</Typography>
-            ) : (
-              <Typography variant="h5">Vote disabled until {moment.unix(gauge?.nextVoteTimestamp).format('YYYY-MM-DD HH:mm')}</Typography>
-            )}
+            {canVoteFor(gauge) ? <Typography variant="h5">{voteLoading ? <CircularProgress size={15} /> : 'Vote'}</Typography> : <Countdown />}
           </Button>
         </div>
         <div className={classes.calculationResults}>
