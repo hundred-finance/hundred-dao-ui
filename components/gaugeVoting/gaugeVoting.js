@@ -69,6 +69,10 @@ export default function GaugeVoting({ project }) {
     return !gauge || gauge.nextVoteTimestamp === 0 || gauge.nextVoteTimestamp <= moment().unix();
   };
 
+  const isFitForVoting = (gauge) => {
+    return !(project.lendlyGauges && project.lendlyGauges.length === 1 && project.lendlyGauges.find((g) => g.toLowerCase() === gauge.address.toLowerCase()));
+  };
+
   return (
     <Paper elevation={1} className={classes.projectCardContainer}>
       <Typography variant="h3" className={classes.sectionHeader}>
@@ -88,7 +92,7 @@ export default function GaugeVoting({ project }) {
           </div>
           <Autocomplete
             disableClearable={true}
-            options={project?.gauges}
+            options={project?.gauges.filter(isFitForVoting)}
             value={gauge}
             onChange={onGaugeSelectChanged}
             getOptionLabel={(option) => option.lpToken.symbol}
@@ -151,7 +155,7 @@ export default function GaugeVoting({ project }) {
         </div>
         {project?.userVotesPercent > 0 && (
           <div className={classes.gaugeVotesTable}>
-            {project?.gauges?.map((gauge, idx) => {
+            {project?.gauges?.filter(isFitForVoting).map((gauge, idx) => {
               if (!gauge.userVotesPercent || (gauge.userVotesPercent && gauge.userVotesPercent === 0)) {
                 return null;
               }
