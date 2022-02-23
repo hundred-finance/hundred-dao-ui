@@ -607,18 +607,16 @@ class Store {
     for (let i = 0; i < project.gauges.length; i++) {
       project.gauges[i].balance = (gaugesData[i].balanceOf / 10 ** project.gauges[i].lpToken.underlyingDecimals) * project.gauges[i].lpToken.conversionRate;
       project.gauges[i].workingBalance = gaugesData[i].workingBalanceOf; //effective balance after boost applied
-      const boostAppliedAmount = project.gauges[i].workingBalance;
-      const workingBalanceNormalized = (boostAppliedAmount / 10 ** project.gauges[i].lpToken.underlyingDecimals) * project.gauges[i].lpToken.conversionRate;
-
+      const boostValue = project.gauge[i].boost;
       project.gauges[i].workingSupply = gaugesData[i].workingSupply;
       project.gauges[i].rawBalance = gaugesData[i].balanceOf;
 
       project.gauges[i].remainingBalance = userRemainingStake(
-        // project.gauges[i].balance,
-        workingBalanceNormalized,
+        project.gauges[i].balance,
         project.gauges[i].totalStakeBalance,
         veTokenBalance,
         totalVeTokenSupply,
+        boostValue,
       );
 
       const gaugeVotePercent = gaugesData[i].voteWeight / 100;
@@ -1030,9 +1028,9 @@ class Store {
   }
 }
 
-function userRemainingStake(balance, totalBalance, veTokenBalance, totalVeTokenSupply) {
+function userRemainingStake(balance, totalBalance, veTokenBalance, totalVeTokenSupply, boostValue) {
   let currentStake = balance;
-
+  let gaugeBoostValue = boostValue;
   let maxStake = (totalBalance * veTokenBalance) / totalVeTokenSupply;
 
   // console.log(
@@ -1047,7 +1045,7 @@ function userRemainingStake(balance, totalBalance, veTokenBalance, totalVeTokenS
     return 0;
   }
 
-  return maxStake - currentStake;
+  return maxStake / (gaugeBoostValue * 0.4) - currentStake;
 }
 
 function userLiquidityShare(gauge, balance, totalBalance, veTokenBalance, totalVeTokenSupply) {
