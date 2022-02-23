@@ -86,7 +86,9 @@ class Store {
           gaugeProxyAddress: '0xb1c4426C86082D91a6c097fC588E5D5d8dD1f5a8',
           votingEscrow: '0x376020c5B0ba3Fd603d7722381fAA06DA8078d8a',
           lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
+          lendlyPriceOrcle: '0xB9960251609e5b545416E87Abb375303B1162C3E',
           rewardPolicyMaker: '0x772918d032cFd4Ff09Ea7Af623e56E2D8D96bB65',
+          lendlyGauges: ['0x1cF3993EbA538e5f085333c86356622161Dd8C0B'],
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -351,7 +353,11 @@ class Store {
 
     const lpCalls = [];
     gaugesLPTokens.forEach((lp, index) => {
-      if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
+      if (project.lendlyGauges && project.lendlyGauges.find((g) => g.toLowerCase() === activeGauges[index].toLowerCase()) !== undefined) {
+        const lendlyPriceOracleMulticall = new Contract(project.lendlyPriceOrcle, PRICE_ORACLE_ABI);
+        const lpContract = new Contract(lp, CTOKEN_ABI);
+        lpCalls.push(lendlyPriceOracleMulticall.getUnderlyingPrice(lp), lpContract.exchangeRateStored(), lpContract.underlying());
+      } else if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
         const lpContract = new Contract(lp, CTOKEN_ABI);
         lpCalls.push(priceOracleMulticall.getUnderlyingPrice(lp), lpContract.exchangeRateStored(), lpContract.underlying());
       } else {
