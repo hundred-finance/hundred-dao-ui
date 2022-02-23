@@ -109,11 +109,11 @@ export default function BoostCalculator({ project }) {
             options={project?.gauges}
             value={gauge}
             onChange={onGaugeSelectChanged}
-            getOptionLabel={(option) => option.lpToken.symbol}
+            getOptionLabel={(option) => option.lpToken.underlyingSymbol}
             fullWidth={true}
             renderOption={(option, { selected }) => (
               <React.Fragment>
-                <div className={classes.text}>{option.lpToken.symbol}</div>
+                <div className={classes.text}>{option.lpToken.underlyingSymbol}</div>
               </React.Fragment>
             )}
             renderInput={(params) => (
