@@ -606,7 +606,7 @@ class Store {
 
     for (let i = 0; i < project.gauges.length; i++) {
       project.gauges[i].balance = (gaugesData[i].balanceOf / 10 ** project.gauges[i].lpToken.underlyingDecimals) * project.gauges[i].lpToken.conversionRate;
-      project.gauges[i].workingBalance = gaugesData[i].workingBalanceOf; //effective balance after boost applied
+      project.gauges[i].workingBalance = gaugesData[i].workingBalanceOf;
       const boostValue = project.gauge[i].boost;
       project.gauges[i].workingSupply = gaugesData[i].workingSupply;
       project.gauges[i].rawBalance = gaugesData[i].balanceOf;
