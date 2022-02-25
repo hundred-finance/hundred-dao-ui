@@ -1069,8 +1069,6 @@ class Store {
 }
 
 function userRemainingStake(balance, totalBalance, veTokenBalance, totalVeTokenSupply) {
-  let currentStake = balance;
-
   let maxStake = (totalBalance * veTokenBalance) / totalVeTokenSupply;
 
   // console.log(
@@ -1081,11 +1079,11 @@ function userRemainingStake(balance, totalBalance, veTokenBalance, totalVeTokenS
   //   maxStake.toString()
   // )
 
-  if (currentStake > maxStake) {
+  if (balance > maxStake) {
     return 0;
   }
 
-  return maxStake - currentStake;
+  return maxStake / (gaugeBoostValue * 0.4) - balance;
 }
 
 function userLiquidityShare(gauge, balance, totalBalance, veTokenBalance, totalVeTokenSupply) {
