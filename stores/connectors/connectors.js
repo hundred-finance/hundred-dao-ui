@@ -7,6 +7,7 @@ import { NetworkConnector } from '@web3-react/network-connector';
 const POLLING_INTERVAL = 12000;
 const RPC_URLS = {
   1: 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+  10: 'https://mainnet.optimism.io',
   42: 'https://kovan.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
   100: 'https://rpc.xdaichain.com',
   250: 'https://rpc.ftm.tools',
@@ -82,12 +83,23 @@ export const NETWORKS_CONFIG = [
     rpcUrls: ['https://rpc.xdaichain.com/'],
     blockExplorerUrls: ['https://blockscout.com/xdai/mainnet/'],
   },
+  {
+    chainId: '0xa',
+    chainName: 'Optimism Chain',
+    nativeCurrency: {
+      name: 'OETH',
+      symbol: 'OETH',
+      decimals: 18,
+    },
+    rpcUrls: ['https://mainnet.optimism.io'],
+    blockExplorerUrls: ['https://optimistic.etherscan.io'],
+  },
 ];
 
 export const network = new NetworkConnector({ urls: { 1: RPC_URLS[1] } });
 
 export const injected = new InjectedConnector({
-  supportedChainIds: [1, 42, 100, 250, 42161, 1666600000],
+  supportedChainIds: [1, 10, 42, 100, 250, 42161, 1666600000],
 });
 
 export const walletconnect = new WalletConnectConnector({
