@@ -103,10 +103,14 @@ class Store {
           logo: '/fantom.png',
           url: '',
           chainId: 250,
-          gaugeProxyAddress: '0x788ac705a7b67562cdd1913b67ee091785fa4f68',
+          gaugeProxyAddress: '0x198618d2aa6cBC89Ea24550fE896D4afa28CD635',
+          mirroredVotingEscrow: '0x6c63287CC629417E96b77DD7184748Bb6536A4e2',
           votingEscrow: '0x376020c5B0ba3Fd603d7722381fAA06DA8078d8a',
-          lpPriceOracle: '0xB9960251609e5b545416E87Abb375303B1162C3E',
-          rewardPolicyMaker: '0xbeD8EFa1973F6E1fB3515bf94aa760174431b3F8',
+          lpPriceOracles: [
+            { lp: '0x2084dCB19D498b8Eb4f1021B14A34308c077cf94', oracle: '0x4dCd0BF94E3b02fda9E3ca6d023E777392Cd5C63' },
+            { lp: '0xA33138a5A6A32d12b2Ac7Fc261378d6C6AB2eF90', oracle: '0xB9960251609e5b545416E87Abb375303B1162C3E' },
+          ],
+          rewardPolicyMaker: '0x9A9C7C065efcd4A8FfBF3d97882BbcaEd4eB2910',
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -327,8 +331,6 @@ class Store {
     const escrowContract = new Contract(project.votingEscrow, VOTING_ESCROW_ABI);
     const mirroredVeTokenAddress = project.mirroredVotingEscrow ? project.mirroredVotingEscrow : veTokenAddress;
 
-    const priceOracleMulticall = new Contract(project.lpPriceOracle, PRICE_ORACLE_ABI);
-
     const [totalWeight, tokenAddress, n_gauges] = await ethcallProvider.all([
       gaugeControllerMulticall.get_total_weight(),
       escrowContract.token(),
@@ -392,6 +394,7 @@ class Store {
 
     const lpCalls = [];
     gaugesLPTokens.forEach((lp, index) => {
+      const priceOracleMulticall = new Contract(lpPriceOracle(project, lp), PRICE_ORACLE_ABI);
       if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
         const lpContract = new Contract(lp, CTOKEN_ABI);
         lpCalls.push(priceOracleMulticall.getUnderlyingPrice(lp), lpContract.exchangeRateStored(), lpContract.underlying());
@@ -1103,6 +1106,13 @@ function userAppliedBoost(gauge) {
 
 function userAppliedLiquidityShare(gauge) {
   return gauge.workingBalance / gauge.workingSupply;
+}
+
+function lpPriceOracle(project, token) {
+  if (project.lpPriceOracles) {
+    return project.lpPriceOracles.find((o) => o.lp.toLowerCase() === token.toLowerCase()).oracle;
+  }
+  return project.lpPriceOracle;
 }
 
 export default Store;
