@@ -6,6 +6,7 @@ import { Typography, Paper } from '@material-ui/core';
 import Layout from '../../../components/layout/layout.js';
 import Balances from '../../../components/balances';
 import LockDurationChart from '../../../components/lockDuration';
+import Mirror from '../../../components/mirror';
 
 import VeAssetGeneration from '../../../components/veAssetGeneration';
 import VeAssetModificationAmount from '../../../components/veAssetModificationAmount';
@@ -27,6 +28,7 @@ import {
   CONFIGURE_RETURNED,
   CONNECT_WALLET,
   CONFIGURE_GAUGES,
+  GET_LOCKS,
 } from '../../../stores/constants';
 
 import PieChart from '../../../components/gaugeVoting/pieChart';
@@ -45,6 +47,7 @@ function Projects({ changeTheme }) {
 
   useEffect(function () {
     const projectReturned = (proj) => {
+      stores.dispatcher.dispatch({ type: GET_LOCKS, project: proj });
       setProject(proj);
       if (proj?.onload) {
         proj.onload();
@@ -107,7 +110,7 @@ function Projects({ changeTheme }) {
 
       <div className={classes.projectContainer}>
         <Balances project={project} />
-
+        {isMirroringAvailable(project) ? <Mirror project={project} /> : ''}
         <div className={classes.projectCardContainer2EqualColumns}>
           <Paper elevation={1} className={classes.ChartContainer}>
             <Typography variant="h3">Current Vote weighting</Typography>
@@ -157,6 +160,10 @@ function Projects({ changeTheme }) {
 
 function isLockIncreasePossible(project) {
   return project && project.veTokenMetadata && project.veTokenMetadata.userLocked > 0;
+}
+
+function isMirroringAvailable(project) {
+  return project?.merkleMirror !== undefined;
 }
 
 export default Projects;

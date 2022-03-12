@@ -26,6 +26,7 @@ import {
   WITHDRAW_RETURNED,
   APPLY_BOOST,
   APPLY_BOOST_RETURNED,
+  GET_LOCKS,
 } from './constants';
 
 import { ERC20_ABI, GAUGE_CONTROLLER_ABI, GAUGE_ABI, VOTING_ESCROW_ABI, GAUGE_CONTROLLER_V2_ABI } from './abis';
@@ -152,6 +153,7 @@ class Store {
           votingEscrow: '0x243E33aa7f6787154a8E59d3C27a66db3F8818ee',
           rewardPolicyMaker: '0x371F3AD36072230424C828629d53B0Dbd93c8273',
           lpPriceOracle: '0x10010069de6bd5408a6ded075cf6ae2498073c73',
+          merkleMirror: '0x77d2bA154F0fE170Fc8C6F7bfE8c156dFD1C1e8d',
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -174,6 +176,7 @@ class Store {
           votingEscrow: '0xf64E1a3eF0d2F5659dC4c10983e595B797C6ecA4',
           rewardPolicyMaker: '0x89Aa51685a2B658be8a7b9C3Af70D66557544181',
           lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
+          merkleMirror: '0x3a8609840b47e8bd4fc0108e2cdcd88ae30c4ff2',
           nativeTokenGauge: '0x7BFE7b45c8019DEDc66c695Ac70b8fc2c0421584',
           nativeTokenSymbol: 'xDAI',
           gauges: [],
@@ -197,6 +200,7 @@ class Store {
           votingEscrow: '0x1F8e8472e124F58b7F0D2598EaE3F4f482780b09',
           rewardPolicyMaker: '0x3ffd03Ef31F6D5A6C517CEFA9CDf43efEBeE8399',
           lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
+          merkleMirror: '0xF191d17dEe9943F06bB784C0492805280AeE0bf9',
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -303,7 +307,6 @@ class Store {
         const updatedProjects = projects.filter((p) => p.chainId !== chainId).concat(project);
 
         this.setStore({ projects: updatedProjects, configured: true });
-
         this.emitter.emit(GAUGES_CONFIGURED);
       },
     );
@@ -651,12 +654,14 @@ class Store {
       project.gauges[i].workingBalance = gaugesData[i].workingBalanceOf;
       project.gauges[i].workingSupply = gaugesData[i].workingSupply;
       project.gauges[i].rawBalance = gaugesData[i].balanceOf;
+      project.gauges[i].boost = userBoost(project.gauges[i], veTokenBalance, totalVeTokenSupply);
 
       project.gauges[i].remainingBalance = userRemainingStake(
         project.gauges[i].balance,
         project.gauges[i].totalStakeBalance,
         veTokenBalance,
         totalVeTokenSupply,
+        project.gauges[i].boost,
       );
 
       const gaugeVotePercent = gaugesData[i].voteWeight / 100;
@@ -664,7 +669,7 @@ class Store {
       totalPercentUsed = totalPercentUsed + gaugeVotePercent;
 
       project.gauges[i].liquidityShare = userAppliedLiquidityShare(project.gauges[i]);
-      project.gauges[i].boost = userBoost(project.gauges[i], veTokenBalance, totalVeTokenSupply);
+
       project.gauges[i].appliedBoost = userAppliedBoost(project.gauges[i]);
       project.gauges[i].needVeHndForMaxBoost =
         (project.gauges[i].balance * project.veTokenMetadata.totalSupply) / (project.gauges[i].totalStakeBalance - project.gauges[i].balance) -
@@ -1068,22 +1073,14 @@ class Store {
   }
 }
 
-function userRemainingStake(balance, totalBalance, veTokenBalance, totalVeTokenSupply) {
+function userRemainingStake(balance, totalBalance, veTokenBalance, totalVeTokenSupply, boost) {
   let maxStake = (totalBalance * veTokenBalance) / totalVeTokenSupply;
-
-  // console.log(
-  //   balance.toString(),
-  //   totalBalance.toString(),
-  //   veTokenBalance.toString(),
-  //   totalVeTokenSupply.toString(),
-  //   maxStake.toString()
-  // )
 
   if (balance > maxStake) {
     return 0;
   }
 
-  return maxStake / (gaugeBoostValue * 0.4) - balance;
+  return maxStake / (boost * 0.4) - balance;
 }
 
 function userLiquidityShare(gauge, balance, totalBalance, veTokenBalance, totalVeTokenSupply) {

@@ -61,3 +61,9 @@ export const INCREASE_LOCK_DURATION = 'INCREASE_LOCK_DURATION';
 export const INCREASE_LOCK_DURATION_RETURNED = 'INCREASE_LOCK_DURATION_RETURNED';
 
 export const MAX_UINT256 = new BigNumber(2).pow(256).minus(1).toFixed(0);
+
+// Mirrors
+
+export const MIRRORS_UPDATED = 'MIRRORS_UPDATED';
+export const MIRROR_LOCKS = 'MIRROR_LOCKS';
+export const GET_LOCKS = 'GET_LOCKS';
