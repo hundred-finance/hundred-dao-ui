@@ -34,9 +34,11 @@
 
 .actionButton {
   display: flex;
-  align-items: center;
+  align-content: center;
   justify-content: center;
-  margin: 24px -12px;
+  flex-direction: column;
+  gap: 10px;
+  margin: 24px 10px 24px -12px;
 }
 
 .sectionHeader {
