@@ -6,12 +6,13 @@ import { formatCurrency, normalizeDate } from '../../utils';
 import moment from 'moment';
 
 import stores from '../../stores/index.js';
-import { ERROR, LOCK, LOCK_RETURNED, APPROVE_LOCK, APPROVE_LOCK_RETURNED } from '../../stores/constants';
+import { ERROR, LOCK, LOCK_RETURNED, APPROVE_LOCK, APPROVE_LOCK_RETURNED, GET_PROJECT } from '../../stores/constants';
 
 import classes from './veAssetGeneration.module.css';
 
 export default function VeAssetGeneration({ project }) {
   const [approveLoading, setApproveLoading] = useState(false);
+  const [revokeApproveLoading, setRevokeApproveLoading] = useState(false);
   const [lockLoading, setLockLoading] = useState(false);
 
   const [amount, setAmount] = useState('');
@@ -24,6 +25,9 @@ export default function VeAssetGeneration({ project }) {
     const lockReturned = () => {
       setLockLoading(false);
       setApproveLoading(false);
+      setRevokeApproveLoading(false);
+
+      stores.dispatcher.dispatch({ type: GET_PROJECT, content: { id: project.id } });
     };
 
     stores.emitter.on(LOCK_RETURNED, lockReturned);
@@ -117,6 +121,13 @@ export default function VeAssetGeneration({ project }) {
     }
   };
 
+  const onRevokeApprove = () => {
+    setAmountError(false);
+    setSelectedDateError(false);
+    setRevokeApproveLoading(true);
+    stores.dispatcher.dispatch({ type: APPROVE_LOCK, content: { amount: BigNumber(0), project } });
+  };
+
   return (
     <Paper elevation={1} className={classes.projectCardContainer}>
       <Typography variant="h2" className={classes.sectionHeader}>
@@ -204,6 +215,18 @@ export default function VeAssetGeneration({ project }) {
       </div>
 
       <div className={classes.actionButton}>
+        <Button
+          fullWidth
+          disableElevation
+          variant="contained"
+          color="primary"
+          size="large"
+          onClick={onRevokeApprove}
+          disabled={revokeApproveLoading || BigNumber(project?.tokenMetadata?.allowance).eq(BigNumber(0))}
+          className={classes.button}
+        >
+          <Typography variant="h5">{revokeApproveLoading ? <CircularProgress size={15} /> : `Revoke approve for ${project?.tokenMetadata?.symbol}`}</Typography>
+        </Button>
         <Button
           fullWidth
           disableElevation

@@ -6,12 +6,13 @@ import { formatCurrency } from '../../utils';
 import moment from 'moment';
 import { ethers } from 'ethers';
 import stores from '../../stores/index.js';
-import { ERROR, INCREASE_LOCK_AMOUNT, INCREASE_LOCK_AMOUNT_RETURNED, APPROVE_LOCK, APPROVE_LOCK_RETURNED } from '../../stores/constants';
+import { ERROR, INCREASE_LOCK_AMOUNT, INCREASE_LOCK_AMOUNT_RETURNED, APPROVE_LOCK, APPROVE_LOCK_RETURNED, GET_PROJECT } from '../../stores/constants';
 
 import classes from './veAssetModification.module.css';
 
 export default function VeAssetGeneration({ project }) {
   const [approveLoading, setApproveLoading] = useState(false);
+  const [revokeApproveLoading, setRevokeApproveLoading] = useState(false);
   const [lockLoading, setLockLoading] = useState(false);
 
   const [amount, setAmount] = useState('');
@@ -22,6 +23,9 @@ export default function VeAssetGeneration({ project }) {
     const lockReturned = () => {
       setLockLoading(false);
       setApproveLoading(false);
+      setRevokeApproveLoading(false);
+
+      stores.dispatcher.dispatch({ type: GET_PROJECT, content: { id: project.id } });
     };
 
     stores.emitter.on(INCREASE_LOCK_AMOUNT_RETURNED, lockReturned);
@@ -72,8 +76,15 @@ export default function VeAssetGeneration({ project }) {
 
     if (!error) {
       setApproveLoading(true);
-      stores.dispatcher.dispatch({ type: APPROVE_LOCK, content: { amount: 'max', project } });
+      stores.dispatcher.dispatch({ type: APPROVE_LOCK, content: { amount: amount, project } });
     }
+  };
+
+  const onRevokeApprove = () => {
+    setAmountError(false);
+    setSelectedDateError(false);
+    setRevokeApproveLoading(true);
+    stores.dispatcher.dispatch({ type: APPROVE_LOCK, content: { amount: BigNumber(0), project } });
   };
 
   return (
@@ -120,6 +131,20 @@ export default function VeAssetGeneration({ project }) {
         />
       </div>
       <div className={classes.actionButton}>
+        <Button
+          fullWidth
+          disableElevation
+          variant="contained"
+          color="primary"
+          size="large"
+          onClick={onRevokeApprove}
+          disabled={approveLoading || BigNumber(project?.tokenMetadata?.allowance).eq(BigNumber(0))}
+          className={classes.button}
+        >
+          <Typography variant="h5">
+            {revokeApproveLoading ? <CircularProgress size={15} /> : `Revoke Approval for ${project?.tokenMetadata?.symbol}`}
+          </Typography>
+        </Button>
         <Button
           fullWidth
           disableElevation
