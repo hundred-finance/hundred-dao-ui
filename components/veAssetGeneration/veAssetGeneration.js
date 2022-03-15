@@ -117,7 +117,13 @@ export default function VeAssetGeneration({ project }) {
 
     if (!error) {
       setApproveLoading(true);
-      stores.dispatcher.dispatch({ type: APPROVE_LOCK, content: { amount: 'max', project } });
+      stores.dispatcher.dispatch({
+        type: APPROVE_LOCK,
+        content: {
+          amount: project?.isV1Escrow ? amount : 'max',
+          project,
+        },
+      });
     }
   };
 
@@ -215,18 +221,24 @@ export default function VeAssetGeneration({ project }) {
       </div>
 
       <div className={classes.actionButton}>
-        <Button
-          fullWidth
-          disableElevation
-          variant="contained"
-          color="primary"
-          size="large"
-          onClick={onRevokeApprove}
-          disabled={revokeApproveLoading || BigNumber(project?.tokenMetadata?.allowance).eq(BigNumber(0))}
-          className={classes.button}
-        >
-          <Typography variant="h5">{revokeApproveLoading ? <CircularProgress size={15} /> : `Revoke approve for ${project?.tokenMetadata?.symbol}`}</Typography>
-        </Button>
+        {project?.isV1Escrow ? (
+          <Button
+            fullWidth
+            disableElevation
+            variant="contained"
+            color="primary"
+            size="large"
+            onClick={onRevokeApprove}
+            disabled={revokeApproveLoading || BigNumber(project?.tokenMetadata?.allowance).eq(BigNumber(0))}
+            className={classes.button}
+          >
+            <Typography variant="h5">
+              {revokeApproveLoading ? <CircularProgress size={15} /> : `Revoke approve for ${project?.tokenMetadata?.symbol}`}
+            </Typography>
+          </Button>
+        ) : (
+          ''
+        )}
         <Button
           fullWidth
           disableElevation
