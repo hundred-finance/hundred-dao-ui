@@ -32,14 +32,6 @@ export default function GaugeVoting({ project }) {
     };
   }, []);
 
-  const setAmountPercent = (percent) => {
-    if (!project || !project.tokenMetadata) {
-      return;
-    }
-
-    setAmount(project.tokenMetadata.balance.times(BigNumber(percent).div(BigNumber(100))).toFixed(project.tokenMetadata.decimals));
-  };
-
   const onGaugeSelectChanged = (event, theOption) => {
     setGauge(theOption);
   };
@@ -53,7 +45,7 @@ export default function GaugeVoting({ project }) {
       setGaugeError(true);
       error = true;
     }
-    if (!amount || amount === '' || isNaN(amount) || amount > 100 || amount < 0) {
+    if (amount === undefined || isNaN(amount) || amount > 100 || amount < 0) {
       setAmountError(true);
       error = true;
     }
