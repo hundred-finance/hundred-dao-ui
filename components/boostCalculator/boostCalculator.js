@@ -106,7 +106,7 @@ export default function BoostCalculator({ project }) {
           </div>
           <Autocomplete
             disableClearable={true}
-            options={project?.gauges}
+            options={project?.gauges.filter((g) => !g.isKilled)}
             value={gauge}
             onChange={onGaugeSelectChanged}
             getOptionLabel={(option) => option.lpToken.underlyingSymbol}

@@ -136,11 +136,11 @@ export default function GaugeVoting({ project }) {
             options={project?.gauges}
             value={gauge}
             onChange={onGaugeSelectChanged}
-            getOptionLabel={(option) => option.lpToken.symbol}
+            getOptionLabel={(option) => `${option.lpToken.symbol} ${option.isKilled ? '(inactive)' : ''}`}
             fullWidth={true}
             renderOption={(option, { selected }) => (
               <React.Fragment>
-                <div className={classes.text}>{option.lpToken.symbol}</div>
+                <div className={classes.text}>{`${option.lpToken.symbol} ${option.isKilled ? '(inactive)' : ''}`}</div>
               </React.Fragment>
             )}
             renderInput={(params) => (

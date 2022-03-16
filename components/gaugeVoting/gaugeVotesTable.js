@@ -358,9 +358,18 @@ export default function EnhancedTable({ project }) {
     <div className={classes.root}>
       <TableContainer>
         <Table className={classes.table} aria-labelledby="tableTitle" size={'medium'} aria-label="enhanced table">
-          <EnhancedTableHead classes={classes} order={order} orderBy={orderBy} onRequestSort={handleRequestSort} rowCount={project?.gauges.length} />
+          <EnhancedTableHead
+            classes={classes}
+            order={order}
+            orderBy={orderBy}
+            onRequestSort={handleRequestSort}
+            rowCount={project?.gauges.filter((g) => !g.isKilled).length}
+          />
           <TableBody>
-            {stableSort(project?.gauges, getComparator(order, orderBy)).map((row, index) => {
+            {stableSort(
+              project?.gauges.filter((g) => !g.isKilled),
+              getComparator(order, orderBy),
+            ).map((row, index) => {
               if (!row) {
                 return null;
               }

@@ -388,24 +388,21 @@ class Store {
     const gaugesCurrentEpochRelativeWeights = [];
     const gaugesNextEpochRelativeWeights = [];
     const gaugesLPTokens = [];
-    const activeGauges = [];
+    const isGaugeKilled = [];
 
     for (let i = 0; i < gauges.length; i++) {
       const data = gaugesData.splice(0, 5);
-      const isGaugeKilled = data[4];
-      if (!isGaugeKilled) {
-        gaugesWeights.push(data[0]);
-        gaugesCurrentEpochRelativeWeights.push(data[1]);
-        gaugesNextEpochRelativeWeights.push(data[2]);
-        gaugesLPTokens.push(data[3]);
-        activeGauges.push(gauges[i]);
-      }
+      isGaugeKilled.push(data[4]);
+      gaugesWeights.push(data[0]);
+      gaugesCurrentEpochRelativeWeights.push(data[1]);
+      gaugesNextEpochRelativeWeights.push(data[2]);
+      gaugesLPTokens.push(data[3]);
     }
 
     const lpCalls = [];
     gaugesLPTokens.forEach((lp, index) => {
       const priceOracleMulticall = new Contract(lpPriceOracle(project, lp), PRICE_ORACLE_ABI);
-      if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
+      if (gauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
         const lpContract = new Contract(lp, CTOKEN_ABI);
         lpCalls.push(priceOracleMulticall.getUnderlyingPrice(lp), lpContract.exchangeRateStored(), lpContract.underlying());
       } else {
@@ -416,7 +413,7 @@ class Store {
 
     const lpData = await ethcallProvider.all(lpCalls);
     const lpTokenUnderlyingInfo = gaugesLPTokens.map((lp, index) => {
-      if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
+      if (gauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
         const lptokenInfo = lpData.splice(0, 3);
         return { price: lptokenInfo[0], exchangeRate: lptokenInfo[1], underlying: lptokenInfo[2] };
       } else {
@@ -428,25 +425,25 @@ class Store {
     const lpTokensCalls = [];
     gaugesLPTokens.forEach((lp, index) => {
       const lpTokenContract = new Contract(lp, ERC20_ABI);
-      if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
+      if (gauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
         const lpUnderlyingTokenContract = new Contract(lpTokenUnderlyingInfo[index].underlying, ERC20_ABI);
         lpTokensCalls.push(
           lpTokenContract.name(),
           lpTokenContract.symbol(),
           lpTokenContract.decimals(),
-          lpTokenContract.balanceOf(activeGauges[index]),
+          lpTokenContract.balanceOf(gauges[index]),
           lpUnderlyingTokenContract.decimals(),
           lpUnderlyingTokenContract.symbol(),
         );
       } else {
-        lpTokensCalls.push(lpTokenContract.name(), lpTokenContract.symbol(), lpTokenContract.decimals(), lpTokenContract.balanceOf(activeGauges[index]));
+        lpTokensCalls.push(lpTokenContract.name(), lpTokenContract.symbol(), lpTokenContract.decimals(), lpTokenContract.balanceOf(gauges[index]));
       }
     });
 
     const lpTokensData = await ethcallProvider.all(lpTokensCalls);
 
     const lpTokens = gaugesLPTokens.map((gauge, index) => {
-      if (activeGauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
+      if (gauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
         const data = lpTokensData.splice(0, 6);
         return { name: data[0], symbol: data[1], decimals: data[2], balance: data[3], underlyingDecimals: data[4], underlyingSymbol: data[5] };
       } else {
@@ -456,12 +453,12 @@ class Store {
     });
 
     let projectGauges = [];
-    for (let i = 0; i < activeGauges.length; i++) {
+    for (let i = 0; i < gauges.length; i++) {
       let lpPrice = lpTokenUnderlyingInfo[i].price / 10 ** (36 - lpTokens[i].underlyingDecimals);
       let convRate = lpTokenUnderlyingInfo[i].exchangeRate / 1e18;
 
       const gauge = {
-        address: activeGauges[i],
+        address: gauges[i],
         weight: gaugesWeights[i] / 1e18,
         currentEpochRelativeWeight: (gaugesCurrentEpochRelativeWeights[i] * 100) / 1e18,
         nextEpochRelativeWeight: (gaugesNextEpochRelativeWeights[i] * 100) / 1e18,
@@ -478,6 +475,7 @@ class Store {
           price: lpPrice,
           conversionRate: convRate,
         },
+        isKilled: isGaugeKilled[i],
       };
 
       projectGauges.push(gauge);
