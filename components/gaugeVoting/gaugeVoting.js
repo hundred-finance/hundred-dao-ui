@@ -199,7 +199,9 @@ export default function GaugeVoting({ project }) {
 
               return (
                 <div className={classes.vote_line} key={'gauge' + idx}>
-                  <Typography variant="h5">{gauge.lpToken.name}</Typography>
+                  <Typography variant="h5">
+                    {gauge.lpToken.name} {`${gauge.isKilled ? '(inactive)' : ''}`}
+                  </Typography>
                   <Typography variant="h5" className={classes.calculationResult}>
                     {formatCurrency(gauge.userVotesPercent)}%
                   </Typography>
