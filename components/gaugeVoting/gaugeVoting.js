@@ -65,8 +65,8 @@ export default function GaugeVoting({ project }) {
     }
   };
 
-  const canVoteFor = (gauge) => {
-    return !gauge || gauge.nextVoteTimestamp === 0 || gauge.nextVoteTimestamp <= moment().unix();
+  const canVoteFor = (project, gauge) => {
+    return !project.isV1Controller || !gauge || gauge.nextVoteTimestamp === 0 || gauge.nextVoteTimestamp <= moment().unix();
   };
 
   //10 days cooldown
@@ -178,8 +178,16 @@ export default function GaugeVoting({ project }) {
           />
         </div>
         <div className={classes.actionButton}>
-          <Button fullWidth disableElevation variant="contained" color="primary" size="large" onClick={onVote} disabled={voteLoading || !canVoteFor(gauge)}>
-            {canVoteFor(gauge) ? <Typography variant="h5">{voteLoading ? <CircularProgress size={15} /> : 'Vote'}</Typography> : <Countdown />}
+          <Button
+            fullWidth
+            disableElevation
+            variant="contained"
+            color="primary"
+            size="large"
+            onClick={onVote}
+            disabled={voteLoading || !canVoteFor(project, gauge)}
+          >
+            {canVoteFor(project, gauge) ? <Typography variant="h5">{voteLoading ? <CircularProgress size={15} /> : 'Vote'}</Typography> : <Countdown />}
           </Button>
         </div>
         <div className={classes.calculationResults}>
