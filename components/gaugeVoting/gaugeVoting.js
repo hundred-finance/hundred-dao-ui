@@ -66,7 +66,7 @@ export default function GaugeVoting({ project }) {
   };
 
   const canVoteFor = (project, gauge) => {
-    return !project.isV1Controller || !gauge || gauge.nextVoteTimestamp === 0 || gauge.nextVoteTimestamp <= moment().unix();
+    return !project?.isV1Controller || !gauge || gauge.nextVoteTimestamp === 0 || gauge.nextVoteTimestamp <= moment().unix();
   };
 
   //10 days cooldown
