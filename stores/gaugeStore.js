@@ -89,6 +89,7 @@ class Store {
           gaugeProxyAddress: '0xb1c4426C86082D91a6c097fC588E5D5d8dD1f5a8',
           votingEscrow: '0x376020c5B0ba3Fd603d7722381fAA06DA8078d8a',
           lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
+          lpPriceOracles: [{ lp: '0xa33138a5a6a32d12b2ac7fc261378d6c6ab2ef90', oracle: '0xB9960251609e5b545416E87Abb375303B1162C3E' }],
           rewardPolicyMaker: '0x772918d032cFd4Ff09Ea7Af623e56E2D8D96bB65',
           isV1Escrow: true,
           isV1Controller: true,
@@ -1116,10 +1117,17 @@ function userAppliedLiquidityShare(gauge) {
 }
 
 function lpPriceOracle(project, token) {
+  let oracle = undefined;
+
   if (project.lpPriceOracles) {
-    return project.lpPriceOracles.find((o) => o.lp.toLowerCase() === token.toLowerCase()).oracle;
+    oracle = project.lpPriceOracles.find((o) => o.lp.toLowerCase() === token.toLowerCase())?.oracle;
   }
-  return project.lpPriceOracle;
+
+  if (!oracle) {
+    oracle = project.lpPriceOracle;
+  }
+
+  return oracle;
 }
 
 export default Store;
