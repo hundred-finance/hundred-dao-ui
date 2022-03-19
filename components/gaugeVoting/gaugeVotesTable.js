@@ -401,7 +401,7 @@ export default function EnhancedTable({ project }) {
                     </Typography>
                   </TableCell>
                   <TableCell className={classes.cell} align="right">
-                    {row.remainingBalance > 0 || row.appliedBoost === 2.5 ? (
+                    {row.remainingBalance > 0 ? (
                       displayStakeAtMaxBoost(row)
                     ) : (
                       <Typography variant="h5" className={classes.textSpaced}>

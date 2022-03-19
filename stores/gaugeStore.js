@@ -1093,6 +1093,10 @@ function userRemainingStake(balance, totalBalance, veTokenBalance, totalVeTokenS
     return 0;
   }
 
+  if ((isNaN(boost) || boost === 0) && balance === 0) {
+    return maxStake;
+  }
+
   return maxStake / (boost * 0.4) - balance;
 }
 
