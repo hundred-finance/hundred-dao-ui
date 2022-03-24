@@ -10,6 +10,7 @@ const RPC_URLS = {
   10: 'https://mainnet.optimism.io',
   42: 'https://kovan.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
   100: 'https://rpc.xdaichain.com',
+  137: 'https://rpc-mainnet.matic.network',
   250: 'https://rpc.ftm.tools',
   1285: 'https://rpc.moonriver.moonbeam.network',
   42161: 'https://arb1.arbitrum.io/rpc',
@@ -93,6 +94,24 @@ export const NETWORKS_CONFIG = [
     },
     rpcUrls: ['https://mainnet.optimism.io'],
     blockExplorerUrls: ['https://optimistic.etherscan.io'],
+  },
+  {
+    chainId: '0x89',
+    chainName: 'Polygon',
+    nativeCurrency: {
+      name: 'MATIC',
+      symbol: 'MATIC',
+      decimals: 18,
+    },
+    rpcUrls: [
+      'https://rpc-mainnet.matic.network',
+      'https://rpc-mainnet.maticvigil.com',
+      'https://rpc-mainnet.matic.quiknode.pro',
+      'https://matic-mainnet.chainstacklabs.com',
+      'https://matic-mainnet-full-rpc.bwarelabs.com',
+      'https://matic-mainnet-archive-rpc.bwarelabs.com',
+    ],
+    blockExplorerUrls: ['https://explorer.matic.network', 'https://explorer-mainnet.maticvigil.com/'],
   },
 ];
 
