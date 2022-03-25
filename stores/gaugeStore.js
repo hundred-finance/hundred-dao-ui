@@ -29,7 +29,7 @@ import {
   GET_LOCKS,
 } from './constants';
 
-import { ERC20_ABI, GAUGE_CONTROLLER_ABI, GAUGE_ABI, VOTING_ESCROW_ABI, GAUGE_CONTROLLER_V2_ABI } from './abis';
+import { ERC20_ABI, GAUGE_CONTROLLER_ABI, GAUGE_ABI, VOTING_ESCROW_ABI, GAUGE_CONTROLLER_V2_ABI, BAAM_ABI } from './abis';
 
 import stores from './';
 import BigNumber from 'bignumber.js';
@@ -68,6 +68,7 @@ class Store {
           votingEscrow: '0xBa57440fA35Fdb671E58F6F56c1A4447aB1f6C2B',
           lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
           rewardPolicyMaker: '0x3A4148DDDd121fbceD8717CB7B82370Be27F76bf',
+          isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: true,
           gauges: [],
@@ -91,6 +92,7 @@ class Store {
           lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
           lpPriceOracles: [{ lp: '0xa33138a5a6a32d12b2ac7fc261378d6c6ab2ef90', oracle: '0xB9960251609e5b545416E87Abb375303B1162C3E' }],
           rewardPolicyMaker: '0x772918d032cFd4Ff09Ea7Af623e56E2D8D96bB65',
+          isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: true,
           gauges: [],
@@ -117,6 +119,7 @@ class Store {
             { lp: '0xA33138a5A6A32d12b2Ac7Fc261378d6C6AB2eF90', oracle: '0xB9960251609e5b545416E87Abb375303B1162C3E' },
           ],
           rewardPolicyMaker: '0x9A9C7C065efcd4A8FfBF3d97882BbcaEd4eB2910',
+          isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: false,
           gauges: [],
@@ -139,6 +142,7 @@ class Store {
           votingEscrow: '0xE4e43864ea18d5E5211352a4B810383460aB7fcC',
           lpPriceOracle: '0x10010069de6bd5408a6ded075cf6ae2498073c73',
           rewardPolicyMaker: '0xEdBA32185BAF7fEf9A26ca567bC4A6cbe426e499',
+          isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: true,
           gauges: [],
@@ -163,6 +167,7 @@ class Store {
           rewardPolicyMaker: '0x371F3AD36072230424C828629d53B0Dbd93c8273',
           lpPriceOracle: '0x10010069de6bd5408a6ded075cf6ae2498073c73',
           merkleMirror: '0x77d2bA154F0fE170Fc8C6F7bfE8c156dFD1C1e8d',
+          isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: false,
           gauges: [],
@@ -190,6 +195,7 @@ class Store {
           merkleMirror: '0x3a8609840b47e8bd4fc0108e2cdcd88ae30c4ff2',
           nativeTokenGauge: '0x7BFE7b45c8019DEDc66c695Ac70b8fc2c0421584',
           nativeTokenSymbol: 'xDAI',
+          isBaamGauges: false,
           isV1Escrow: false,
           isV1Controller: false,
           gauges: [],
@@ -214,6 +220,7 @@ class Store {
           rewardPolicyMaker: '0x3ffd03Ef31F6D5A6C517CEFA9CDf43efEBeE8399',
           lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
           merkleMirror: '0xF191d17dEe9943F06bB784C0492805280AeE0bf9',
+          isBaamGauges: false,
           isV1Escrow: false,
           isV1Controller: false,
           gauges: [],
@@ -237,6 +244,7 @@ class Store {
           votingEscrow: '0xb4BAfc3d60662De362c0cB0f5e2DE76603Ea77D7',
           rewardPolicyMaker: '0x1dB11Cf7C332E797ac912e11b8762e0A4b24a836',
           lpPriceOracle: '0x0b510A226F4A7A66c480988704eCd5306B6f1954',
+          isBaamGauges: false,
           isV1Escrow: false,
           isV1Controller: false,
           gauges: [],
@@ -248,29 +256,30 @@ class Store {
           maxDurationYears: 4,
           onload: null,
         },
-        // {
-        //   type: 'hundredfinance',
-        //   id: 'hundred-finance-polygon-bprotocol',
-        //   name: 'Polygon (B.Protocol)',
-        //   logo: '/polygon.png',
-        //   url: '',
-        //   chainId: 137,
-        //   gaugeProxyAddress: '0x1cF3993EbA538e5f085333c86356622161Dd8C0B',
-        //   mirroredVotingEscrow: '0xc3CC9369fcB8491DaD4FA64cE1Fbd3DD2d70034f',
-        //   votingEscrow: '0xb4BAfc3d60662De362c0cB0f5e2DE76603Ea77D7',
-        //   rewardPolicyMaker: '0x3A7f310ee75b8cE3e46410Ac438419842B541D10',
-        //   lpPriceOracle: '0x0b510A226F4A7A66c480988704eCd5306B6f1954',
-        //   isV1Escrow: false,
-        //   isV1Controller: false,
-        //   gauges: [],
-        //   vaults: [],
-        //   tokenMetadata: {},
-        //   veTokenMetadata: {},
-        //   otherTokenMetadata: {},
-        //   useDays: false,
-        //   maxDurationYears: 4,
-        //   onload: null,
-        // },
+        {
+          type: 'hundredfinance',
+          id: 'hundred-finance-polygon-bprotocol',
+          name: 'Polygon (B.Protocol)',
+          logo: '/polygon.png',
+          url: '',
+          chainId: 137,
+          gaugeProxyAddress: '0x1cF3993EbA538e5f085333c86356622161Dd8C0B',
+          mirroredVotingEscrow: '0xc3CC9369fcB8491DaD4FA64cE1Fbd3DD2d70034f',
+          votingEscrow: '0xb4BAfc3d60662De362c0cB0f5e2DE76603Ea77D7',
+          rewardPolicyMaker: '0x3A7f310ee75b8cE3e46410Ac438419842B541D10',
+          lpPriceOracle: '0x0b510A226F4A7A66c480988704eCd5306B6f1954',
+          isBaamGauges: true,
+          isV1Escrow: false,
+          isV1Controller: false,
+          gauges: [],
+          vaults: [],
+          tokenMetadata: {},
+          veTokenMetadata: {},
+          otherTokenMetadata: {},
+          useDays: false,
+          maxDurationYears: 4,
+          onload: null,
+        },
         // {
         //   type: 'hundredfinance',
         //   id: 'hundred-finance-kovan',
@@ -441,7 +450,7 @@ class Store {
     const gaugesWeights = [];
     const gaugesCurrentEpochRelativeWeights = [];
     const gaugesNextEpochRelativeWeights = [];
-    const gaugesLPTokens = [];
+    let gaugesLPTokens = [];
     const isGaugeKilled = [];
 
     for (let i = 0; i < gauges.length; i++) {
@@ -451,6 +460,15 @@ class Store {
       gaugesCurrentEpochRelativeWeights.push(data[1]);
       gaugesNextEpochRelativeWeights.push(data[2]);
       gaugesLPTokens.push(data[3]);
+    }
+
+    if (project.isBaamGauges) {
+      let baamLpCalls = [];
+      gaugesLPTokens.forEach((lp, index) => {
+        const lpContract = new Contract(lp, BAAM_ABI);
+        baamLpCalls.push(lpContract.LUSD());
+      });
+      gaugesLPTokens = await ethcallProvider.all(baamLpCalls);
     }
 
     const lpCalls = [];
