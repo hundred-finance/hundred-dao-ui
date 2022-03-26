@@ -115,14 +115,14 @@ function Projects({ changeTheme }) {
           <Paper elevation={1} className={classes.ChartContainer}>
             <Typography variant="h3">Current Vote weighting</Typography>
             <PieChart
-              data={project?.gauges?.sort((a, b) => (a.currentEpochRelativeWeight > b.currentEpochRelativeWeight ? -1 : 1))}
+              data={project?.gauges.filter((g) => !g.isKilled)?.sort((a, b) => (a.currentEpochRelativeWeight > b.currentEpochRelativeWeight ? -1 : 1))}
               dataKey={'currentEpochRelativeWeight'}
             />
           </Paper>
           <Paper elevation={1} className={classes.ChartContainer}>
             <Typography variant="h3">Next epoch Vote weighting</Typography>
             <PieChart
-              data={project?.gauges?.sort((a, b) => (a.nextEpochRelativeWeight > b.nextEpochRelativeWeight ? -1 : 1))}
+              data={project?.gauges?.filter((g) => !g.isKilled)?.sort((a, b) => (a.nextEpochRelativeWeight > b.nextEpochRelativeWeight ? -1 : 1))}
               dataKey={'nextEpochRelativeWeight'}
             />
           </Paper>
