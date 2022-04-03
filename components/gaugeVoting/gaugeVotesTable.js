@@ -315,7 +315,7 @@ export default function EnhancedTable({ project }) {
     }
 
     return (
-      <Tooltip title={`You need ${formatCurrency(gauge.needVeHndForMaxBoost)} more veHND to get max boost`} followCursor>
+      <Tooltip title={`You need ${formatCurrency(gauge.needVeHndForMaxBoost)} more veHND to get max boost`} followcursor>
         <Typography variant="h5" className={classes.textSpacedClickable}>
           {formatCurrency(gauge.appliedBoost)}x
         </Typography>
@@ -326,7 +326,7 @@ export default function EnhancedTable({ project }) {
   function displayApplyBoost(gauge) {
     if (gauge.boost - gauge.appliedBoost > 0.01) {
       return (
-        <Tooltip title={`Your effective boost is ${formatCurrency(gauge.boost)} click on apply if you wish to update it`} followCursor>
+        <Tooltip title={`Your effective boost is ${formatCurrency(gauge.boost)} click on apply if you wish to update it`} followcursor>
           <Button
             disableElevation
             variant="contained"
@@ -346,7 +346,7 @@ export default function EnhancedTable({ project }) {
 
   function displayStakeAtMaxBoost(gauge) {
     return (
-      <Tooltip title={`You can stake ${formatCurrency(gauge.remainingBalance)} ${gauge.lpToken.underlyingSymbol} more at max boost`} followCursor>
+      <Tooltip title={`You can stake ${formatCurrency(gauge.remainingBalance)} ${gauge.lpToken.underlyingSymbol} more at max boost`} followcursor>
         <Typography variant="h5" className={classes.textSpacedClickable}>
           {formatCurrency(gauge.balance)}
         </Typography>

@@ -14,7 +14,7 @@ export default function LayerZeroMirror({ project }) {
   };
 
   const onMirror = () => {
-    stores.dispatcher.dispatch({ type: MIRROR_LOCK, content: { project: project, target: targetChain.layerZero } });
+    stores.dispatcher.dispatch({ type: MIRROR_LOCK, content: { project: project, target: targetChain } });
   };
 
   return (
@@ -96,6 +96,24 @@ export default function LayerZeroMirror({ project }) {
             No mirrored locks yet
           </Typography>
         </div>
+      )}
+      {project?.locks_being_mirrored?.length > 0 ? (
+        <div className={classes.overviewCard}>
+          <Typography variant="h3" className={classes.subsectionHeader}>
+            Lock mirrors waiting for bridging:
+          </Typography>
+          <div className={classes.locksTable}>
+            {project?.locks_being_mirrored?.map((lock, idx) => {
+              return (
+                <div className={classes.lock_line} key={'lock-in-progress' + idx}>
+                  <Typography variant="h5">from {lock.source.name}</Typography>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        ''
       )}
     </Paper>
   );

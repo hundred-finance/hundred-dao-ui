@@ -83,7 +83,7 @@ class MySnackbar extends Component {
     let color = colors.blue;
     let messageType = '';
     let actions = [
-      <IconButton key="close" aria-label="Close" onClick={this.handleClose}>
+      <IconButton key="close-snackbar" aria-label="Close" onClick={this.handleClose}>
         <CloseIcon />
       </IconButton>,
     ];
@@ -117,11 +117,10 @@ class MySnackbar extends Component {
         let snackbarMessage = `${message.baseUrl}/tx/${message.hash}`;
 
         actions = [
-          // the button was missing a key, but not sure if i'm adding the correct key
-          <Button key="close" variant="text" size="small" onClick={() => window.open(snackbarMessage, '_blank')}>
+          <Button key="close-view" variant="text" size="small" onClick={() => window.open(snackbarMessage, '_blank')}>
             View
           </Button>,
-          <IconButton key="close" aria-label="Close" onClick={this.handleClose}>
+          <IconButton key="close-icon" aria-label="Close" onClick={this.handleClose}>
             <CloseIcon />
           </IconButton>,
         ];

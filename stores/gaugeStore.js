@@ -396,7 +396,6 @@ class Store {
 
   setStore(obj) {
     this.store = { ...this.store, ...obj };
-    console.log(this.store);
     return this.emitter.emit(STORE_UPDATED);
   }
 
@@ -710,6 +709,15 @@ class Store {
       project = project[0];
     }
 
+    let mirror_transactions = [];
+    let user_mirror_transactions = [];
+    let storage = window.localStorage.getItem('mirror_transactions');
+    if (storage) {
+      mirror_transactions = mirror_transactions = JSON.parse(window.localStorage.getItem('mirror_transactions'));
+
+      user_mirror_transactions = mirror_transactions.filter((t) => t.account === account.address && t.target.chainId === project.chainId && !t.bridged);
+    }
+
     const ethcallProvider = new Provider();
     await ethcallProvider.init(provider);
     if (project.multicallAddress) {
@@ -760,6 +768,16 @@ class Store {
       });
     }
 
+    if (project.layerZero) {
+      const layerZeroEndpoint = new Contract(project.layerZero.endpoint, LAYER_ZERO_ENDPOINT_ABI);
+      user_mirror_transactions.forEach((t) => {
+        calls.push(
+          layerZeroEndpoint.getInboundNonce(t.source.layerZero.endpointId, t.source.layerZero.mirrorGate),
+          layerZeroEndpoint.hasStoredPayload(t.source.layerZero.endpointId, t.source.layerZero.mirrorGate),
+        );
+      });
+    }
+
     const data = await ethcallProvider.all(calls);
 
     const tokenBalance = data[0];
@@ -790,9 +808,10 @@ class Store {
     project.mirrored_locks = [];
 
     if (hasMveHnd) {
+      const d = data.splice(0, project.targetChainIds.length);
       let now = moment().unix();
       let maxLockEnd = moment().add(4, 'years').unix();
-      data.forEach((l, index) => {
+      d.forEach((l, index) => {
         if (l.end.toNumber() > now) {
           project.mirrored_locks.push({
             amount: (+ethers.utils.formatEther(l.amount.mul(l.end.toNumber() - now).div(maxLockEnd - now))).toFixed(2),
@@ -800,8 +819,18 @@ class Store {
           });
         }
       });
-      console.log('mirrored locks', project.mirrored_locks);
     }
+
+    if (project.layerZero && user_mirror_transactions.length > 0) {
+      let d = data.splice(0, user_mirror_transactions.length * 2);
+      for (let i = 0; i < user_mirror_transactions.length; i++) {
+        user_mirror_transactions[i].bridged =
+          +d[i * 2] > +user_mirror_transactions[i].nonce || (+d[i * 2] === +user_mirror_transactions[i].nonce && !d[i * 2 + 1]);
+      }
+      project.locks_being_mirrored = user_mirror_transactions.filter((l) => !l.bridged);
+    }
+
+    window.localStorage.setItem('mirror_transactions', JSON.stringify(mirror_transactions.filter((t) => !t.bridged)));
 
     project.tokenMetadata.balance = BigNumber(ethers.utils.formatUnits(tokenBalance, project.tokenMetadata.decimals));
     project.tokenMetadata.allowance = BigNumber(ethers.utils.formatUnits(allowance, project.tokenMetadata.decimals));
@@ -953,8 +982,6 @@ class Store {
     }
 
     const { amount, selectedDate, project } = payload.content;
-    console.log('amount');
-    console.log(amount);
 
     this._callLock(web3, project, account, amount, selectedDate, (err, lockResult) => {
       if (err) {
@@ -995,9 +1022,6 @@ class Store {
     const amountToSend = BigNumber(amount)
       .times(10 ** project.tokenMetadata.decimals)
       .toFixed(0);
-
-    console.log('amount to send');
-    console.log(amountToSend);
 
     await this._asyncCallContractWait(
       web3,
@@ -1046,10 +1070,6 @@ class Store {
     const gaugeControllerContract = new web3.eth.Contract(GAUGE_CONTROLLER_ABI, project.gaugeProxyAddress);
 
     const amountToSend = (amount * 100).toFixed(0);
-
-    console.log(gaugeControllerContract);
-    console.log('vote_for_gauge_weights');
-    console.log([gaugeAddress, amountToSend]);
 
     await this._asyncCallContractWait(
       web3,
@@ -1198,14 +1218,10 @@ class Store {
       .on('transactionHash', function (hash) {
         context.emitter.emit(TX_SUBMITTED, { hash: hash, baseUrl: chain.blockExplorerUrls[0] });
       })
-      .on('receipt', function (receipt) {
-        console.log(receipt);
-        callback(null, receipt.transactionHash);
+      .once('receipt', function (receipt) {
+        callback(null, receipt.transactionHash, receipt);
 
         if (dispatchEvent) {
-          console.log('dispatching new event');
-          console.log(dispatchEvent);
-          console.log(dispatchEventPayload);
           context.dispatcher.dispatch({ type: dispatchEvent, content: dispatchEventPayload });
         }
       })
@@ -1246,7 +1262,42 @@ class Store {
     return 0;
   }
 
+  registerLockEvent(account, project, web3, target, error, hash, receipt) {
+    if (receipt) {
+      const abi = [
+        { indexed: false, internalType: 'uint16', name: 'chainId', type: 'uint16' },
+        { indexed: false, internalType: 'uint64', name: 'nonce', type: 'uint64' },
+        { indexed: false, internalType: 'uint16', name: 'outboundProofType', type: 'uint16' },
+        { indexed: false, internalType: 'bytes', name: 'adapterParams', type: 'bytes' },
+      ];
+
+      let event = receipt.events[0];
+      let params = web3.eth.abi.decodeLog(abi, event.raw.data, event.raw.topics);
+
+      let mirror_transactions = [];
+      let storage = window.localStorage.getItem('mirror_transactions');
+      if (storage) {
+        mirror_transactions = JSON.parse(window.localStorage.getItem('mirror_transactions'));
+      }
+
+      mirror_transactions.push({
+        account: account.address,
+        source: {
+          chainId: project.chainId,
+          name: this.chainName(project.chainId),
+          layerZero: project.layerZero,
+        },
+        target: target,
+        nonce: params.nonce,
+        bridged: false,
+      });
+
+      window.localStorage.setItem('mirror_transactions', JSON.stringify(mirror_transactions));
+    }
+  }
+
   async mirrorLock(payload) {
+    let that = this;
     const { project, target } = payload.content;
     const web3 = await stores.accountStore.getWeb3Provider();
     const account = stores.accountStore.getStore('account');
@@ -1257,12 +1308,12 @@ class Store {
       web3,
       mirrorGate,
       'mirrorLock',
-      [target.endpointId, 0, 500000],
+      [target.layerZero.endpointId, 0, 500000],
       account,
       null,
       GET_TOKEN_BALANCES,
       { id: project.id },
-      () => {},
+      (error, hash, receipt) => that.registerLockEvent(account, project, web3, target, error, hash, receipt),
       fee,
     );
   }
@@ -1323,8 +1374,8 @@ async function estimateMirrorFee(project, target, account) {
 
   const layerZeroEndpoint = new Contract(project.layerZero.endpoint, LAYER_ZERO_ENDPOINT_ABI);
   const call = layerZeroEndpoint.estimateFees(
-    target.endpointId,
-    target.mirrorGate,
+    target.layerZero.endpointId,
+    target.layerZero.mirrorGate,
     ethers.utils.defaultAbiCoder.encode(
       ['address', 'uint256', 'uint256', 'uint256', 'uint256'],
       [account.address, project.chainId, 0, project.veTokenMetadata.userLockAmount.toString(), project.veTokenMetadata.userLockEnd.toString()],

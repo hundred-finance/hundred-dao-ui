@@ -168,7 +168,7 @@ function isMirroringAvailable(project) {
 }
 
 function isLZMirroringAvailable(project) {
-  return (project?.layerZero !== undefined && project?.targetChainMirrorGates.length !== 0) || project?.mirrored_locks.length > 0;
+  return (project?.layerZero !== undefined && project?.targetChainMirrorGates?.length !== 0) || project?.mirrored_locks.length > 0;
 }
 
 export default Projects;
