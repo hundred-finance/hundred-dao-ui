@@ -1,9 +1,7 @@
 .overviewContainer {
-  padding: 32px 48px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  border-radius: 10px;
-  margin-top: 0px;
+  padding: 24px;
+}
+
+.sectionHeader {
+  padding-bottom: 100px;
 }

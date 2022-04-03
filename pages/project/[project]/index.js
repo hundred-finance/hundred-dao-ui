@@ -12,6 +12,7 @@ import VeAssetGeneration from '../../../components/veAssetGeneration';
 import VeAssetModificationAmount from '../../../components/veAssetModificationAmount';
 import VeAssetModificationDuration from '../../../components/veAssetModificationDuration';
 import GaugeVoting from '../../../components/gaugeVoting';
+import GaugeVotesTable from '../../../components/gaugeVoting/gaugeVotesTable';
 import BoostCalculator from '../../../components/boostCalculator';
 import Header from '../../../components/header';
 import Footer from '../../../components/footer';
@@ -32,8 +33,7 @@ import {
 } from '../../../stores/constants';
 
 import PieChart from '../../../components/gaugeVoting/pieChart';
-import GaugeVotesTable from '../../../components/gaugeVoting/gaugeVotesTable';
-import BigNumber from 'bignumber.js';
+import LayerZeroMirror from '../../../components/mirror/layerZeroMirror';
 
 function Projects({ changeTheme }) {
   const router = useRouter();
@@ -129,21 +129,22 @@ function Projects({ changeTheme }) {
         </div>
 
         {isLockIncreasePossible(project) ? (
-          <div className={classes.projectCardContainer}>
+          <div className={isLZMirroringAvailable(project) ? classes.projectCardContainer : classes.projectCardContainer}>
             <VeAssetModificationAmount project={project} />
             <VeAssetModificationDuration project={project} />
-            <LockDurationChart project={project} />
+            {isLZMirroringAvailable(project) ? <LayerZeroMirror project={project} /> : ''}
           </div>
         ) : (
-          <div className={classes.projectCardContainer2Columns}>
+          <div className={isLZMirroringAvailable(project) ? classes.projectCardContainer2Columns : classes.projectContainer}>
             <VeAssetGeneration project={project} />
-            <LockDurationChart project={project} />
+            {isLZMirroringAvailable(project) ? <LayerZeroMirror project={project} /> : ''}
           </div>
         )}
 
-        <div className={classes.projectCardContainer2EqualColumns}>
+        <div className={classes.projectCardContainer}>
           <GaugeVoting project={project} />
           <BoostCalculator project={project} />
+          <LockDurationChart project={project} />
         </div>
 
         <div className={classes.fakeGrid}>
@@ -164,6 +165,10 @@ function isLockIncreasePossible(project) {
 
 function isMirroringAvailable(project) {
   return project?.merkleMirror !== undefined;
+}
+
+function isLZMirroringAvailable(project) {
+  return (project?.layerZero !== undefined && project?.targetChainMirrorGates.length !== 0) || project?.mirrored_locks.length > 0;
 }
 
 export default Projects;

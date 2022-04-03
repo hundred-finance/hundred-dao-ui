@@ -66,4 +66,5 @@ export const MAX_UINT256 = new BigNumber(2).pow(256).minus(1).toFixed(0);
 
 export const MIRRORS_UPDATED = 'MIRRORS_UPDATED';
 export const MIRROR_LOCKS = 'MIRROR_LOCKS';
+export const MIRROR_LOCK = 'MIRROR_LOCK';
 export const GET_LOCKS = 'GET_LOCKS';

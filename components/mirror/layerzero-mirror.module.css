@@ -1,31 +1,63 @@
 .overviewContainer {
-  padding: 32px 48px;
-  margin: 36px;
-  display: flex;
+  padding: 24px;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   border-radius: 10px;
-  margin-top: 0px;
-}
-
-.separator {
-  border-right: 1px solid rgba(128, 128, 128, 0.25);
-  height: 100px;
-  margin-right: 48px;
-  margin-left: 48px;
 }
 
 .overviewCard {
-  display: flex;
   align-items: center;
   justify-content: center;
   flex: 1;
-  padding-left: 12px;
+  padding-top: 12px;
 }
 
-.lock {
-  margin-bottom: 10px;
+.sectionHeader {
+  padding-bottom: 12px;
+}
+
+.sectionsubHeader {
+  padding-bottom: 30px;
+}
+
+.subsectionHeader {
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+
+.inputTitleContainer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.inputTitle {
+  padding-bottom: 6px;
+  margin-left: 12px;
+}
+
+.locksTable {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(128, 128, 128, 0.5);
+  padding: 12px;
+  border-radius: 10px;
+  width: 100%;
+}
+
+.lockChainName {
+  text-align: end;
+}
+
+.lock_line {
+  font-weight: bold;
+  display: grid;
+  grid-template-columns: 50% 48%;
+  grid-gap: 2%;
+  align-items: center;
+  margin-bottom: 2%;
 }
 
 @media screen and (max-width: 1600px) {

@@ -49,10 +49,6 @@ export default function VeAssetGeneration({ project }) {
     setAmount(project.tokenMetadata.balance.times(BigNumber(percent).div(BigNumber(100))).toFixed(project.tokenMetadata.decimals));
   };
 
-  const handleChangeAmount = (e) => {
-    console.log(e);
-  };
-
   const handleDateChange = (event) => {
     setSelectedDate(normalizeDate(event.target.value));
     setSelectedValue(null);

@@ -27,9 +27,20 @@ import {
   APPLY_BOOST,
   APPLY_BOOST_RETURNED,
   GET_LOCKS,
+  MIRROR_LOCK,
 } from './constants';
 
-import { ERC20_ABI, GAUGE_CONTROLLER_ABI, GAUGE_ABI, VOTING_ESCROW_ABI, GAUGE_CONTROLLER_V2_ABI, BAAM_ABI } from './abis';
+import {
+  ERC20_ABI,
+  GAUGE_CONTROLLER_ABI,
+  GAUGE_ABI,
+  VOTING_ESCROW_ABI,
+  GAUGE_CONTROLLER_V2_ABI,
+  BAAM_ABI,
+  LAYER_ZERO_ENDPOINT_ABI,
+  MIRROR_GATE_ABI,
+  MIRRORED_VOTING_ESCROW_ABI,
+} from './abis';
 
 import stores from './';
 import BigNumber from 'bignumber.js';
@@ -40,6 +51,7 @@ import { network, NETWORKS_CONFIG } from './connectors';
 import { Contract, Provider } from 'ethcall';
 import { ethers } from 'ethers';
 import { CETHER_ABI } from './abis/CetherABI';
+import moment from 'moment';
 
 const fetch = require('node-fetch');
 
@@ -68,6 +80,11 @@ class Store {
           votingEscrow: '0xBa57440fA35Fdb671E58F6F56c1A4447aB1f6C2B',
           lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
           rewardPolicyMaker: '0x3A4148DDDd121fbceD8717CB7B82370Be27F76bf',
+          layerZero: {
+            mirrorGate: '0x3752F823A8E5BfE706203C87Fb5BbbD33b943F02',
+            endpoint: '0x3c2269811836af69497E5F486A85D7316753cf62',
+            endpointId: 10,
+          },
           isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: true,
@@ -92,6 +109,11 @@ class Store {
           lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
           lpPriceOracles: [{ lp: '0xa33138a5a6a32d12b2ac7fc261378d6c6ab2ef90', oracle: '0xB9960251609e5b545416E87Abb375303B1162C3E' }],
           rewardPolicyMaker: '0x772918d032cFd4Ff09Ea7Af623e56E2D8D96bB65',
+          layerZero: {
+            mirrorGate: '0xD7a8De0672131668be0366cF517DbD1c369cE200',
+            endpoint: '0xb6319cC6c8c27A8F5dAF0dD3DF91EA35C4720dd7',
+            endpointId: 12,
+          },
           isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: true,
@@ -119,6 +141,11 @@ class Store {
             { lp: '0xA33138a5A6A32d12b2Ac7Fc261378d6C6AB2eF90', oracle: '0xB9960251609e5b545416E87Abb375303B1162C3E' },
           ],
           rewardPolicyMaker: '0x9A9C7C065efcd4A8FfBF3d97882BbcaEd4eB2910',
+          layerZero: {
+            mirrorGate: '0xD7a8De0672131668be0366cF517DbD1c369cE200',
+            endpoint: '0xb6319cC6c8c27A8F5dAF0dD3DF91EA35C4720dd7',
+            endpointId: 12,
+          },
           isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: false,
@@ -166,7 +193,6 @@ class Store {
           votingEscrow: '0x243E33aa7f6787154a8E59d3C27a66db3F8818ee',
           rewardPolicyMaker: '0x371F3AD36072230424C828629d53B0Dbd93c8273',
           lpPriceOracle: '0x10010069de6bd5408a6ded075cf6ae2498073c73',
-          merkleMirror: '0x77d2bA154F0fE170Fc8C6F7bfE8c156dFD1C1e8d',
           isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: false,
@@ -192,7 +218,6 @@ class Store {
           votingEscrow: '0xf64E1a3eF0d2F5659dC4c10983e595B797C6ecA4',
           rewardPolicyMaker: '0x89Aa51685a2B658be8a7b9C3Af70D66557544181',
           lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
-          merkleMirror: '0x3a8609840b47e8bd4fc0108e2cdcd88ae30c4ff2',
           nativeTokenGauge: '0x7BFE7b45c8019DEDc66c695Ac70b8fc2c0421584',
           nativeTokenSymbol: 'xDAI',
           isBaamGauges: false,
@@ -219,7 +244,11 @@ class Store {
           votingEscrow: '0x1F8e8472e124F58b7F0D2598EaE3F4f482780b09',
           rewardPolicyMaker: '0x3ffd03Ef31F6D5A6C517CEFA9CDf43efEBeE8399',
           lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
-          merkleMirror: '0xF191d17dEe9943F06bB784C0492805280AeE0bf9',
+          layerZero: {
+            mirrorGate: '0x1cF3993EbA538e5f085333c86356622161Dd8C0B',
+            endpoint: '0x3c2269811836af69497E5F486A85D7316753cf62',
+            endpointId: 11,
+          },
           isBaamGauges: false,
           isV1Escrow: false,
           isV1Controller: false,
@@ -244,6 +273,11 @@ class Store {
           votingEscrow: '0xb4BAfc3d60662De362c0cB0f5e2DE76603Ea77D7',
           rewardPolicyMaker: '0x1dB11Cf7C332E797ac912e11b8762e0A4b24a836',
           lpPriceOracle: '0x0b510A226F4A7A66c480988704eCd5306B6f1954',
+          layerZero: {
+            mirrorGate: '0x96a0eEa3a9cff74764b73A891c3b36a4F6B81181',
+            endpoint: '0x3c2269811836af69497E5F486A85D7316753cf62',
+            endpointId: 9,
+          },
           isBaamGauges: false,
           isV1Escrow: false,
           isV1Controller: false,
@@ -268,6 +302,11 @@ class Store {
           votingEscrow: '0xb4BAfc3d60662De362c0cB0f5e2DE76603Ea77D7',
           rewardPolicyMaker: '0x3A7f310ee75b8cE3e46410Ac438419842B541D10',
           lpPriceOracle: '0x0b510A226F4A7A66c480988704eCd5306B6f1954',
+          layerZero: {
+            mirrorGate: '0x96a0eEa3a9cff74764b73A891c3b36a4F6B81181',
+            endpoint: '0x3c2269811836af69497E5F486A85D7316753cf62',
+            endpointId: 9,
+          },
           isBaamGauges: true,
           isV1Escrow: false,
           isV1Controller: false,
@@ -341,6 +380,9 @@ class Store {
           case APPLY_BOOST:
             that.applyBoost(payload);
             break;
+          case MIRROR_LOCK:
+            this.mirrorLock(payload);
+            break;
           default: {
           }
         }
@@ -358,6 +400,10 @@ class Store {
     return this.emitter.emit(STORE_UPDATED);
   }
 
+  chainName(id) {
+    return NETWORKS_CONFIG.find((c) => parseInt(c.chainId, 16) === parseInt(id)).chainName;
+  }
+
   async configure(payload) {
     const projects = this.getStore('projects');
 
@@ -367,7 +413,11 @@ class Store {
     async.map(
       projects.filter((p) => p.chainId === chainId),
       (project, callback) => {
-        this._getProjectData(project, callback);
+        this._getProjectData(
+          project,
+          projects.filter((p) => p.chainId !== project.chainId),
+          callback,
+        );
       },
       (err, project) => {
         if (err) {
@@ -382,9 +432,26 @@ class Store {
     );
   }
 
-  async _getProjectData(project, callback) {
+  async _getProjectData(project, targetProjects, callback) {
     const web3 = await stores.accountStore.getWeb3Provider();
     const ethersProvider = await stores.accountStore.getEthersProvider();
+
+    project.targetChainMirrorGates = [];
+    project.targetChainIds = [];
+
+    for (let i = 0; i < targetProjects.length; i++) {
+      let p = targetProjects[i];
+      if (project.targetChainMirrorGates.find((t) => t.chainId === p.chainId) === undefined) {
+        if (p.layerZero !== undefined) {
+          project.targetChainMirrorGates.push({
+            chainId: p.chainId,
+            name: this.chainName(p.chainId),
+            layerZero: p.layerZero,
+          });
+        }
+        project.targetChainIds.push(p.chainId);
+      }
+    }
 
     if (!web3 || !ethersProvider) {
       return;
@@ -649,11 +716,12 @@ class Store {
       ethcallProvider.multicall = { address: project.multicallAddress, block: 0 };
     }
 
+    const hasMveHnd = project.mirroredVotingEscrow !== undefined;
     const mirroredVeTokenAddress = project.mirroredVotingEscrow ? project.mirroredVotingEscrow : project.votingEscrow;
 
     const tokenContract = new Contract(project.tokenMetadata.address, ERC20_ABI);
     const veTokenContract = new Contract(project.votingEscrow, VOTING_ESCROW_ABI);
-    const mirroredVeTokenContract = new Contract(mirroredVeTokenAddress, VOTING_ESCROW_ABI);
+    const mirroredVeTokenContract = new Contract(mirroredVeTokenAddress, MIRRORED_VOTING_ESCROW_ABI);
     const rewardPolicyMakerContract = new Contract(project.rewardPolicyMaker, REWARD_POLICY_MAKER_ABI);
     const gaugeControllerContract = new Contract(project.gaugeProxyAddress, GAUGE_CONTROLLER_ABI);
     const gaugeControllerV2Contract = new Contract(project.gaugeProxyAddress, GAUGE_CONTROLLER_V2_ABI);
@@ -669,6 +737,7 @@ class Store {
       veTokenContract.supply(),
       rewardPolicyMakerContract.rate_at(currentEpochTime()),
       rewardPolicyMakerContract.rate_at(nextEpochTime()),
+      veTokenContract.balanceOf(account.address),
     ];
 
     project.gauges.forEach((gauge) => {
@@ -685,6 +754,12 @@ class Store {
       );
     });
 
+    if (hasMveHnd) {
+      project.targetChainIds.forEach((id) => {
+        calls.push(mirroredVeTokenContract.mirrored_locks(account.address, id, 0));
+      });
+    }
+
     const data = await ethcallProvider.all(calls);
 
     const tokenBalance = data[0];
@@ -697,8 +772,9 @@ class Store {
     const supply = data[7];
     const currentRewardRate = data[8];
     const nextEpochRewardRate = data[9];
+    const veTokenLocalBalance = data[10];
 
-    data.splice(0, 10);
+    data.splice(0, 11);
 
     const gaugesData = project.gauges.map(() => {
       const d = data.splice(0, 5);
@@ -711,17 +787,35 @@ class Store {
       };
     });
 
+    project.mirrored_locks = [];
+
+    if (hasMveHnd) {
+      let now = moment().unix();
+      let maxLockEnd = moment().add(4, 'years').unix();
+      data.forEach((l, index) => {
+        if (l.end.toNumber() > now) {
+          project.mirrored_locks.push({
+            amount: (+ethers.utils.formatEther(l.amount.mul(l.end.toNumber() - now).div(maxLockEnd - now))).toFixed(2),
+            chain: this.chainName(project.targetChainIds[index]),
+          });
+        }
+      });
+      console.log('mirrored locks', project.mirrored_locks);
+    }
+
     project.tokenMetadata.balance = BigNumber(ethers.utils.formatUnits(tokenBalance, project.tokenMetadata.decimals));
     project.tokenMetadata.allowance = (allowance / 10 ** project.tokenMetadata.decimals).toFixed(project.tokenMetadata.decimals);
     project.tokenMetadata.totalLocked = (totalLocked / 10 ** project.tokenMetadata.decimals).toFixed(project.tokenMetadata.decimals);
 
     project.veTokenMetadata.balance = (veTokenBalance / 10 ** project.veTokenMetadata.decimals).toFixed(project.veTokenMetadata.decimals);
+    project.veTokenMetadata.localBalance = (veTokenLocalBalance / 10 ** project.veTokenMetadata.decimals).toFixed(project.veTokenMetadata.decimals);
     project.veTokenMetadata.totalSupply = (totalVeTokenSupply / 10 ** project.veTokenMetadata.decimals).toFixed(project.veTokenMetadata.decimals);
     project.veTokenMetadata.totalLocalSupply = (totalLocalVeTokenSupply / 10 ** project.veTokenMetadata.decimals).toFixed(project.veTokenMetadata.decimals);
     project.veTokenMetadata.userLocked = (userLocked.amount / 10 ** project.veTokenMetadata.decimals).toFixed(project.veTokenMetadata.decimals);
 
     project.veTokenMetadata.supply = (supply / 10 ** project.tokenMetadata.decimals).toFixed(project.tokenMetadata.decimals);
 
+    project.veTokenMetadata.userLockAmount = userLocked.amount;
     project.veTokenMetadata.userLockEnd = userLocked.end;
 
     let totalPercentUsed = 0;
@@ -1082,10 +1176,13 @@ class Store {
     );
   }
 
-  async _asyncCallContractWait(web3, contract, method, params, account, gasPrice, dispatchEvent, dispatchEventPayload, callback) {
+  async _asyncCallContractWait(web3, contract, method, params, account, gasPrice, dispatchEvent, dispatchEventPayload, callback, value = undefined) {
     let sendPayload = {
       from: account.address,
     };
+    if (value) {
+      sendPayload.value = value;
+    }
 
     await this._callContractWait(web3, contract, method, params, account, sendPayload, dispatchEvent, dispatchEventPayload, callback);
   }
@@ -1148,6 +1245,27 @@ class Store {
     }
     return 0;
   }
+
+  async mirrorLock(payload) {
+    const { project, target } = payload.content;
+    const web3 = await stores.accountStore.getWeb3Provider();
+    const account = stores.accountStore.getStore('account');
+
+    const mirrorGate = new web3.eth.Contract(MIRROR_GATE_ABI, project.layerZero.mirrorGate);
+    const fee = await estimateMirrorFee(project, target, account);
+    await this._asyncCallContractWait(
+      web3,
+      mirrorGate,
+      'mirrorLock',
+      [target.endpointId, 0, 500000],
+      account,
+      null,
+      GET_TOKEN_BALANCES,
+      { id: project.id },
+      () => {},
+      fee,
+    );
+  }
 }
 
 function userRemainingStake(balance, totalBalance, veTokenBalance, totalVeTokenSupply, boost) {
@@ -1196,6 +1314,28 @@ function lpPriceOracle(project, token) {
   }
 
   return oracle;
+}
+
+async function estimateMirrorFee(project, target, account) {
+  const ethersProvider = await stores.accountStore.getEthersProvider();
+  const ethcallProvider = new Provider();
+  await ethcallProvider.init(ethersProvider);
+
+  const layerZeroEndpoint = new Contract(project.layerZero.endpoint, LAYER_ZERO_ENDPOINT_ABI);
+  const call = layerZeroEndpoint.estimateFees(
+    target.endpointId,
+    target.mirrorGate,
+    ethers.utils.defaultAbiCoder.encode(
+      ['address', 'uint256', 'uint256', 'uint256', 'uint256'],
+      [account.address, project.chainId, 0, project.veTokenMetadata.userLockAmount.toString(), project.veTokenMetadata.userLockEnd.toString()],
+    ),
+    false,
+    ethers.utils.solidityPack(['uint16', 'uint256'], [1, 500000]),
+  );
+
+  const fee = await ethcallProvider.all([call]);
+
+  return fee[0].nativeFee;
 }
 
 export default Store;

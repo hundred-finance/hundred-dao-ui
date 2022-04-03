@@ -5,7 +5,7 @@ import { ethers, BigNumber } from 'ethers';
 import GaugeChart from 'react-gauge-chart';
 import styled from 'styled-components';
 import Skeleton from '@material-ui/lab/Skeleton';
-import { Paper } from '@material-ui/core';
+import { Paper, Typography } from '@material-ui/core';
 
 // import { UseDillOutput } from "../../../containers/Dill";
 // import { accentColor } from "../../../util/constants";
@@ -24,16 +24,8 @@ function LockDurationChart({ project }) {
     }
   `;
 
-  // const [project, setProject] = useState(null);
-  // const updateProject = () => {
-  //   setProject(props.project);
-  // };
-  // useEffect(updateProject, [props]);
-
   let totalSupply = project?.veTokenMetadata.totalLocalSupply;
   let totalLocked = project?.veTokenMetadata.supply;
-
-  // const { totalSupply: dillSupply, totalLocked: pickleLocked } = dillStats;
 
   if (!totalSupply || !totalLocked) {
     return (
@@ -51,17 +43,18 @@ function LockDurationChart({ project }) {
   }
 
   const ratio = totalSupply / totalLocked;
-  // parseFloat(ethers.utils.formatEther(totalLocked)) /
-  // parseFloat(ethers.utils.formatEther(totalLocked));
   const years = Math.round(ratio * project.maxDurationYears * 100) / 100;
 
   return (
     <Paper elevation={1} className={classes.overviewContainer}>
+      <Typography variant="h3" className={classes.sectionHeader}>
+        Average lock duration
+      </Typography>
       <ChartContainer>
         <GaugeChart
           id="lock-duration-gauge-chart"
           nrOfLevels={project.maxDurationYears}
-          colors={['#FFF', accentColor]}
+          colors={['#cafae2', accentColor]}
           arcWidth={0.2}
           needleColor={accentColor}
           needleBaseColor={accentColor}
