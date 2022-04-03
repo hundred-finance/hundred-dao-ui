@@ -225,7 +225,7 @@ export default function VeAssetGeneration({ project }) {
             color="primary"
             size="large"
             onClick={onRevokeApprove}
-            disabled={revokeApproveLoading || BigNumber(project?.tokenMetadata?.allowance).eq(BigNumber(0))}
+            disabled={revokeApproveLoading || !project?.tokenMetadata?.allowance || project?.tokenMetadata?.allowance.eq(BigNumber(0))}
             className={classes.button}
           >
             <Typography variant="h5">
@@ -248,7 +248,7 @@ export default function VeAssetGeneration({ project }) {
             amount === '' ||
             isNaN(amount) ||
             BigNumber(amount).eq(BigNumber(0)) ||
-            BigNumber(project?.tokenMetadata?.allowance).gte(BigNumber(amount))
+            project?.tokenMetadata?.allowance.gte(BigNumber(amount))
           }
           className={classes.button}
         >
@@ -267,7 +267,7 @@ export default function VeAssetGeneration({ project }) {
             amount === '' ||
             isNaN(amount) ||
             BigNumber(amount).eq(BigNumber(0)) ||
-            BigNumber(project?.tokenMetadata?.allowance).lt(BigNumber(amount))
+            project?.tokenMetadata?.allowance.lt(BigNumber(amount))
           }
           className={classes.button}
         >

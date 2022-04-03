@@ -804,8 +804,8 @@ class Store {
     }
 
     project.tokenMetadata.balance = BigNumber(ethers.utils.formatUnits(tokenBalance, project.tokenMetadata.decimals));
-    project.tokenMetadata.allowance = (allowance / 10 ** project.tokenMetadata.decimals).toFixed(project.tokenMetadata.decimals);
-    project.tokenMetadata.totalLocked = (totalLocked / 10 ** project.tokenMetadata.decimals).toFixed(project.tokenMetadata.decimals);
+    project.tokenMetadata.allowance = BigNumber(ethers.utils.formatUnits(allowance, project.tokenMetadata.decimals));
+    project.tokenMetadata.totalLocked = ethers.utils.formatUnits(totalLocked, project.tokenMetadata.decimals);
 
     project.veTokenMetadata.balance = (veTokenBalance / 10 ** project.veTokenMetadata.decimals).toFixed(project.veTokenMetadata.decimals);
     project.veTokenMetadata.localBalance = (veTokenLocalBalance / 10 ** project.veTokenMetadata.decimals).toFixed(project.veTokenMetadata.decimals);
