@@ -446,6 +446,7 @@ class Store {
             chainId: p.chainId,
             name: this.chainName(p.chainId),
             layerZero: p.layerZero,
+            hasActiveMveHND: p.mirroredVotingEscrow !== undefined,
           });
         }
         project.targetChainIds.push(p.chainId);

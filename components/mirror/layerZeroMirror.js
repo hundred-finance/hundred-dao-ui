@@ -35,7 +35,7 @@ export default function LayerZeroMirror({ project }) {
         </div>
         <Autocomplete
           disableClearable={true}
-          options={project.targetChainMirrorGates}
+          options={project.targetChainMirrorGates.filter((t) => t.hasActiveMveHND)}
           value={targetChain}
           onChange={onTargetSelectChanged}
           getOptionLabel={(option) => option.name}
