@@ -529,35 +529,51 @@ class Store {
       gaugesLPTokens.push(data[3]);
     }
 
+    let baamGaugeLpTokens = [...gaugesLPTokens];
     if (project.isBaamGauges) {
       let baamLpCalls = [];
       gaugesLPTokens.forEach((lp, index) => {
         const lpContract = new Contract(lp, BAAM_ABI);
         baamLpCalls.push(lpContract.LUSD());
+        baamLpCalls.push(lpContract.totalSupply());
       });
-      gaugesLPTokens = await ethcallProvider.all(baamLpCalls);
+      baamGaugeLpTokens = await ethcallProvider.all(baamLpCalls);
     }
 
     const lpCalls = [];
     gaugesLPTokens.forEach((lp, index) => {
-      const priceOracleMulticall = new Contract(lpPriceOracle(project, lp), PRICE_ORACLE_ABI);
+      const gaugeUnderlying = project.isBaamGauges ? baamGaugeLpTokens[index * 2] : lp;
+      const priceOracleMulticall = new Contract(lpPriceOracle(project, gaugeUnderlying), PRICE_ORACLE_ABI);
       if (gauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
-        const lpContract = new Contract(lp, CTOKEN_ABI);
-        lpCalls.push(priceOracleMulticall.getUnderlyingPrice(lp), lpContract.exchangeRateStored(), lpContract.underlying());
+        const lpContract = new Contract(gaugeUnderlying, CTOKEN_ABI);
+        lpCalls.push(
+          priceOracleMulticall.getUnderlyingPrice(gaugeUnderlying),
+          lpContract.exchangeRateStored(),
+          lpContract.underlying(),
+          lpContract.balanceOf(lp),
+        );
       } else {
-        const lpContract = new Contract(lp, CETHER_ABI);
-        lpCalls.push(priceOracleMulticall.getUnderlyingPrice(lp), lpContract.exchangeRateStored());
+        const lpContract = new Contract(gaugeUnderlying, CETHER_ABI);
+        lpCalls.push(priceOracleMulticall.getUnderlyingPrice(gaugeUnderlying), lpContract.exchangeRateStored(), lpContract.balanceOf(lp));
       }
     });
 
     const lpData = await ethcallProvider.all(lpCalls);
     const lpTokenUnderlyingInfo = gaugesLPTokens.map((lp, index) => {
       if (gauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
-        const lptokenInfo = lpData.splice(0, 3);
-        return { price: lptokenInfo[0], exchangeRate: lptokenInfo[1], underlying: lptokenInfo[2] };
+        const lptokenInfo = lpData.splice(0, 4);
+        return {
+          price: lptokenInfo[0],
+          exchangeRate: project.isBaamGauges ? (lptokenInfo[1] * +lptokenInfo[3]) / +baamGaugeLpTokens[index * 2 + 1] : lptokenInfo[1],
+          underlying: lptokenInfo[2],
+        };
       } else {
-        const lptokenInfo = lpData.splice(0, 2);
-        return { price: lptokenInfo[0], exchangeRate: lptokenInfo[1] };
+        const lptokenInfo = lpData.splice(0, 3);
+        return {
+          price: lptokenInfo[0],
+          nominalExchangeRate: lptokenInfo[1],
+          exchangeRate: project.isBaamGauges ? (lptokenInfo[1] * +lptokenInfo[2]) / +baamGaugeLpTokens[index * 2 + 1] : lptokenInfo[1],
+        };
       }
     });
 
