@@ -13,6 +13,25 @@ export default function LayerZeroMirror({ project }) {
     setTargetChain(option);
   };
 
+  const buildTargetChainsList = (project) => {
+    let targets = [];
+
+    if (project.layerZero) {
+      targets = [...project.targetChainMirrorGates.filter((t) => t.hasActiveMveHND && t.layerZero !== undefined)];
+    }
+
+    if (project.multichain) {
+      let multiChain = project.targetChainMirrorGates.filter((t) => t.hasActiveMveHND && t.multichain !== undefined);
+      for (let t = 0; t < multiChain.length; t++) {
+        if (targets.find((tt) => tt.chainId === multiChain[t].chainId) === undefined) {
+          targets.push(multiChain[t]);
+        }
+      }
+    }
+
+    return targets;
+  };
+
   const onMirror = () => {
     stores.dispatcher.dispatch({ type: MIRROR_LOCK, content: { project: project, target: targetChain } });
   };
@@ -22,10 +41,7 @@ export default function LayerZeroMirror({ project }) {
       <Typography variant="h3" className={classes.sectionHeader}>
         Mirror lock to a target chain
       </Typography>
-      <Typography variant="h5" className={classes.sectionsubHeader}>
-        powered by LayerZero
-      </Typography>
-      {project.layerZero ? (
+      {project.layerZero || project.multichain ? (
         <>
           <div className={classes.overviewCard}>
             <div className={classes.inputTitleContainer}>
@@ -37,7 +53,7 @@ export default function LayerZeroMirror({ project }) {
             </div>
             <Autocomplete
               disableClearable={true}
-              options={project.targetChainMirrorGates.filter((t) => t.hasActiveMveHND)}
+              options={buildTargetChainsList(project)}
               value={targetChain}
               onChange={onTargetSelectChanged}
               getOptionLabel={(option) => option.name}

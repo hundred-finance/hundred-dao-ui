@@ -38,8 +38,9 @@ import {
   GAUGE_CONTROLLER_V2_ABI,
   BAAM_ABI,
   LAYER_ZERO_ENDPOINT_ABI,
-  MIRROR_GATE_ABI,
   MIRRORED_VOTING_ESCROW_ABI,
+  LAYER_ZERO_MIRROR_GATE_ABI,
+  MULTICHAIN_MIRROR_GATE_ABI,
 } from './abis';
 
 import stores from './';
@@ -85,6 +86,10 @@ class Store {
             endpoint: '0x3c2269811836af69497E5F486A85D7316753cf62',
             endpointId: 10,
           },
+          multichain: {
+            mirrorGate: '0x340A3F5a18c455f39714B6b692905801f21ed353',
+            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
+          },
           isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: true,
@@ -113,6 +118,10 @@ class Store {
             mirrorGate: '0xD7a8De0672131668be0366cF517DbD1c369cE200',
             endpoint: '0xb6319cC6c8c27A8F5dAF0dD3DF91EA35C4720dd7',
             endpointId: 12,
+          },
+          multichain: {
+            mirrorGate: '0xc9F08308fE6724BD7F0E87e2661DE2FDfcC9e8a8',
+            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
           },
           isBaamGauges: false,
           isV1Escrow: true,
@@ -146,6 +155,10 @@ class Store {
             endpoint: '0xb6319cC6c8c27A8F5dAF0dD3DF91EA35C4720dd7',
             endpointId: 12,
           },
+          multichain: {
+            mirrorGate: '0xc9F08308fE6724BD7F0E87e2661DE2FDfcC9e8a8',
+            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
+          },
           isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: false,
@@ -169,6 +182,10 @@ class Store {
           votingEscrow: '0xE4e43864ea18d5E5211352a4B810383460aB7fcC',
           lpPriceOracle: '0x10010069de6bd5408a6ded075cf6ae2498073c73',
           rewardPolicyMaker: '0xEdBA32185BAF7fEf9A26ca567bC4A6cbe426e499',
+          multichain: {
+            mirrorGate: '0xC457D2DD3209b7186934426ACd8391d504dc3978',
+            endpoint: '0x6f058086d91a181007c2325e5b285425ca84d615',
+          },
           isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: true,
@@ -193,6 +210,10 @@ class Store {
           votingEscrow: '0x243E33aa7f6787154a8E59d3C27a66db3F8818ee',
           rewardPolicyMaker: '0x371F3AD36072230424C828629d53B0Dbd93c8273',
           lpPriceOracle: '0x10010069de6bd5408a6ded075cf6ae2498073c73',
+          multichain: {
+            mirrorGate: '0xc9F08308fE6724BD7F0E87e2661DE2FDfcC9e8a8',
+            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
+          },
           isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: false,
@@ -219,6 +240,10 @@ class Store {
           rewardPolicyMaker: '0x89Aa51685a2B658be8a7b9C3Af70D66557544181',
           lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
           nativeTokenGauge: '0x7BFE7b45c8019DEDc66c695Ac70b8fc2c0421584',
+          multichain: {
+            mirrorGate: '0xb1A76e5454E4aF0C4F8f7b071df14a3B4011e8AF',
+            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
+          },
           nativeTokenSymbol: 'xDAI',
           isBaamGauges: false,
           isV1Escrow: false,
@@ -249,6 +274,10 @@ class Store {
             endpoint: '0x3c2269811836af69497E5F486A85D7316753cf62',
             endpointId: 11,
           },
+          multichain: {
+            mirrorGate: '0x27a1B793b5B51a8862F66B0a1181EF42b2A8D9C2',
+            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
+          },
           isBaamGauges: false,
           isV1Escrow: false,
           isV1Controller: false,
@@ -278,6 +307,10 @@ class Store {
             endpoint: '0x3c2269811836af69497E5F486A85D7316753cf62',
             endpointId: 9,
           },
+          multichain: {
+            mirrorGate: '0x9c15a48A2ce440298815f64ddd5De91800Ad89ec',
+            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
+          },
           isBaamGauges: false,
           isV1Escrow: false,
           isV1Controller: false,
@@ -306,6 +339,10 @@ class Store {
             mirrorGate: '0x96a0eEa3a9cff74764b73A891c3b36a4F6B81181',
             endpoint: '0x3c2269811836af69497E5F486A85D7316753cf62',
             endpointId: 9,
+          },
+          multichain: {
+            mirrorGate: '0x9c15a48A2ce440298815f64ddd5De91800Ad89ec',
+            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
           },
           isBaamGauges: true,
           isV1Escrow: false,
@@ -441,11 +478,12 @@ class Store {
     for (let i = 0; i < targetProjects.length; i++) {
       let p = targetProjects[i];
       if (project.targetChainMirrorGates.find((t) => t.chainId === p.chainId) === undefined) {
-        if (p.layerZero !== undefined) {
+        if (p.layerZero !== undefined || p.multichain !== undefined) {
           project.targetChainMirrorGates.push({
             chainId: p.chainId,
             name: this.chainName(p.chainId),
             layerZero: p.layerZero,
+            multichain: p.multichain,
             hasActiveMveHND: p.mirroredVotingEscrow !== undefined,
           });
         }
@@ -1319,20 +1357,36 @@ class Store {
     const web3 = await stores.accountStore.getWeb3Provider();
     const account = stores.accountStore.getStore('account');
 
-    const mirrorGate = new web3.eth.Contract(MIRROR_GATE_ABI, project.layerZero.mirrorGate);
-    const fee = await estimateMirrorFee(project, target, account);
-    await this._asyncCallContractWait(
-      web3,
-      mirrorGate,
-      'mirrorLock',
-      [target.layerZero.endpointId, 0, 500000],
-      account,
-      null,
-      GET_TOKEN_BALANCES,
-      { id: project.id },
-      (error, hash, receipt) => that.registerLockEvent(account, project, web3, target, error, hash, receipt),
-      fee,
-    );
+    if (project.layerZero && target.layerZero) {
+      const mirrorGate = new web3.eth.Contract(LAYER_ZERO_MIRROR_GATE_ABI, project.layerZero.mirrorGate);
+      const fee = await estimateMirrorFee(project, target, account);
+      await this._asyncCallContractWait(
+        web3,
+        mirrorGate,
+        'mirrorLock',
+        [target.layerZero.endpointId, 0, 500000],
+        account,
+        null,
+        GET_TOKEN_BALANCES,
+        { id: project.id },
+        (error, hash, receipt) => that.registerLockEvent(account, project, web3, target, error, hash, receipt),
+        fee,
+      );
+    } else if (project.multichain && target.multichain) {
+      const mirrorGate = new web3.eth.Contract(MULTICHAIN_MIRROR_GATE_ABI, project.multichain.mirrorGate);
+      await this._asyncCallContractWait(
+        web3,
+        mirrorGate,
+        'mirrorLock',
+        [target.chainId, target.mirroredVotingEscrow, 0],
+        account,
+        null,
+        GET_TOKEN_BALANCES,
+        { id: project.id },
+        (error, hash, receipt) => that.registerLockEvent(account, project, web3, target, error, hash, receipt),
+        fee,
+      );
+    }
   }
 }
 

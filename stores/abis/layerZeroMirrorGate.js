@@ -1,4 +1,4 @@
-export const mirrorGateAbi = [
+export const layerZeroMirrorGateAbi = [
   {
     inputs: [
       {
