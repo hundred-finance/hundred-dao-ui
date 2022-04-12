@@ -486,6 +486,7 @@ class Store {
             layerZero: p.layerZero,
             multichain: p.multichain,
             hasActiveMveHND: p.mirroredVotingEscrow !== undefined,
+            mirroredVotingEscrow: p.mirroredVotingEscrow,
           });
         }
         project.targetChainIds.push(p.chainId);
@@ -1385,7 +1386,7 @@ class Store {
         GET_TOKEN_BALANCES,
         { id: project.id },
         (error, hash, receipt) => that.registerLockEvent(account, project, web3, target, error, hash, receipt),
-        fee,
+        0,
       );
     }
   }
