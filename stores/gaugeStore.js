@@ -183,10 +183,10 @@ class Store {
           mirroredVotingEscrow: '0x1dB11Cf7C332E797ac912e11b8762e0A4b24a836',
           lpPriceOracle: '0x10010069de6bd5408a6ded075cf6ae2498073c73',
           rewardPolicyMaker: '0xC3bae38Bfa2CbBE30f442649070408f484bd5882',
-          // multichain: {
-          //   mirrorGate: '0xC457D2DD3209b7186934426ACd8391d504dc3978',
-          //   endpoint: '0x6f058086d91a181007c2325e5b285425ca84d615',
-          // },
+          multichain: {
+            mirrorGate: '0xC457D2DD3209b7186934426ACd8391d504dc3978',
+            endpoint: '0x6f058086d91a181007c2325e5b285425ca84d615',
+          },
           isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: false,
@@ -241,10 +241,10 @@ class Store {
           rewardPolicyMaker: '0x89Aa51685a2B658be8a7b9C3Af70D66557544181',
           lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
           nativeTokenGauge: '0x7BFE7b45c8019DEDc66c695Ac70b8fc2c0421584',
-          // multichain: {
-          //   mirrorGate: '0xb1A76e5454E4aF0C4F8f7b071df14a3B4011e8AF',
-          //   endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
-          // },
+          multichain: {
+            mirrorGate: '0xb1A76e5454E4aF0C4F8f7b071df14a3B4011e8AF',
+            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
+          },
           nativeTokenSymbol: 'xDAI',
           isBaamGauges: false,
           isV1Escrow: false,
@@ -275,10 +275,10 @@ class Store {
             endpoint: '0x3c2269811836af69497E5F486A85D7316753cf62',
             endpointId: 11,
           },
-          // multichain: {
-          //   mirrorGate: '0x27a1B793b5B51a8862F66B0a1181EF42b2A8D9C2',
-          //   endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
-          // },
+          multichain: {
+            mirrorGate: '0x27a1B793b5B51a8862F66B0a1181EF42b2A8D9C2',
+            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
+          },
           isBaamGauges: false,
           isV1Escrow: false,
           isV1Controller: false,
