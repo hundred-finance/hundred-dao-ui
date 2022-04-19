@@ -78,10 +78,11 @@ class Store {
           logo: '/arbitrum.png',
           url: '',
           chainId: 42161,
-          gaugeProxyAddress: '0xb4BAfc3d60662De362c0cB0f5e2DE76603Ea77D7',
+          gaugeProxyAddress: '0xBA427dDccba3B63497D8148276Bf64783FaBBe7E',
           votingEscrow: '0xBa57440fA35Fdb671E58F6F56c1A4447aB1f6C2B',
+          mirroredVotingEscrow: '0x6b5f15E939C8d797E6bd8D5fFda24eDeC655D08d',
           lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
-          rewardPolicyMaker: '0x3A4148DDDd121fbceD8717CB7B82370Be27F76bf',
+          rewardPolicyMaker: '0xb5D66fB34DD0D874709fDB4682C89bB634E7c364',
           layerZero: {
             mirrorGate: '0x3752F823A8E5BfE706203C87Fb5BbbD33b943F02',
             endpoint: '0x3c2269811836af69497E5F486A85D7316753cf62',
