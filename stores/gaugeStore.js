@@ -90,6 +90,7 @@ class Store {
           },
           // multichain: {
           //   mirrorGate: '0x340A3F5a18c455f39714B6b692905801f21ed353',
+          //   mirrorGateV2: '0xb13B67E805A621F58095277cBD98475Da451E739',
           //   endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
           // },
           isBaamGauges: false,
