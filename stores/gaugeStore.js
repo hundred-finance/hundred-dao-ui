@@ -41,6 +41,7 @@ import {
   MIRRORED_VOTING_ESCROW_ABI,
   LAYER_ZERO_MIRROR_GATE_ABI,
   MULTICHAIN_MIRROR_GATE_ABI,
+  MULTICHAIN_MIRROR_GATE_V2_ABI,
 } from './abis';
 
 import stores from './';
@@ -121,6 +122,7 @@ class Store {
           },
           multichain: {
             mirrorGate: '0xc9F08308fE6724BD7F0E87e2661DE2FDfcC9e8a8',
+            mirrorGateV2: '0xb13B67E805A621F58095277cBD98475Da451E739',
             endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
           },
           isBaamGauges: false,
@@ -157,6 +159,7 @@ class Store {
           },
           multichain: {
             mirrorGate: '0xc9F08308fE6724BD7F0E87e2661DE2FDfcC9e8a8',
+            mirrorGateV2: '0xb13B67E805A621F58095277cBD98475Da451E739',
             endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
           },
           isBaamGauges: false,
@@ -1375,7 +1378,10 @@ class Store {
         fee,
       );
     } else if (project.multichain && target.multichain) {
-      const mirrorGate = new web3.eth.Contract(MULTICHAIN_MIRROR_GATE_ABI, project.multichain.mirrorGate);
+      let mirrorGate = new web3.eth.Contract(MULTICHAIN_MIRROR_GATE_ABI, project.multichain.mirrorGate);
+      if (target.chainId === 1666600000) {
+        mirrorGate = new web3.eth.Contract(MULTICHAIN_MIRROR_GATE_V2_ABI, project.multichain.mirrorGateV2);
+      }
       await this._asyncCallContractWait(
         web3,
         mirrorGate,
