@@ -374,6 +374,10 @@ class Store {
           votingEscrow: '0xAc8204a9d79CA87D192ea98A9381600642A66a5F',
           rewardPolicyMaker: '0xBa57440fA35Fdb671E58F6F56c1A4447aB1f6C2B',
           lpPriceOracle: '0x0b510A226F4A7A66c480988704eCd5306B6f1954',
+          multichain: {
+            mirrorGate: '0x206eA32143b066a146990e2Aa4E5e8432C4a065E',
+            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
+          },
           isBaamGauges: false,
           isV1Escrow: false,
           isV1Controller: false,
