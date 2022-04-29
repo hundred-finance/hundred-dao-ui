@@ -89,7 +89,7 @@ function Balances({ project }) {
       <div className={classes.separator}></div>
       <div className={classes.overviewCard}>
         <div>
-          <Typography variant="h5">Total {project?.tokenMetadata?.symbol} staked</Typography>
+          <Typography variant="h5">Total {project?.tokenMetadata?.symbol} locked</Typography>
           <Typography variant="h3">
             {!project ? <Skeleton style={{ minWidth: '200px ' }} /> : `${formatCurrency(project?.veTokenMetadata?.supply, 0)}`}
           </Typography>
