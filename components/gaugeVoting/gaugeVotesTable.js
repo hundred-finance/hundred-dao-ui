@@ -46,7 +46,7 @@ function stableSort(array, comparator) {
 }
 
 const headCells = [
-  { id: 'vault', numeric: false, disablePadding: false, label: 'Vault' },
+  { id: 'vault', numeric: false, disablePadding: false, label: 'Gauge' },
   {
     id: 'totalBalance',
     numeric: true,

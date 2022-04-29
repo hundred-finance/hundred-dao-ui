@@ -46,7 +46,7 @@ export default function Mirror({ project }) {
     return (
       <Typography variant="h5">
         <div className={classes.lock}>
-          {chainName(mirror.lock[1])}: {calculateVeHndBalance(mirror.lock)} veHND
+          {chainName(mirror.lock[1])}: {calculateVeHndBalance(mirror.lock)} mveHND
         </div>
       </Typography>
     );
