@@ -90,7 +90,7 @@ export default function LayerZeroMirror({ project }) {
               onClick={onMirror}
               disabled={targetChain === undefined || +project?.veTokenMetadata?.localBalance === 0}
             >
-              Mirror {formatCurrency(project.veTokenMetadata.localBalance)} veHND
+              Mirror {formatCurrency(project.veTokenMetadata.localBalance)} mveHND
             </Button>
           </div>
         </>
@@ -111,7 +111,7 @@ export default function LayerZeroMirror({ project }) {
             {project?.mirrored_locks?.map((lock, idx) => {
               return (
                 <div className={classes.lock_line} key={'lock' + idx}>
-                  <Typography variant="h5">{lock.amount} veHND</Typography>
+                  <Typography variant="h5">{lock.amount} mveHND</Typography>
                   <Typography variant="h5" className={classes.lockChainName}>
                     {lock.chain}
                   </Typography>
