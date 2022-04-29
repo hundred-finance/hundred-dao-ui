@@ -129,22 +129,22 @@ function Projects({ changeTheme }) {
         </div>
 
         {isLockIncreasePossible(project) ? (
-          <div className={isLZMirroringAvailable(project) ? classes.projectCardContainer : classes.projectCardContainer}>
+          <div className={classes.projectCardContainer}>
             <VeAssetModificationAmount project={project} />
             <VeAssetModificationDuration project={project} />
-            {isLZMirroringAvailable(project) ? <LayerZeroMirror project={project} /> : ''}
+            <LockDurationChart project={project} />
           </div>
         ) : (
-          <div className={isLZMirroringAvailable(project) ? classes.projectCardContainer2Columns : classes.projectContainer}>
+          <div className={classes.projectCardContainer2Columns}>
             <VeAssetGeneration project={project} />
-            {isLZMirroringAvailable(project) ? <LayerZeroMirror project={project} /> : ''}
+            <LockDurationChart project={project} />
           </div>
         )}
 
-        <div className={classes.projectCardContainer}>
+        <div className={isLZMirroringAvailable(project) ? classes.projectCardContainer : classes.projectCardContainer2Columns}>
           <GaugeVoting project={project} />
           <BoostCalculator project={project} />
-          <LockDurationChart project={project} />
+          {isLZMirroringAvailable(project) ? <LayerZeroMirror project={project} /> : ''}
         </div>
 
         <div className={classes.fakeGrid}>
