@@ -113,6 +113,17 @@ export const NETWORKS_CONFIG = [
     ],
     blockExplorerUrls: ['https://explorer.matic.network', 'https://explorer-mainnet.maticvigil.com/'],
   },
+  {
+    chainId: '0x1251',
+    chainName: 'Iotex',
+    nativeCurrency: {
+      name: 'IOTX',
+      symbol: 'IOTX',
+      decimals: 18,
+    },
+    rpcUrls: ['https://babel-api.mainnet.iotex.io'],
+    blockExplorerUrls: ['https://iotexscout.io/'],
+  },
 ];
 
 export const network = new NetworkConnector({ urls: { 1: RPC_URLS[1] } });
