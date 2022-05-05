@@ -66,10 +66,8 @@ class Store {
       return null;
     }
 
-    const web3 = await stores.accountStore.getWeb3Provider();
-
     const provider = await stores.accountStore.getEthersProvider();
-    if (!web3 || !provider) {
+    if (!provider) {
       return null;
     }
 
@@ -110,7 +108,7 @@ class Store {
     let locks = await this.locksToMirror(this.store.mirrors);
 
     const prov = new ethers.providers.Web3Provider(window.ethereum);
-    const mirrorContract = new ethers.Contract(project.merkleMirror, MERKLE_MIRROR_ABI, prov.getSigner());
+    const mirrorContract = new Contract(project.merkleMirror, MERKLE_MIRROR_ABI, prov.getSigner());
 
     let tx = await mirrorContract.multicall(this.buildMirrorTransactions(locks, mirrorContract));
     await tx.wait().then((_) => {
@@ -120,8 +118,8 @@ class Store {
   }
 
   async locksToMirror(mirrors) {
-    const web3 = await stores.accountStore.getWeb3Provider();
-    let chainId = await web3?.eth?.getChainId();
+    const provider = await stores.accountStore.getEthersProvider();
+    let { chainId } = await provider?.getNetwork();
     return mirrors.filter((m) => parseInt(m.lock[1]) !== chainId && !m.isMirrored);
   }
 

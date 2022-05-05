@@ -1,21 +1,8 @@
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { WalletLinkConnector } from '@web3-react/walletlink-connector';
-import { FortmaticConnector } from '@web3-react/fortmatic-connector';
-import { NetworkConnector } from '@web3-react/network-connector';
 
 const POLLING_INTERVAL = 12000;
-const RPC_URLS = {
-  1: 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
-  10: 'https://mainnet.optimism.io',
-  42: 'https://kovan.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
-  100: 'https://rpc.xdaichain.com',
-  137: 'https://rpc-mainnet.matic.network',
-  250: 'https://rpc.ftm.tools',
-  1285: 'https://rpc.moonriver.moonbeam.network',
-  42161: 'https://arb1.arbitrum.io/rpc',
-  1666600000: 'https://harmony-0-rpc.gateway.pokt.network/',
-};
 
 export const NETWORKS_CONFIG = [
   {
@@ -126,14 +113,19 @@ export const NETWORKS_CONFIG = [
   },
 ];
 
-export const network = new NetworkConnector({ urls: { 1: RPC_URLS[1] } });
+const supportedChains = NETWORKS_CONFIG.map((n) => parseInt(n.chainId));
+
+const RPC_URLS = {};
+NETWORKS_CONFIG.forEach((n) => {
+  RPC_URLS[parseInt(n.chainId)] = n.rpcUrls[0];
+});
 
 export const injected = new InjectedConnector({
-  supportedChainIds: [1, 10, 42, 100, 250, 42161, 1666600000],
+  supportedChainIds: supportedChains,
 });
 
 export const walletconnect = new WalletConnectConnector({
-  rpc: { 1: RPC_URLS[1] },
+  rpc: RPC_URLS,
   bridge: 'https://bridge.walletconnect.org',
   qrcode: true,
   pollingInterval: POLLING_INTERVAL,
@@ -141,10 +133,6 @@ export const walletconnect = new WalletConnectConnector({
 
 export const walletlink = new WalletLinkConnector({
   url: RPC_URLS[1],
-  appName: 'veToken',
-});
-
-export const fortmatic = new FortmaticConnector({
-  apiKey: 'pk_live_F95FEECB1BE324B5',
-  chainId: 1,
+  appName: 'Hundred Finance Governance',
+  supportedChainIds: supportedChains,
 });

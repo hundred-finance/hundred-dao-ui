@@ -17,14 +17,14 @@ export default function ProjectCard({ project }) {
     }
 
     if (stores.accountStore.store.account.chainId !== project.chainId) {
-      const provider = await stores.accountStore.getWeb3Provider();
+      const provider = await stores.accountStore.getEthersProvider();
       const targetNetwork = NETWORKS_CONFIG.find((n) => parseInt(n.chainId) === project.chainId);
       if (project.chainId === 1) {
-        await provider.currentProvider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x1' }] });
+        await provider.provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x1' }] });
       } else if (project.chainId === 42) {
-        await provider.currentProvider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x2A' }] });
+        await provider.provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x2A' }] });
       } else {
-        await provider.currentProvider.request({ method: 'wallet_addEthereumChain', params: [targetNetwork] });
+        await provider.provider.request({ method: 'wallet_addEthereumChain', params: [targetNetwork] });
       }
       return;
     }

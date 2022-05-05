@@ -16,6 +16,10 @@ export default function LayerZeroMirror({ project }) {
   const buildTargetChainsList = (project) => {
     let targets = [];
 
+    if (!project.targetChainMirrorGates) {
+      return [];
+    }
+
     if (project.layerZero) {
       targets = [...project.targetChainMirrorGates.filter((t) => t.hasActiveMveHND && t.layerZero !== undefined)];
     }

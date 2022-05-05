@@ -1,10 +1,8 @@
-import async from 'async';
 import { ethers } from 'ethers';
 import { ERROR, STORE_UPDATED, CONFIGURE, CONFIGURE_RETURNED, ACCOUNT_CHANGED, CONFIGURE_GAUGES } from './constants';
 
-import { injected, walletconnect, walletlink, fortmatic, network } from './connectors';
+import { injected, walletconnect, walletlink } from './connectors';
 
-import Web3 from 'web3';
 import stores from './index';
 
 class Store {
@@ -20,7 +18,6 @@ class Store {
         TrustWallet: injected,
         WalletConnect: walletconnect,
         WalletLink: walletlink,
-        Fortmatic: fortmatic,
       },
     };
 
@@ -91,8 +88,8 @@ class Store {
     const that = this;
 
     window.ethereum.on('accountsChanged', async function (accounts) {
-      let provider = await stores.accountStore.getWeb3Provider();
-      let connectedChainId = await provider.eth.getChainId();
+      let provider = await stores.accountStore.getEthersProvider();
+      let { connectedChainId } = await provider.getNetwork();
 
       that.setStore({
         account: { address: accounts[0], chainId: connectedChainId },
@@ -115,27 +112,6 @@ class Store {
     });
   }
 
-  async getWeb3Provider() {
-    try {
-      let web3context = this.getStore('web3context');
-      let provider = null;
-
-      if (web3context && web3context.library) {
-        provider = web3context.library.provider;
-      } else {
-        provider = network.providers['1'];
-      }
-
-      if (!provider) {
-        return null;
-      }
-      return new Web3(provider);
-    } catch (ex) {
-      console.log(ex);
-      return null;
-    }
-  }
-
   async getEthersProvider() {
     try {
       let web3context = this.getStore('web3context');
@@ -143,8 +119,6 @@ class Store {
 
       if (web3context && web3context.library) {
         provider = web3context.library.provider;
-      } else {
-        provider = network.providers['1'];
       }
 
       if (!provider) {

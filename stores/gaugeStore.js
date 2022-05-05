@@ -49,7 +49,7 @@ import BigNumber from 'bignumber.js';
 import { PRICE_ORACLE_ABI } from './abis/HundredFinancePriceOracleABI';
 import { CTOKEN_ABI } from './abis/CtokenABI';
 import { REWARD_POLICY_MAKER_ABI } from './abis/RewardPolicyMaker';
-import { network, NETWORKS_CONFIG } from './connectors';
+import { NETWORKS_CONFIG } from './connectors';
 import { Contract, Provider } from 'ethcall';
 import { ethers } from 'ethers';
 import { CETHER_ABI } from './abis/CetherABI';
@@ -541,8 +541,8 @@ class Store {
   async configure(payload) {
     const projects = this.getStore('projects');
 
-    const web3 = await stores.accountStore.getWeb3Provider();
-    let chainId = await web3?.eth?.getChainId();
+    const provider = await stores.accountStore.getEthersProvider();
+    let { chainId } = await provider.getNetwork();
 
     async.map(
       projects.filter((p) => p.chainId === chainId),
@@ -567,8 +567,7 @@ class Store {
   }
 
   async _getProjectData(project, targetProjects, callback) {
-    const web3 = await stores.accountStore.getWeb3Provider();
-    const ethersProvider = await stores.accountStore.getEthersProvider();
+    const provider = await stores.accountStore.getEthersProvider();
 
     project.targetChainMirrorGates = [];
     project.targetChainIds = [];
@@ -590,12 +589,12 @@ class Store {
       }
     }
 
-    if (!web3 || !ethersProvider) {
+    if (!provider) {
       return;
     }
 
     const ethcallProvider = new Provider();
-    await ethcallProvider.init(ethersProvider);
+    await ethcallProvider.init(provider);
 
     if (project.multicallAddress) {
       ethcallProvider.multicall = { address: project.multicallAddress, block: 0 };
@@ -774,14 +773,14 @@ class Store {
     }
 
     const projectTokenMetadata = {
-      address: web3.utils.toChecksumAddress(tokenMetadata.address),
+      address: tokenMetadata.address,
       symbol: tokenMetadata.symbol,
       decimals: parseInt(tokenMetadata.decimals),
       logo: `/logo128.png`,
     };
 
     const projectVeTokenMetadata = {
-      address: web3.utils.toChecksumAddress(veTokenMetadata.address),
+      address: veTokenMetadata.address,
       symbol: veTokenMetadata.symbol,
       decimals: parseInt(veTokenMetadata.decimals),
       logo: `https://assets.coingecko.com/coins/images/18445/thumb/hnd.PNG`,
@@ -818,8 +817,8 @@ class Store {
       return;
     }
 
-    const web3 = await stores.accountStore.getWeb3Provider();
-    if (!web3) {
+    const provider = await stores.accountStore.getEthersProvider();
+    if (!provider) {
       return null;
     }
 
@@ -842,9 +841,8 @@ class Store {
       return;
     }
 
-    const web3 = await stores.accountStore.getWeb3Provider();
     const provider = await stores.accountStore.getEthersProvider();
-    if (!web3 || !provider) {
+    if (!provider) {
       return null;
     }
 
@@ -877,6 +875,8 @@ class Store {
     if (project.multicallAddress) {
       ethcallProvider.multicall = { address: project.multicallAddress, block: 0 };
     }
+
+    console.log('project', project);
 
     const hasMveHnd = project.mirroredVotingEscrow !== undefined;
     const mirroredVeTokenAddress = project.mirroredVotingEscrow ? project.mirroredVotingEscrow : project.votingEscrow;
@@ -916,7 +916,7 @@ class Store {
       );
     });
 
-    if (hasMveHnd) {
+    if (hasMveHnd && project.targetChainIds) {
       project.targetChainIds.forEach((id) => {
         calls.push(mirroredVeTokenContract.mirrored_locks(account.address, id, 0));
       });
@@ -1080,15 +1080,15 @@ class Store {
       //maybe throw an error
     }
 
-    const web3 = await stores.accountStore.getWeb3Provider();
-    if (!web3) {
+    const provider = await stores.accountStore.getEthersProvider();
+    if (!provider) {
       return false;
       //maybe throw an error
     }
 
     const { amount, project } = payload.content;
 
-    this._callApproveLock(web3, project, account, amount, (err, approveResult) => {
+    this._callApproveLock(provider, project, account, amount, (err, approveResult) => {
       if (err) {
         return this.emitter.emit(ERROR, err);
       }
@@ -1097,8 +1097,8 @@ class Store {
     });
   }
 
-  async _callApproveLock(web3, project, account, amount, callback) {
-    const tokenContract = new web3.eth.Contract(ERC20_ABI, project.tokenMetadata.address);
+  async _callApproveLock(provider, project, account, amount, callback) {
+    const tokenContract = new ethers.Contract(project.tokenMetadata.address, ERC20_ABI, provider.getSigner());
 
     let amountToSend = '0';
     if (amount === 'max') {
@@ -1110,7 +1110,7 @@ class Store {
     }
 
     await this._asyncCallContractWait(
-      web3,
+      provider,
       tokenContract,
       'approve',
       [project.votingEscrow, amountToSend],
@@ -1129,15 +1129,15 @@ class Store {
       //maybe throw an error
     }
 
-    const web3 = await stores.accountStore.getWeb3Provider();
-    if (!web3) {
+    const provider = await stores.accountStore.getEthersProvider();
+    if (!provider) {
       return false;
       //maybe throw an error
     }
 
     const { amount, selectedDate, project } = payload.content;
 
-    this._callLock(web3, project, account, amount, selectedDate, (err, lockResult) => {
+    this._callLock(provider, project, account, amount, selectedDate, (err, lockResult) => {
       if (err) {
         return this.emitter.emit(ERROR, err);
       }
@@ -1153,15 +1153,15 @@ class Store {
       //maybe throw an error
     }
 
-    const web3 = await stores.accountStore.getWeb3Provider();
-    if (!web3) {
+    const provider = await stores.accountStore.getEthersProvider();
+    if (!provider) {
       return false;
       //maybe throw an error
     }
 
     const { project } = payload.content;
 
-    this._callUnlock(web3, project, account, (err, lockResult) => {
+    this._callUnlock(provider, project, account, (err, lockResult) => {
       if (err) {
         return this.emitter.emit(ERROR, err);
       }
@@ -1170,15 +1170,15 @@ class Store {
     });
   }
 
-  async _callLock(web3, project, account, amount, selectedDate, callback) {
-    const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.votingEscrow);
+  async _callLock(provider, project, account, amount, selectedDate, callback) {
+    const escrowContract = new ethers.Contract(project.votingEscrow, VOTING_ESCROW_ABI, provider.getSigner());
 
     const amountToSend = BigNumber(amount)
       .times(10 ** project.tokenMetadata.decimals)
       .toFixed(0);
 
     await this._asyncCallContractWait(
-      web3,
+      provider,
       escrowContract,
       'create_lock',
       [amountToSend, selectedDate],
@@ -1190,10 +1190,10 @@ class Store {
     );
   }
 
-  async _callUnlock(web3, project, account, callback) {
-    const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.votingEscrow);
+  async _callUnlock(provider, project, account, callback) {
+    const escrowContract = new ethers.Contract(project.votingEscrow, VOTING_ESCROW_ABI, provider.getSigner());
 
-    await this._asyncCallContractWait(web3, escrowContract, 'withdraw', [], account, null, GET_TOKEN_BALANCES, { id: project.id }, callback);
+    await this._asyncCallContractWait(provider, escrowContract, 'withdraw', [], account, null, GET_TOKEN_BALANCES, { id: project.id }, callback);
   }
 
   async vote(payload) {
@@ -1203,15 +1203,15 @@ class Store {
       //maybe throw an error
     }
 
-    const web3 = await stores.accountStore.getWeb3Provider();
-    if (!web3) {
+    const provider = await stores.accountStore.getEthersProvider();
+    if (!provider) {
       return false;
       //maybe throw an error
     }
 
     const { amount, gaugeAddress, project } = payload.content;
 
-    this._calVoteForGaugeWeights(web3, project, account, amount, gaugeAddress, (err, voteResult) => {
+    this._calVoteForGaugeWeights(provider, project, account, amount, gaugeAddress, (err, voteResult) => {
       if (err) {
         return this.emitter.emit(ERROR, err);
       }
@@ -1220,13 +1220,13 @@ class Store {
     });
   }
 
-  async _calVoteForGaugeWeights(web3, project, account, amount, gaugeAddress, callback) {
-    const gaugeControllerContract = new web3.eth.Contract(GAUGE_CONTROLLER_ABI, project.gaugeProxyAddress);
+  async _calVoteForGaugeWeights(provider, project, account, amount, gaugeAddress, callback) {
+    const gaugeControllerContract = new ethers.Contract(project.gaugeProxyAddress, GAUGE_CONTROLLER_ABI, provider.getSigner());
 
     const amountToSend = (amount * 100).toFixed(0);
 
     await this._asyncCallContractWait(
-      web3,
+      provider,
       gaugeControllerContract,
       'vote_for_gauge_weights',
       [gaugeAddress, amountToSend],
@@ -1245,15 +1245,15 @@ class Store {
       //maybe throw an error
     }
 
-    const web3 = await stores.accountStore.getWeb3Provider();
-    if (!web3) {
+    const provider = await stores.accountStore.getEthersProvider();
+    if (!provider) {
       return false;
       //maybe throw an error
     }
 
     const { amount, project } = payload.content;
 
-    this._callIncreaseAmount(web3, project, account, amount, (err, lockResult) => {
+    this._callIncreaseAmount(provider, project, account, amount, (err, lockResult) => {
       if (err) {
         return this.emitter.emit(ERROR, err);
       }
@@ -1262,14 +1262,24 @@ class Store {
     });
   }
 
-  async _callIncreaseAmount(web3, project, account, amount, callback) {
-    const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.votingEscrow);
+  async _callIncreaseAmount(provider, project, account, amount, callback) {
+    const escrowContract = new ethers.Contract(project.votingEscrow, VOTING_ESCROW_ABI, provider.getSigner());
 
     const amountToSend = BigNumber(amount)
       .times(10 ** project.tokenMetadata.decimals)
       .toFixed(0);
 
-    await this._asyncCallContractWait(web3, escrowContract, 'increase_amount', [amountToSend], account, null, GET_TOKEN_BALANCES, { id: project.id }, callback);
+    await this._asyncCallContractWait(
+      provider,
+      escrowContract,
+      'increase_amount',
+      [amountToSend],
+      account,
+      null,
+      GET_TOKEN_BALANCES,
+      { id: project.id },
+      callback,
+    );
   }
 
   async increaseLockDuration(payload) {
@@ -1279,8 +1289,8 @@ class Store {
       //maybe throw an error
     }
 
-    const web3 = await stores.accountStore.getWeb3Provider();
-    if (!web3) {
+    const provider = await stores.accountStore.getEthersProvider();
+    if (!provider) {
       return false;
       //maybe throw an error
     }
@@ -1291,7 +1301,7 @@ class Store {
     //   selectedDate = moment.duration(moment.unix(selectedDate).diff(moment().startOf('day'))).asDays();
     // }
 
-    this._callIncreaseUnlockTime(web3, project, account, selectedDate, (err, lockResult) => {
+    this._callIncreaseUnlockTime(provider, project, account, selectedDate, (err, lockResult) => {
       if (err) {
         return this.emitter.emit(ERROR, err);
       }
@@ -1307,17 +1317,17 @@ class Store {
       //maybe throw an error
     }
 
-    const web3 = await stores.accountStore.getWeb3Provider();
-    if (!web3) {
+    const provider = await stores.accountStore.getEthersProvider();
+    if (!provider) {
       return false;
       //maybe throw an error
     }
 
     let { gaugeAddress, project } = payload.content;
 
-    const gaugeContract = new web3.eth.Contract(GAUGE_ABI, gaugeAddress);
+    const gaugeContract = new ethers.Contract(gaugeAddress, GAUGE_ABI, provider.getSigner());
     await this._asyncCallContractWait(
-      web3,
+      provider,
       gaugeContract,
       'user_checkpoint',
       [account.address],
@@ -1334,11 +1344,11 @@ class Store {
     );
   }
 
-  async _callIncreaseUnlockTime(web3, project, account, selectedDate, callback) {
-    const escrowContract = new web3.eth.Contract(VOTING_ESCROW_ABI, project.votingEscrow);
+  async _callIncreaseUnlockTime(provider, project, account, selectedDate, callback) {
+    const escrowContract = new ethers.Contract(project.votingEscrow, VOTING_ESCROW_ABI, provider.getSigner());
 
     await this._asyncCallContractWait(
-      web3,
+      provider,
       escrowContract,
       'increase_unlock_time',
       [selectedDate],
@@ -1350,7 +1360,7 @@ class Store {
     );
   }
 
-  async _asyncCallContractWait(web3, contract, method, params, account, gasPrice, dispatchEvent, dispatchEventPayload, callback, value = undefined) {
+  async _asyncCallContractWait(provider, contract, method, params, account, gasPrice, dispatchEvent, dispatchEventPayload, callback, value = undefined) {
     let sendPayload = {
       from: account.address,
     };
@@ -1358,43 +1368,41 @@ class Store {
       sendPayload.value = value;
     }
 
-    await this._callContractWait(web3, contract, method, params, account, sendPayload, dispatchEvent, dispatchEventPayload, callback);
+    await this._callContractWait(provider, contract, method, params, account, sendPayload, dispatchEvent, dispatchEventPayload, callback);
   }
 
-  async _callContractWait(web3, contract, method, params, account, sendPayload, dispatchEvent, dispatchEventPayload, callback) {
+  async _callContractWait(provider, contract, method, params, account, sendPayload, dispatchEvent, dispatchEventPayload, callback) {
     const context = this;
 
-    let chainId = await web3?.eth?.getChainId();
+    let { chainId } = await provider?.getNetwork();
     let chain = NETWORKS_CONFIG.find((chain) => parseInt(chain.chainId) === chainId);
 
-    contract.methods[method](...params)
-      .send(sendPayload)
-      .on('transactionHash', function (hash) {
-        context.emitter.emit(TX_SUBMITTED, { hash: hash, baseUrl: chain.blockExplorerUrls[0] });
-      })
-      .once('receipt', function (receipt) {
-        callback(null, receipt.transactionHash, receipt);
+    try {
+      const txGas = await contract.estimateGas[method](...params, sendPayload);
+      let tx = await contract[method](...params, { ...sendPayload, gasLimit: txGas });
+      context.emitter.emit(TX_SUBMITTED, { hash: tx.hash, baseUrl: chain.blockExplorerUrls[0] });
 
-        if (dispatchEvent) {
-          context.dispatcher.dispatch({ type: dispatchEvent, content: dispatchEventPayload });
+      let receipt = await tx.wait();
+      callback(null, receipt.transactionHash, receipt);
+
+      if (dispatchEvent) {
+        context.dispatcher.dispatch({ type: dispatchEvent, content: dispatchEventPayload });
+      }
+    } catch (error) {
+      if (!error.toString().includes('-32601')) {
+        if (error.message) {
+          return callback(error.message);
         }
-      })
-      .on('error', function (error) {
-        if (!error.toString().includes('-32601')) {
-          if (error.message) {
-            return callback(error.message);
-          }
-          callback(error);
+        callback(error);
+      }
+
+      if (!error.toString().includes('-32601')) {
+        if (error.message) {
+          return callback(error.message);
         }
-      })
-      .catch((error) => {
-        if (!error.toString().includes('-32601')) {
-          if (error.message) {
-            return callback(error.message);
-          }
-          callback(error);
-        }
-      });
+        callback(error);
+      }
+    }
   }
 
   async _getHndPrice() {
@@ -1416,7 +1424,7 @@ class Store {
     return 0;
   }
 
-  registerLockEvent(account, project, web3, target, error, hash, receipt) {
+  registerLockEvent(account, project, provider, target, error, hash, receipt) {
     if (receipt) {
       const abi = [
         { indexed: false, internalType: 'uint16', name: 'chainId', type: 'uint16' },
@@ -1426,7 +1434,7 @@ class Store {
       ];
 
       let event = receipt.events[0];
-      let params = web3.eth.abi.decodeLog(abi, event.raw.data, event.raw.topics);
+      let params = provider.eth.abi.decodeLog(abi, event.raw.data, event.raw.topics);
 
       let mirror_transactions = [];
       let storage = window.localStorage.getItem('mirror_transactions');
@@ -1453,14 +1461,14 @@ class Store {
   async mirrorLock(payload) {
     let that = this;
     const { project, target } = payload.content;
-    const web3 = await stores.accountStore.getWeb3Provider();
+    const provider = await stores.accountStore.getEthersProvider();
     const account = stores.accountStore.getStore('account');
 
     if (project.layerZero && target.layerZero) {
-      const mirrorGate = new web3.eth.Contract(LAYER_ZERO_MIRROR_GATE_ABI, project.layerZero.mirrorGate);
+      const mirrorGate = new ethers.Contract(project.layerZero.mirrorGate, LAYER_ZERO_MIRROR_GATE_ABI, provider.getSigner());
       const fee = await estimateMirrorFee(project, target, account);
       await this._asyncCallContractWait(
-        web3,
+        provider,
         mirrorGate,
         'mirrorLock',
         [target.layerZero.endpointId, 0, 500000],
@@ -1468,16 +1476,16 @@ class Store {
         null,
         GET_TOKEN_BALANCES,
         { id: project.id },
-        (error, hash, receipt) => that.registerLockEvent(account, project, web3, target, error, hash, receipt),
+        (error, hash, receipt) => that.registerLockEvent(account, project, provider, target, error, hash, receipt),
         fee,
       );
     } else if (project.multichain && target.multichain) {
-      let mirrorGate = new web3.eth.Contract(MULTICHAIN_MIRROR_GATE_ABI, project.multichain.mirrorGate);
+      let mirrorGate = new ethers.Contract(project.multichain.mirrorGate, MULTICHAIN_MIRROR_GATE_ABI, provider.getSigner());
       if (target.chainId === 1666600000) {
-        mirrorGate = new web3.eth.Contract(MULTICHAIN_MIRROR_GATE_V2_ABI, project.multichain.mirrorGateV2);
+        mirrorGate = new ethers.Contract(project.multichain.mirrorGateV2, provider.getSigner());
       }
       await this._asyncCallContractWait(
-        web3,
+        provider,
         mirrorGate,
         'mirrorLock',
         [target.chainId, target.mirroredVotingEscrow, 0],
@@ -1485,7 +1493,7 @@ class Store {
         null,
         GET_TOKEN_BALANCES,
         { id: project.id },
-        (error, hash, receipt) => that.registerLockEvent(account, project, web3, target, error, hash, receipt),
+        (error, hash, receipt) => that.registerLockEvent(account, project, provider, target, error, hash, receipt),
         0,
       );
     }

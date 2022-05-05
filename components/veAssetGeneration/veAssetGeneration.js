@@ -27,7 +27,7 @@ export default function VeAssetGeneration({ project }) {
       setApproveLoading(false);
       setRevokeApproveLoading(false);
 
-      stores.dispatcher.dispatch({ type: GET_PROJECT, content: { id: project.id } });
+      stores.dispatcher.dispatch({ type: GET_PROJECT, content: { id: project?.id } });
     };
 
     stores.emitter.on(LOCK_RETURNED, lockReturned);
