@@ -280,8 +280,8 @@ class Store {
           mirroredVotingEscrow: '0x988174f4AB5ad41E1313F1b07877dFe4A78CE5F2',
           votingEscrow: '0xf64E1a3eF0d2F5659dC4c10983e595B797C6ecA4',
           rewardPolicyMaker: '0x89Aa51685a2B658be8a7b9C3Af70D66557544181',
-          lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
-          nativeTokenGauge: '0x7BFE7b45c8019DEDc66c695Ac70b8fc2c0421584',
+          lpPriceOracle: '0x36208A6D429b056BE6bE5fa81CdF4092748ac35D',
+          nativeTokenGauge: '0x5835d6A367Ded86dbc33CE796eD5013488D205c0',
           multichain: {
             mirrorGate: '0xb1A76e5454E4aF0C4F8f7b071df14a3B4011e8AF',
             endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
