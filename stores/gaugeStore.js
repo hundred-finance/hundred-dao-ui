@@ -281,7 +281,11 @@ class Store {
           votingEscrow: '0xf64E1a3eF0d2F5659dC4c10983e595B797C6ecA4',
           rewardPolicyMaker: '0x89Aa51685a2B658be8a7b9C3Af70D66557544181',
           lpPriceOracle: '0x36208A6D429b056BE6bE5fa81CdF4092748ac35D',
-          nativeTokenGauge: '0x5835d6A367Ded86dbc33CE796eD5013488D205c0',
+          lpPriceOracles: [
+            { lp: '0x090a00A2De0EA83DEf700B5e216f87a5D4F394FE', oracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73' },
+            { lp: '0x243E33aa7f6787154a8E59d3C27a66db3F8818ee', oracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73' },
+          ],
+          nativeTokenGauges: ['0x5835d6A367Ded86dbc33CE796eD5013488D205c0', '0x7BFE7b45c8019DEDc66c695Ac70b8fc2c0421584'],
           multichain: {
             mirrorGate: '0xb1A76e5454E4aF0C4F8f7b071df14a3B4011e8AF',
             endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
@@ -706,7 +710,7 @@ class Store {
     gaugesLPTokens.forEach((lp, index) => {
       const gaugeUnderlying = project.isBaamGauges ? baamGaugeLpTokens[index * 2] : lp;
       const priceOracleMulticall = new Contract(lpPriceOracle(project, gaugeUnderlying), PRICE_ORACLE_ABI);
-      if (gauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
+      if (project.nativeTokenGauges?.find((g) => g.toLowerCase() === gauges[index].toLowerCase()) === undefined) {
         const lpContract = new Contract(gaugeUnderlying, CTOKEN_ABI);
         lpCalls.push(
           priceOracleMulticall.getUnderlyingPrice(gaugeUnderlying),
@@ -722,7 +726,7 @@ class Store {
 
     const lpData = await ethcallProvider.all(lpCalls);
     const lpTokenUnderlyingInfo = gaugesLPTokens.map((lp, index) => {
-      if (gauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
+      if (project.nativeTokenGauges?.find((g) => g.toLowerCase() === gauges[index].toLowerCase()) === undefined) {
         const lptokenInfo = lpData.splice(0, 4);
         return {
           price: lptokenInfo[0],
@@ -742,7 +746,7 @@ class Store {
     const lpTokensCalls = [];
     gaugesLPTokens.forEach((lp, index) => {
       const lpTokenContract = new Contract(lp, ERC20_ABI);
-      if (gauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
+      if (project.nativeTokenGauges?.find((g) => g.toLowerCase() === gauges[index].toLowerCase()) === undefined) {
         const lpUnderlyingTokenContract = new Contract(lpTokenUnderlyingInfo[index].underlying, ERC20_ABI);
         lpTokensCalls.push(
           lpTokenContract.name(),
@@ -760,7 +764,7 @@ class Store {
     const lpTokensData = await ethcallProvider.all(lpTokensCalls);
 
     const lpTokens = gaugesLPTokens.map((gauge, index) => {
-      if (gauges[index].toLowerCase() !== project.nativeTokenGauge?.toLowerCase()) {
+      if (project.nativeTokenGauges?.find((g) => g.toLowerCase() === gauges[index].toLowerCase()) === undefined) {
         const data = lpTokensData.splice(0, 6);
         return { name: data[0], symbol: data[1], decimals: data[2], balance: data[3], underlyingDecimals: data[4], underlyingSymbol: data[5] };
       } else {
