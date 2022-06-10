@@ -8,6 +8,7 @@ import { layerZeroEndpointAbi } from './layerZeroEndpoint';
 import { layerZeroMirrorGateAbi } from './layerZeroMirrorGate';
 import { multiChainMirrorGateAbi } from './multiChainMirrorGate';
 import { multiChainMirrorGateV2Abi } from './multiChainMirrorGateV2';
+import { multiChainMirrorGateV3Abi } from './multiChainMirrorGateV3';
 
 export const ERC20_ABI = erc20ABI;
 export const VOTING_ESCROW_ABI = votingEscrowABI;
@@ -19,4 +20,5 @@ export const LAYER_ZERO_ENDPOINT_ABI = layerZeroEndpointAbi;
 export const LAYER_ZERO_MIRROR_GATE_ABI = layerZeroMirrorGateAbi;
 export const MULTICHAIN_MIRROR_GATE_ABI = multiChainMirrorGateAbi;
 export const MULTICHAIN_MIRROR_GATE_V2_ABI = multiChainMirrorGateV2Abi;
+export const MULTICHAIN_MIRROR_GATE_V3_ABI = multiChainMirrorGateV3Abi;
 export const MIRRORED_VOTING_ESCROW_ABI = mirroredVotingEscrowABI;

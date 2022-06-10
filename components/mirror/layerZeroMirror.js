@@ -24,10 +24,8 @@ export default function LayerZeroMirror({ project }) {
       targets = [...project.targetChainMirrorGates.filter((t) => t.hasActiveMveHND && t.layerZero !== undefined)];
     }
 
-    if (project.multichain) {
-      let multiChain = project.targetChainMirrorGates
-        .filter((t) => t.hasActiveMveHND && t.multichain !== undefined)
-        .filter((t) => t.chainId !== 1666600000 || project.multichain.mirrorGateV2 !== undefined);
+    if (project.multichain && project.multichain.mirrorGateV3) {
+      let multiChain = project.targetChainMirrorGates.filter((t) => t.hasActiveMveHND && t.multichain !== undefined);
 
       for (let t = 0; t < multiChain.length; t++) {
         if (targets.find((tt) => tt.chainId === multiChain[t].chainId) === undefined) {

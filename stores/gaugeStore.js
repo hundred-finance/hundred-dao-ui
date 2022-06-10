@@ -42,6 +42,7 @@ import {
   LAYER_ZERO_MIRROR_GATE_ABI,
   MULTICHAIN_MIRROR_GATE_ABI,
   MULTICHAIN_MIRROR_GATE_V2_ABI,
+  MULTICHAIN_MIRROR_GATE_V3_ABI,
 } from './abis';
 
 import stores from './';
@@ -88,11 +89,9 @@ class Store {
             endpoint: '0x3c2269811836af69497E5F486A85D7316753cf62',
             endpointId: 10,
           },
-          // multichain: {
-          //   mirrorGate: '0x340A3F5a18c455f39714B6b692905801f21ed353',
-          //   mirrorGateV2: '0xb13B67E805A621F58095277cBD98475Da451E739',
-          //   endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
-          // },
+          multichain: {
+            mirrorGateV3: '0xba0649B1a51Ab1f0074E26Ba164b26EBF6e9a91e',
+          },
           isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: true,
@@ -124,9 +123,7 @@ class Store {
             endpointId: 12,
           },
           multichain: {
-            mirrorGate: '0xc9F08308fE6724BD7F0E87e2661DE2FDfcC9e8a8',
-            mirrorGateV2: '0xb13B67E805A621F58095277cBD98475Da451E739',
-            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
+            mirrorGateV3: '0xA0c94183a74CF22dE491DcbB02fc7433267c6D32',
           },
           isBaamGauges: false,
           isV1Escrow: true,
@@ -161,9 +158,7 @@ class Store {
             endpointId: 12,
           },
           multichain: {
-            mirrorGate: '0xc9F08308fE6724BD7F0E87e2661DE2FDfcC9e8a8',
-            mirrorGateV2: '0xb13B67E805A621F58095277cBD98475Da451E739',
-            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
+            mirrorGateV3: '0xA0c94183a74CF22dE491DcbB02fc7433267c6D32',
           },
           isBaamGauges: false,
           isV1Escrow: true,
@@ -196,9 +191,7 @@ class Store {
             endpointId: 12,
           },
           multichain: {
-            mirrorGate: '0xc9F08308fE6724BD7F0E87e2661DE2FDfcC9e8a8',
-            mirrorGateV2: '0xb13B67E805A621F58095277cBD98475Da451E739',
-            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
+            mirrorGateV3: '0xA0c94183a74CF22dE491DcbB02fc7433267c6D32',
           },
           isBaamGauges: true,
           isV1Escrow: true,
@@ -225,8 +218,7 @@ class Store {
           lpPriceOracle: '0x10010069de6bd5408a6ded075cf6ae2498073c73',
           rewardPolicyMaker: '0xC3bae38Bfa2CbBE30f442649070408f484bd5882',
           multichain: {
-            mirrorGate: '0xC457D2DD3209b7186934426ACd8391d504dc3978',
-            endpoint: '0x6f058086d91a181007c2325e5b285425ca84d615',
+            mirrorGateV3: '0x1cF3993EbA538e5f085333c86356622161Dd8C0B',
           },
           isBaamGauges: false,
           isV1Escrow: true,
@@ -253,8 +245,7 @@ class Store {
           rewardPolicyMaker: '0x371F3AD36072230424C828629d53B0Dbd93c8273',
           lpPriceOracle: '0x10010069de6bd5408a6ded075cf6ae2498073c73',
           multichain: {
-            mirrorGate: '0xc9F08308fE6724BD7F0E87e2661DE2FDfcC9e8a8',
-            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
+            mirrorGateV3: '0x989b2F0722808d9F9c574363fA8759e925f30F12',
           },
           isBaamGauges: false,
           isV1Escrow: true,
@@ -287,8 +278,7 @@ class Store {
           ],
           nativeTokenGauges: ['0x5835d6A367Ded86dbc33CE796eD5013488D205c0', '0x7BFE7b45c8019DEDc66c695Ac70b8fc2c0421584'],
           multichain: {
-            mirrorGate: '0xb1A76e5454E4aF0C4F8f7b071df14a3B4011e8AF',
-            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
+            mirrorGateV3: '0xA0c94183a74CF22dE491DcbB02fc7433267c6D32',
           },
           nativeTokenSymbol: 'xDAI',
           isBaamGauges: false,
@@ -321,8 +311,7 @@ class Store {
             endpointId: 11,
           },
           multichain: {
-            mirrorGate: '0x27a1B793b5B51a8862F66B0a1181EF42b2A8D9C2',
-            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
+            mirrorGateV3: '0x6c63287CC629417E96b77DD7184748Bb6536A4e2',
           },
           isBaamGauges: false,
           isV1Escrow: false,
@@ -354,8 +343,7 @@ class Store {
             endpointId: 9,
           },
           multichain: {
-            mirrorGate: '0x9c15a48A2ce440298815f64ddd5De91800Ad89ec',
-            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
+            mirrorGateV3: '0xd33d15f91A25Ec74dd9224E71C5175BA9DC4e01D',
           },
           isBaamGauges: false,
           isV1Escrow: false,
@@ -387,8 +375,7 @@ class Store {
             endpointId: 9,
           },
           multichain: {
-            mirrorGate: '0x9c15a48A2ce440298815f64ddd5De91800Ad89ec',
-            endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
+            mirrorGateV3: '0xd33d15f91A25Ec74dd9224E71C5175BA9DC4e01D',
           },
           isBaamGauges: true,
           isV1Escrow: false,
@@ -414,10 +401,9 @@ class Store {
           votingEscrow: '0xAc8204a9d79CA87D192ea98A9381600642A66a5F',
           rewardPolicyMaker: '0xBa57440fA35Fdb671E58F6F56c1A4447aB1f6C2B',
           lpPriceOracle: '0x0b510A226F4A7A66c480988704eCd5306B6f1954',
-          // multichain: {
-          //   mirrorGate: '0x206eA32143b066a146990e2Aa4E5e8432C4a065E',
-          //   endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
-          // },
+          multichain: {
+            mirrorGateV3: '0x1Ac7Cb8D9e3AC86296a5DEA9d55BF846AB459bA9',
+          },
           isBaamGauges: false,
           isV1Escrow: false,
           isV1Controller: false,
@@ -442,10 +428,9 @@ class Store {
           votingEscrow: '0xAc8204a9d79CA87D192ea98A9381600642A66a5F',
           rewardPolicyMaker: '0x73280c390dA5c6fe05ad2d1e6837E8E8c05E4b32',
           lpPriceOracle: '0x0b510A226F4A7A66c480988704eCd5306B6f1954',
-          // multichain: {
-          //   mirrorGate: '0x206eA32143b066a146990e2Aa4E5e8432C4a065E',
-          //   endpoint: '0x37414a8662bC1D25be3ee51Fb27C2686e2490A89',
-          // },
+          multichain: {
+            mirrorGateV3: '0x1Ac7Cb8D9e3AC86296a5DEA9d55BF846AB459bA9',
+          },
           isBaamGauges: true,
           isV1Escrow: false,
           isV1Controller: false,
@@ -1409,6 +1394,7 @@ class Store {
 
     try {
       const txGas = await contract.estimateGas[method](...params, sendPayload);
+      console.log('calling with gas: ', txGas.toString());
       let tx = await contract[method](...params, { ...sendPayload, gasLimit: txGas });
       context.emitter.emit(TX_SUBMITTED, { hash: tx.hash, baseUrl: chain.blockExplorerUrls[0] });
 
@@ -1419,6 +1405,7 @@ class Store {
         context.dispatcher.dispatch({ type: dispatchEvent, content: dispatchEventPayload });
       }
     } catch (error) {
+      console.log('error', error);
       if (!error.toString().includes('-32601')) {
         if (error.message) {
           return callback(error.message);
@@ -1494,9 +1481,41 @@ class Store {
     const provider = await stores.accountStore.getEthersProvider();
     const account = stores.accountStore.getStore('account');
 
-    if (project.layerZero && target.layerZero) {
+    if (project.multichain && target.multichain) {
+      let mirrorGate = new ethers.Contract(project.multichain.mirrorGateV3, MULTICHAIN_MIRROR_GATE_V3_ABI, provider.getSigner());
+      const fee = await estimateMultichainMirrorFee(project, target, account);
+      console.log('estimated fee: ', fee, fee.toString());
+      console.log('calling: ', mirrorGate, [
+        target.chainId,
+        target.multichain.mirrorGateV3,
+        [project.chainId],
+        [0],
+        [project.veTokenMetadata.userLockAmount.toString()],
+        [project.veTokenMetadata.userLockEnd.toString()],
+      ]);
+      await this._asyncCallContractWait(
+        provider,
+        mirrorGate,
+        'mirrorLocks',
+        [
+          target.chainId,
+          target.multichain.mirrorGateV3,
+          [project.chainId],
+          [0],
+          [project.veTokenMetadata.userLockAmount.toString()],
+          [project.veTokenMetadata.userLockEnd.toString()],
+        ],
+        account,
+        null,
+        GET_TOKEN_BALANCES,
+        { id: project.id },
+        (error, hash, receipt) => that.registerLockEvent(account, project, provider, target, error, hash, receipt),
+        fee,
+      );
+    } else if (project.layerZero && target.layerZero) {
       const mirrorGate = new ethers.Contract(project.layerZero.mirrorGate, LAYER_ZERO_MIRROR_GATE_ABI, provider.getSigner());
       const fee = await estimateMirrorFee(project, target, account);
+      console.log('estimated fee: ', fee, fee.toString());
       await this._asyncCallContractWait(
         provider,
         mirrorGate,
@@ -1508,23 +1527,6 @@ class Store {
         { id: project.id },
         (error, hash, receipt) => that.registerLockEvent(account, project, provider, target, error, hash, receipt),
         fee,
-      );
-    } else if (project.multichain && target.multichain) {
-      let mirrorGate = new ethers.Contract(project.multichain.mirrorGate, MULTICHAIN_MIRROR_GATE_ABI, provider.getSigner());
-      if (target.chainId === 1666600000) {
-        mirrorGate = new ethers.Contract(project.multichain.mirrorGateV2, provider.getSigner());
-      }
-      await this._asyncCallContractWait(
-        provider,
-        mirrorGate,
-        'mirrorLock',
-        [target.chainId, target.mirroredVotingEscrow, 0],
-        account,
-        null,
-        GET_TOKEN_BALANCES,
-        { id: project.id },
-        (error, hash, receipt) => that.registerLockEvent(account, project, provider, target, error, hash, receipt),
-        0,
       );
     }
   }
@@ -1598,6 +1600,25 @@ async function estimateMirrorFee(project, target, account) {
   const fee = await ethcallProvider.all([call]);
 
   return fee[0].nativeFee;
+}
+
+async function estimateMultichainMirrorFee(project, target, account) {
+  const ethersProvider = await stores.accountStore.getEthersProvider();
+  const ethcallProvider = new Provider();
+  await ethcallProvider.init(ethersProvider);
+
+  const mirrorGate = new Contract(project.multichain.mirrorGateV3, MULTICHAIN_MIRROR_GATE_V3_ABI);
+  const call = mirrorGate.calculateFee(
+    account.address,
+    target.chainId,
+    [project.chainId],
+    [0],
+    [project.veTokenMetadata.userLockAmount],
+    [project.veTokenMetadata.userLockEnd],
+  );
+
+  const fee = await ethcallProvider.all([call]);
+  return fee[0];
 }
 
 export default Store;
