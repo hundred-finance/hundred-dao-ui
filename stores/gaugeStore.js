@@ -983,8 +983,12 @@ class Store {
       d.forEach((l, index) => {
         if (l.end.toNumber() > now) {
           project.mirrored_locks.push({
-            amount: (+ethers.utils.formatEther(l.amount.mul(l.end.toNumber() - now).div(maxLockEnd - now))).toFixed(2),
+            amount: l.amount.mul(l.end.toNumber() - now).div(maxLockEnd - now),
+            lockAmount: l.amount,
+            lockEnd: l.end,
             chain: this.chainName(project.targetChainIds[index]),
+            chainId: project.targetChainIds[index],
+            escrowId: 0,
           });
         }
       });
@@ -1015,6 +1019,23 @@ class Store {
 
     project.veTokenMetadata.userLockAmount = userLocked.amount;
     project.veTokenMetadata.userLockEnd = userLocked.end;
+
+    if (project.veTokenMetadata.userLockAmount && project.veTokenMetadata.userLockAmount.gt(0)) {
+      let now = moment().unix();
+      let maxLockEnd = moment().add(4, 'years').unix();
+      const amount = project.veTokenMetadata.userLockAmount;
+      const end = project.veTokenMetadata.userLockEnd;
+      project.mirrored_locks.push({
+        amount: amount.mul(end.toNumber() - now).div(maxLockEnd - now),
+        lockAmount: amount,
+        lockEnd: end,
+        chain: this.chainName(project.chainId),
+        chainId: project.chainId,
+        escrowId: 0,
+      });
+    }
+
+    console.log('mirrored locks', project.mirrored_locks);
 
     let totalPercentUsed = 0;
 
@@ -1394,7 +1415,6 @@ class Store {
 
     try {
       const txGas = await contract.estimateGas[method](...params, sendPayload);
-      console.log('calling with gas: ', txGas.toString());
       let tx = await contract[method](...params, { ...sendPayload, gasLimit: txGas });
       context.emitter.emit(TX_SUBMITTED, { hash: tx.hash, baseUrl: chain.blockExplorerUrls[0] });
 
@@ -1405,7 +1425,6 @@ class Store {
         context.dispatcher.dispatch({ type: dispatchEvent, content: dispatchEventPayload });
       }
     } catch (error) {
-      console.log('error', error);
       if (!error.toString().includes('-32601')) {
         if (error.message) {
           return callback(error.message);
@@ -1483,16 +1502,8 @@ class Store {
 
     if (project.multichain && target.multichain) {
       let mirrorGate = new ethers.Contract(project.multichain.mirrorGateV3, MULTICHAIN_MIRROR_GATE_V3_ABI, provider.getSigner());
-      const fee = await estimateMultichainMirrorFee(project, target, account);
-      console.log('estimated fee: ', fee, fee.toString());
-      console.log('calling: ', mirrorGate, [
-        target.chainId,
-        target.multichain.mirrorGateV3,
-        [project.chainId],
-        [0],
-        [project.veTokenMetadata.userLockAmount.toString()],
-        [project.veTokenMetadata.userLockEnd.toString()],
-      ]);
+      const locks = project.mirrored_locks.filter((l) => l.chainId !== target.chainId);
+      const fee = await estimateMultichainMirrorFee(project, target, account, locks);
       await this._asyncCallContractWait(
         provider,
         mirrorGate,
@@ -1500,10 +1511,10 @@ class Store {
         [
           target.chainId,
           target.multichain.mirrorGateV3,
-          [project.chainId],
-          [0],
-          [project.veTokenMetadata.userLockAmount.toString()],
-          [project.veTokenMetadata.userLockEnd.toString()],
+          locks.map((l) => l.chainId),
+          locks.map((l) => l.escrowId),
+          locks.map((l) => l.lockAmount),
+          locks.map((l) => l.lockEnd),
         ],
         account,
         null,
@@ -1515,7 +1526,6 @@ class Store {
     } else if (project.layerZero && target.layerZero) {
       const mirrorGate = new ethers.Contract(project.layerZero.mirrorGate, LAYER_ZERO_MIRROR_GATE_ABI, provider.getSigner());
       const fee = await estimateMirrorFee(project, target, account);
-      console.log('estimated fee: ', fee, fee.toString());
       await this._asyncCallContractWait(
         provider,
         mirrorGate,
@@ -1602,7 +1612,7 @@ async function estimateMirrorFee(project, target, account) {
   return fee[0].nativeFee;
 }
 
-async function estimateMultichainMirrorFee(project, target, account) {
+async function estimateMultichainMirrorFee(project, target, account, locks) {
   const ethersProvider = await stores.accountStore.getEthersProvider();
   const ethcallProvider = new Provider();
   await ethcallProvider.init(ethersProvider);
@@ -1611,10 +1621,10 @@ async function estimateMultichainMirrorFee(project, target, account) {
   const call = mirrorGate.calculateFee(
     account.address,
     target.chainId,
-    [project.chainId],
-    [0],
-    [project.veTokenMetadata.userLockAmount],
-    [project.veTokenMetadata.userLockEnd],
+    locks.map((l) => l.chainId),
+    locks.map((l) => l.escrowId),
+    locks.map((l) => l.lockAmount),
+    locks.map((l) => l.lockEnd),
   );
 
   const fee = await ethcallProvider.all([call]);

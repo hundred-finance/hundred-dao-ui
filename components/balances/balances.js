@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
-import { Typography, Paper, TextField, InputAdornment, Grid } from '@material-ui/core';
+import { Typography, Paper } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 import classes from './balances.module.css';
-import BigNumber from 'bignumber.js';
 
-import stores from '../../stores/index.js';
-import { VAULTS_UPDATED, ETHERSCAN_URL, LEND_UPDATED, CONFIGURE_RETURNED } from '../../stores/constants';
-
-import { formatCurrency, formatAddress } from '../../utils';
+import { formatCurrency } from '../../utils';
 import moment from 'moment';
 
 const WEEK = 604800;
