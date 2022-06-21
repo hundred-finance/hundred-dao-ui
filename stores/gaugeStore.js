@@ -1425,6 +1425,8 @@ class Store {
         context.dispatcher.dispatch({ type: dispatchEvent, content: dispatchEventPayload });
       }
     } catch (error) {
+      console.log('transaction error: ', error);
+
       if (!error.toString().includes('-32601')) {
         if (error.message) {
           return callback(error.message);
@@ -1502,7 +1504,11 @@ class Store {
 
     if (project.multichain && target.multichain) {
       let mirrorGate = new ethers.Contract(project.multichain.mirrorGateV3, MULTICHAIN_MIRROR_GATE_V3_ABI, provider.getSigner());
-      const locks = project.mirrored_locks.filter((l) => l.chainId !== target.chainId);
+      let locks = project.mirrored_locks.filter((l) => l.chainId !== target.chainId && l.chainId !== project.chainId);
+      const currentChainLock = project.mirrored_locks.find((l) => l.chainId === project.chainId);
+      if (currentChainLock) {
+        locks = [currentChainLock, ...locks];
+      }
       const fee = await estimateMultichainMirrorFee(project, target, account, locks);
       await this._asyncCallContractWait(
         provider,
