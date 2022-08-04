@@ -115,7 +115,7 @@ function Projects({ changeTheme }) {
           <Paper elevation={1} className={classes.ChartContainer}>
             <Typography variant="h3">Current Vote weighting</Typography>
             <PieChart
-              data={project?.gauges.filter((g) => !g.isKilled)?.sort((a, b) => (a.currentEpochRelativeWeight > b.currentEpochRelativeWeight ? -1 : 1))}
+              data={project?.gauges?.filter((g) => !g.isKilled)?.sort((a, b) => (a.currentEpochRelativeWeight > b.currentEpochRelativeWeight ? -1 : 1))}
               dataKey={'currentEpochRelativeWeight'}
             />
           </Paper>

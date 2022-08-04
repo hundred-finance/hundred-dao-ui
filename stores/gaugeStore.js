@@ -1414,8 +1414,18 @@ class Store {
     let chain = NETWORKS_CONFIG.find((chain) => parseInt(chain.chainId) === chainId);
 
     try {
-      const txGas = await contract.estimateGas[method](...params, sendPayload);
-      let tx = await contract[method](...params, { ...sendPayload, gasLimit: txGas });
+      let txGas = 0;
+      try {
+        txGas = await contract.estimateGas[method](...params, sendPayload);
+      } catch (e) {
+        console.warn('Gas estimation failed, sending transaction without...');
+      }
+      let tx;
+      if (txGas) {
+        tx = await contract[method](...params, { ...sendPayload, gasLimit: txGas });
+      } else {
+        tx = await contract[method](...params, { ...sendPayload });
+      }
       context.emitter.emit(TX_SUBMITTED, { hash: tx.hash, baseUrl: chain.blockExplorerUrls[0] });
 
       let receipt = await tx.wait();
