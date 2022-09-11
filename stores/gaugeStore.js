@@ -87,7 +87,7 @@ class Store {
           layerZero: {
             mirrorGate: '0x3752F823A8E5BfE706203C87Fb5BbbD33b943F02',
             endpoint: '0x3c2269811836af69497E5F486A85D7316753cf62',
-            endpointId: 10,
+            endpointId: 110,
           },
           multichain: {
             mirrorGateV3: '0xba0649B1a51Ab1f0074E26Ba164b26EBF6e9a91e',
@@ -120,7 +120,7 @@ class Store {
           layerZero: {
             mirrorGate: '0xD7a8De0672131668be0366cF517DbD1c369cE200',
             endpoint: '0xb6319cC6c8c27A8F5dAF0dD3DF91EA35C4720dd7',
-            endpointId: 12,
+            endpointId: 112,
           },
           multichain: {
             mirrorGateV3: '0xA0c94183a74CF22dE491DcbB02fc7433267c6D32',
@@ -155,7 +155,7 @@ class Store {
           layerZero: {
             mirrorGate: '0xD7a8De0672131668be0366cF517DbD1c369cE200',
             endpoint: '0xb6319cC6c8c27A8F5dAF0dD3DF91EA35C4720dd7',
-            endpointId: 12,
+            endpointId: 112,
           },
           multichain: {
             mirrorGateV3: '0xA0c94183a74CF22dE491DcbB02fc7433267c6D32',
@@ -188,7 +188,7 @@ class Store {
           layerZero: {
             mirrorGate: '0xD7a8De0672131668be0366cF517DbD1c369cE200',
             endpoint: '0xb6319cC6c8c27A8F5dAF0dD3DF91EA35C4720dd7',
-            endpointId: 12,
+            endpointId: 112,
           },
           multichain: {
             mirrorGateV3: '0xA0c94183a74CF22dE491DcbB02fc7433267c6D32',
@@ -308,7 +308,7 @@ class Store {
           layerZero: {
             mirrorGate: '0x1cF3993EbA538e5f085333c86356622161Dd8C0B',
             endpoint: '0x3c2269811836af69497E5F486A85D7316753cf62',
-            endpointId: 11,
+            endpointId: 111,
           },
           multichain: {
             mirrorGateV3: '0x6c63287CC629417E96b77DD7184748Bb6536A4e2',
@@ -340,7 +340,7 @@ class Store {
           layerZero: {
             mirrorGate: '0x96a0eEa3a9cff74764b73A891c3b36a4F6B81181',
             endpoint: '0x3c2269811836af69497E5F486A85D7316753cf62',
-            endpointId: 9,
+            endpointId: 109,
           },
           multichain: {
             mirrorGateV3: '0xd33d15f91A25Ec74dd9224E71C5175BA9DC4e01D',
