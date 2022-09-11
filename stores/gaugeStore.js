@@ -677,7 +677,7 @@ class Store {
       gaugesWeights.push(data[0]);
       gaugesCurrentEpochRelativeWeights.push(data[1]);
       gaugesNextEpochRelativeWeights.push(data[2]);
-      gaugesLPTokens.push(data[3]);
+      gaugesLPTokens.push(data[3].toLowerCase());
     }
 
     let baamGaugeLpTokens = [...gaugesLPTokens];
@@ -692,13 +692,14 @@ class Store {
     }
 
     const lpCalls = [];
+    const ust = '0x376020c5b0ba3fd603d7722381faa06da8078d8a';
     gaugesLPTokens.forEach((lp, index) => {
       const gaugeUnderlying = project.isBaamGauges ? baamGaugeLpTokens[index * 2] : lp;
       const priceOracleMulticall = new Contract(lpPriceOracle(project, gaugeUnderlying), PRICE_ORACLE_ABI);
       if (project.nativeTokenGauges?.find((g) => g.toLowerCase() === gauges[index].toLowerCase()) === undefined) {
         const lpContract = new Contract(gaugeUnderlying, CTOKEN_ABI);
         lpCalls.push(
-          priceOracleMulticall.getUnderlyingPrice(gaugeUnderlying),
+          project.chainId === 1666600000 && ust === lp ? lpContract.balanceOf(ust) : priceOracleMulticall.getUnderlyingPrice(gaugeUnderlying),
           lpContract.exchangeRateStored(),
           lpContract.underlying(),
           lpContract.balanceOf(lp),
