@@ -50,6 +50,7 @@ import BigNumber from 'bignumber.js';
 import { PRICE_ORACLE_ABI } from './abis/HundredFinancePriceOracleABI';
 import { CTOKEN_ABI } from './abis/CtokenABI';
 import { REWARD_POLICY_MAKER_ABI } from './abis/RewardPolicyMaker';
+import { REWARD_POLICY_MAKER_V2_ABI } from './abis/RewardPolicyMakerV2';
 import { NETWORKS_CONFIG } from './connectors';
 import { Contract, Provider } from 'ethcall';
 import { ethers } from 'ethers';
@@ -95,6 +96,7 @@ class Store {
           isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: true,
+          isV5Gauge: false,
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -128,6 +130,7 @@ class Store {
           isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: false,
+          isV5Gauge: false,
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -163,6 +166,7 @@ class Store {
           isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: false,
+          isV5Gauge: false,
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -196,6 +200,7 @@ class Store {
           isBaamGauges: true,
           isV1Escrow: true,
           isV1Controller: false,
+          isV5Gauge: false,
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -223,6 +228,7 @@ class Store {
           isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: false,
+          isV5Gauge: false,
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -250,6 +256,7 @@ class Store {
           isBaamGauges: false,
           isV1Escrow: true,
           isV1Controller: false,
+          isV5Gauge: false,
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -284,6 +291,7 @@ class Store {
           isBaamGauges: false,
           isV1Escrow: false,
           isV1Controller: false,
+          isV5Gauge: false,
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -300,10 +308,11 @@ class Store {
           logo: '/optimism.png',
           url: '',
           chainId: 10,
-          gaugeProxyAddress: '0xBa57440fA35Fdb671E58F6F56c1A4447aB1f6C2B',
+          gaugeProxyAddress: '0x55Bba7755B77420d3d3C966440164F15a74F8696',
           mirroredVotingEscrow: '0xAc8204a9d79CA87D192ea98A9381600642A66a5F',
           votingEscrow: '0x1F8e8472e124F58b7F0D2598EaE3F4f482780b09',
-          rewardPolicyMaker: '0x3ffd03Ef31F6D5A6C517CEFA9CDf43efEBeE8399',
+          rewardPolicyMaker: '0x274E94f03AC51779D14bD45aF77C0e0e9d97cef9',
+          minter: '0xbE7CA18470B4AB61741bC2dcad50B1D4052b6b04',
           lpPriceOracle: '0x10010069DE6bD5408A6dEd075Cf6ae2498073c73',
           layerZero: {
             mirrorGate: '0x1cF3993EbA538e5f085333c86356622161Dd8C0B',
@@ -313,9 +322,11 @@ class Store {
           multichain: {
             mirrorGateV3: '0x6c63287CC629417E96b77DD7184748Bb6536A4e2',
           },
+          hnd: '0x10010078a54396F62c96dF8532dc2B4847d47ED3',
           isBaamGauges: false,
           isV1Escrow: false,
           isV1Controller: false,
+          isV5Gauge: true,
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -348,6 +359,7 @@ class Store {
           isBaamGauges: false,
           isV1Escrow: false,
           isV1Controller: false,
+          isV5Gauge: false,
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -380,6 +392,7 @@ class Store {
           isBaamGauges: true,
           isV1Escrow: false,
           isV1Controller: false,
+          isV5Gauge: false,
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -407,6 +420,7 @@ class Store {
           isBaamGauges: false,
           isV1Escrow: false,
           isV1Controller: false,
+          isV5Gauge: false,
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -434,6 +448,7 @@ class Store {
           isBaamGauges: true,
           isV1Escrow: false,
           isV1Controller: false,
+          isV5Gauge: false,
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -457,6 +472,7 @@ class Store {
           isBaamGauges: false,
           isV1Escrow: false,
           isV1Controller: false,
+          isV5Gauge: false,
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -480,6 +496,7 @@ class Store {
           isBaamGauges: true,
           isV1Escrow: false,
           isV1Controller: false,
+          isV5Gauge: false,
           gauges: [],
           vaults: [],
           tokenMetadata: {},
@@ -901,6 +918,7 @@ class Store {
     const veTokenContract = new Contract(project.votingEscrow, VOTING_ESCROW_ABI);
     const mirroredVeTokenContract = new Contract(mirroredVeTokenAddress, MIRRORED_VOTING_ESCROW_ABI);
     const rewardPolicyMakerContract = new Contract(project.rewardPolicyMaker, REWARD_POLICY_MAKER_ABI);
+    const rewardPolicyMakerV2Contract = new Contract(project.rewardPolicyMaker, REWARD_POLICY_MAKER_V2_ABI);
     const gaugeControllerContract = new Contract(project.gaugeProxyAddress, GAUGE_CONTROLLER_ABI);
     const gaugeControllerV2Contract = new Contract(project.gaugeProxyAddress, GAUGE_CONTROLLER_V2_ABI);
 
@@ -913,8 +931,8 @@ class Store {
       veTokenContract.totalSupply(),
       veTokenContract.locked(account.address),
       veTokenContract.supply(),
-      rewardPolicyMakerContract.rate_at(currentEpochTime()),
-      rewardPolicyMakerContract.rate_at(nextEpochTime()),
+      project.isV5Gauge ? rewardPolicyMakerV2Contract.rate_at(currentEpochTime(), project.hnd) : rewardPolicyMakerContract.rate_at(currentEpochTime()),
+      project.isV5Gauge ? rewardPolicyMakerV2Contract.rate_at(nextEpochTime(), project.hnd) : rewardPolicyMakerContract.rate_at(nextEpochTime()),
       veTokenContract.balanceOf(account.address),
     ];
 
