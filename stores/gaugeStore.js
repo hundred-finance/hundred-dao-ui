@@ -323,6 +323,8 @@ class Store {
             mirrorGateV3: '0x6c63287CC629417E96b77DD7184748Bb6536A4e2',
           },
           hnd: '0x10010078a54396F62c96dF8532dc2B4847d47ED3',
+          rewardToken: '0x4200000000000000000000000000000000000042',
+          rewardTokenGeckoId: 'optimism',
           isBaamGauges: false,
           isV1Escrow: false,
           isV1Controller: false,
@@ -633,6 +635,7 @@ class Store {
     }
 
     const hndPrice = await this._getHndPrice();
+    const rewardTokenPrice = await this._getPrice(project.rewardTokenGeckoId);
 
     const veTokenAddress = project.votingEscrow;
     const gaugeControllerMulticall = new Contract(project.gaugeProxyAddress, GAUGE_CONTROLLER_ABI);
@@ -824,6 +827,7 @@ class Store {
     project.veTokenMetadata = projectVeTokenMetadata;
     project.gauges = projectGauges;
     project.hndPrice = hndPrice;
+    project.rewardTokenPrice = rewardTokenPrice;
 
     callback(null, project);
   }
@@ -933,6 +937,12 @@ class Store {
       veTokenContract.supply(),
       project.isV5Gauge ? rewardPolicyMakerV2Contract.rate_at(currentEpochTime(), project.hnd) : rewardPolicyMakerContract.rate_at(currentEpochTime()),
       project.isV5Gauge ? rewardPolicyMakerV2Contract.rate_at(nextEpochTime(), project.hnd) : rewardPolicyMakerContract.rate_at(nextEpochTime()),
+      project.isV5Gauge
+        ? rewardPolicyMakerV2Contract.rate_at(currentEpochTime(), project.rewardToken || project.hnd)
+        : rewardPolicyMakerContract.rate_at(currentEpochTime()),
+      project.isV5Gauge
+        ? rewardPolicyMakerV2Contract.rate_at(nextEpochTime(), project.rewardToken || project.hnd)
+        : rewardPolicyMakerContract.rate_at(nextEpochTime()),
       veTokenContract.balanceOf(account.address),
     ];
 
@@ -978,9 +988,11 @@ class Store {
     const supply = data[7];
     const currentRewardRate = data[8];
     const nextEpochRewardRate = data[9];
-    const veTokenLocalBalance = data[10];
+    const currentTokenRewardRate = data[10];
+    const nextEpochTokenRewardRate = data[11];
+    const veTokenLocalBalance = data[12];
 
-    data.splice(0, 11);
+    data.splice(0, 13);
 
     const gaugesData = project.gauges.map(() => {
       const d = data.splice(0, 5);
@@ -1087,10 +1099,16 @@ class Store {
       let providedLiquidity = project.gauges[i].balance * project.gauges[i].lpToken.price;
 
       let totalRewards = (currentRewardRate * 365 * 24 * 3600 * project.hndPrice) / 1e18;
+      if (project.rewardToken) {
+        totalRewards += (currentTokenRewardRate * 365 * 24 * 3600 * project.rewardTokenPrice) / 1e18;
+      }
       let gaugeRewards = (totalRewards * project.gauges[i].currentEpochRelativeWeight) / 100;
       let rewards = gaugeRewards * project.gauges[i].liquidityShare;
 
       let nextEpochTotalRewards = (nextEpochRewardRate * 365 * 24 * 3600 * project.hndPrice) / 1e18;
+      if (project.rewardToken) {
+        nextEpochTotalRewards += (nextEpochTokenRewardRate * 365 * 24 * 3600 * project.rewardTokenPrice) / 1e18;
+      }
       let nextEpochGaugeRewards = (nextEpochTotalRewards * project.gauges[i].nextEpochRelativeWeight) / 100;
       let nextEpochRewards = nextEpochGaugeRewards * project.gauges[i].liquidityShare;
 
@@ -1473,8 +1491,15 @@ class Store {
   }
 
   async _getHndPrice() {
+    return this._getPrice('hundred-finance');
+  }
+
+  async _getPrice(id) {
+    if (!id) {
+      return 0;
+    }
     try {
-      const url = 'https://api.coingecko.com/api/v3/simple/price?ids=hundred-finance&vs_currencies=usd';
+      const url = `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`;
       const headers = {};
       const response = await fetch(url, {
         method: 'GET',
@@ -1482,9 +1507,9 @@ class Store {
         headers: headers,
       });
       const data = await response.json();
-      const hnd = data ? data['hundred-finance'] : null;
+      const price = data ? data[id] : null;
 
-      return hnd ? +hnd.usd : 0;
+      return price ? +price.usd : 0;
     } catch (err) {
       console.log(err);
     }
